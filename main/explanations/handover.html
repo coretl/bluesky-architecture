@@ -1,0 +1,1280 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Handover — validation architecture for Bluesky at DLS &#8212; bluesky-architecture 0.1.dev2+g8e98543f4 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=4a58b78f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/handover';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reference" href="../reference.html" />
+    <link rel="prev" title="2. Adopt python-copier-template for project structure" href="decisions/0002-switched-to-python-copier-template.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">bluesky-architecture</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/bluesky-architecture" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/bluesky-architecture" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="decisions.html">Architectural Decision Records</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Handover — validation architecture for Bluesky at DLS</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../explanations.html" class="nav-link">Explanations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Handover — validation architecture for Bluesky at DLS</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="handover-validation-architecture-for-bluesky-at-dls">
+<h1>Handover — validation architecture for Bluesky at DLS<a class="headerlink" href="#handover-validation-architecture-for-bluesky-at-dls" title="Link to this heading">#</a></h1>
+<p>Seed document for <code class="docutils literal notranslate"><span class="pre">coretl/bluesky-architecture</span></code>. Written across a web session that
+worked out the shape of insertion-time and runtime scan validation, then built a
+strawman (<code class="docutils literal notranslate"><span class="pre">strawman/</span></code>) to settle the two load-bearing unknowns.
+session that worked out the shape of insertion-time and runtime scan validation.
+Everything below is either decided, measured, or explicitly open.</p>
+<p>Read this before doing anything else in the repo. Where a decision has reasoning
+attached, the reasoning matters more than the conclusion — several conclusions in
+this conversation were reversed when an assumption turned out to be wrong.</p>
+<hr class="docutils" />
+<section id="pinned-references">
+<h2>Pinned references<a class="headerlink" href="#pinned-references" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Thing</p></th>
+<th class="head"><p>Version / SHA</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>blueapi</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">b767635920d1675bc4db58c6bbf80c29378aa3f7</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>bluesky-queueserver</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0a084cfb722308f384847c24e6a43a8f572f302e</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>scanspec <code class="docutils literal notranslate"><span class="pre">v2-dev</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">9a1d6364e09ce85788db0fa2839b638a143ba455</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>ophyd-async</p></td>
+<td><p>0.20.1</p></td>
+</tr>
+<tr class="row-even"><td><p>bluesky</p></td>
+<td><p>1.15.1</p></td>
+</tr>
+<tr class="row-odd"><td><p>diffcalc-core</p></td>
+<td><p>as on PyPI, July 2026</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Use these for permalinks so meeting attendees are looking at the same code.</p>
+</section>
+<hr class="docutils" />
+<section id="scope-note">
+<h2>Scope note<a class="headerlink" href="#scope-note" title="Link to this heading">#</a></h2>
+<p>The task as set was “add queueing to blueapi, plus validation”. What emerged is
+that <strong>the queue question and the validation question are nearly orthogonal</strong>.</p>
+<p>The validation endpoint does not require ADR-0003 (“No Queues”) to be superseded —
+a stateless dry-run endpoint is queue-free. And the substance of the design turned
+out to sit in ophyd-async and scanspec, not in blueapi.</p>
+<p>Worth communicating to whoever set the task: the piece with real design risk is
+not the one on the ticket.</p>
+</section>
+<hr class="docutils" />
+<section id="decisions-taken">
+<h2>Decisions taken<a class="headerlink" href="#decisions-taken" title="Link to this heading">#</a></h2>
+<section id="d1-validation-runs-in-a-second-read-only-subprocess">
+<h3>D1. Validation runs in a second, read-only subprocess<a class="headerlink" href="#d1-validation-runs-in-a-second-read-only-subprocess" title="Link to this heading">#</a></h3>
+<p>blueapi’s task worker runs one task at a time in the subprocess that holds the
+devices. Validation must work while a scan runs, so it needs its own process.</p>
+<p>Consequences:</p>
+<ul class="simple">
+<li><p>It sees <strong>live</strong> PVs, so mid-scan it sees a machine in flight. Insertion
+validation must therefore validate against the <em>projected end state</em> of the
+running task, not the instantaneous state.</p></li>
+<li><p>Interacts with blueapi <strong>ADR-0005</strong> (“connect all dodal devices during
+startup”). A second subprocess connecting everything doubles the CA footprint.
+Probably needs a device-subset concept, which blueapi does not have.</p></li>
+</ul>
+</section>
+<section id="d2-insertion-validation-is-a-solver-not-a-validator">
+<h3>D2. Insertion validation is a solver, not a validator<a class="headerlink" href="#d2-insertion-validation-is-a-solver-not-a-validator" title="Link to this heading">#</a></h3>
+<p>It does two things: coarse anti-collision against simplified models, and
+selection of a kinematic branch that works across the scan. It emits state that
+execution depends on. The verdict is a side effect.</p>
+</section>
+<section id="d3-the-certificate-has-two-parts">
+<h3>D3. The certificate has two parts<a class="headerlink" href="#d3-the-certificate-has-two-parts" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Choices</strong> — per-window branch/constraint assignment, covering only the
+choice-offering devices.</p></li>
+<li><p><strong>Preconditions</strong> — the assumed state of every device contributing to the
+collision model, including ones not participating in the scan.</p></li>
+</ul>
+<p>Preconditions give a mechanically-checkable invalidation rule. They need
+<em>monitoring</em>, not a single check at start — see the i19 optics-hutch case, where
+another hutch can move shared equipment mid-scan.</p>
+<p>Requires a declared <strong>collision scope</strong>: a beamline config artifact listing which
+devices participate. Without it the precondition set tends toward “every device
+on the beamline”.</p>
+</section>
+<section id="d4-the-certificate-is-a-recipe-not-a-result">
+<h3>D4. The certificate is a recipe, not a result<a class="headerlink" href="#d4-the-certificate-is-a-recipe-not-a-result" title="Link to this heading">#</a></h3>
+<p>Precomputing all joint positions works for step scans and fails for fly, for
+three independent reasons: size (an hour at 20 kHz is ~72M points × 6 axes),
+streaming (chunk N+1 is generated while N executes), and densification happening
+at runtime by construction.</p>
+<p>So the branch must reach runtime IK. It cannot be resolved away at insertion.</p>
+</section>
+<section id="d5-transform-stays-synchronous-both-directions">
+<h3>D5. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> stays synchronous, both directions<a class="headerlink" href="#d5-transform-stays-synchronous-both-directions" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Forward is forced.</strong> <code class="docutils literal notranslate"><span class="pre">raw_to_derived</span></code> is called from the monitor callback
+path (<code class="docutils literal notranslate"><span class="pre">_make_derived_readings</span></code>, <code class="docutils literal notranslate"><span class="pre">get_locations</span></code>). Async there means task
+scheduling, ordering and backpressure on every derived signal update.</p></li>
+<li><p><strong>Inverse is chosen.</strong> Once branch and constraints are fixed the inverse is
+believed closed-form (see O1). Sync enforces that <code class="docutils literal notranslate"><span class="pre">Transform</span></code> is pure maths:
+portable to analysis, cacheable, testable without hardware, runnable in a
+subprocess. Admitting I/O makes every downstream assumption conditional.</p></li>
+</ul>
+<p>These are two different decisions that look like one. If the inverse is
+revisited later, that should not drag the forward into the discussion.</p>
+</section>
+<section id="d6-transform-in-runstart-certificate-separate">
+<h3>D6. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> in RunStart; certificate separate<a class="headerlink" href="#d6-transform-in-runstart-certificate-separate" title="Link to this heading">#</a></h3>
+<p>Transform carries forward maths plus geometry parameters (UB, wavelength,
+offsets) — exactly what analysis needs. Branch is <strong>not</strong> a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> field,
+because the instance on the device is the one that gets serialised and branch
+must not reach analysis.</p>
+<p>Branch is an explicit argument at the inverse call site. The solver holds
+<code class="docutils literal notranslate"><span class="pre">(transform,</span> <span class="pre">branch)</span></code> as a pair.</p>
+</section>
+<section id="d7-transform-must-be-array-safe">
+<h3>D7. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> must be array-safe<a class="headerlink" href="#d7-transform-must-be-array-safe" title="Link to this heading">#</a></h3>
+<p>“Write the maths once, works for scalars or arrays” already holds via numpy
+broadcasting for simple transforms. It does <strong>not</strong> hold for diffcalc, whose
+Python API is scalar and loops internally.</p>
+<p>So a diffractometer’s forward transform should be <strong>the maths written directly in
+numpy</strong>, not a call into diffcalc. This means owning a second implementation —
+round-trip test against diffcalc as the oracle.</p>
+<p>Contract change is documentation + a property test (run every registered
+transform with scalars and with length-1 arrays, assert agreement), not API.</p>
+</section>
+<section id="d8-transform-needs-a-type-discriminator-and-probably-its-own-package">
+<h3>D8. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> needs a type discriminator, and probably its own package<a class="headerlink" href="#d8-transform-needs-a-type-discriminator-and-probably-its-own-package" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">model_dump_json()</span></code> currently gives <code class="docutils literal notranslate"><span class="pre">{&quot;distance&quot;:</span> <span class="pre">2.0}</span></code> with no type tag.
+Analysis receives JSON and must reconstruct the class. Fix: the
+<code class="docutils literal notranslate"><span class="pre">discriminated_union_of_subclasses</span></code> pattern scanspec already uses.</p>
+<p>Packaging: <code class="docutils literal notranslate"><span class="pre">Transform</span></code> lives in <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code>, so an analysis pipeline must
+install ophyd-async to convert angles to hkl. Argues for extraction into a small
+dependency-light package that both ophyd-async and analysis depend on — same
+shape as scanspec. Decide before transforms proliferate across dodal.</p>
+</section>
+<section id="d9-layered-transforms-not-merged">
+<h3>D9. Layered Transforms, not merged<a class="headerlink" href="#d9-layered-transforms-not-merged" title="Link to this heading">#</a></h3>
+<p>hkl→cartesian and cartesian→joint stay separate. The collision checker works in
+joint space and should not care that hkl was involved.</p>
+</section>
+<section id="d10-the-collision-model-consumes-raw-axis-values-not-transforms">
+<h3>D10. The collision model consumes raw axis values, not Transforms<a class="headerlink" href="#d10-the-collision-model-consumes-raw-axis-values-not-transforms" title="Link to this heading">#</a></h3>
+<p>Raw motors with no derived signals contribute geometry. So the model cannot be
+built from Transforms — it takes a vector of raw positions, places bodies in a
+common frame, and reports interference.</p>
+<p>A raw motor with no Transform is the base case; derived signals are what add
+something on top.</p>
+</section>
+<section id="d11-selection-is-machine-scoped-enumeration-is-device-scoped">
+<h3>D11. Selection is machine-scoped; enumeration is device-scoped<a class="headerlink" href="#d11-selection-is-machine-scoped-enumeration-is-device-scoped" title="Link to this heading">#</a></h3>
+<p>Each device can enumerate its own candidate branches. <strong>Choosing</strong> is a joint
+constraint-satisfaction problem across devices — two diffractometers give 8×8
+combinations per window, and a combination can work when neither device’s locally
+preferred choice does.</p>
+<p>Solver interface takes a window’s derived targets across all participating
+devices and returns a consistent assignment.</p>
+</section>
+<section id="d12-the-solver-hook-is-for-collision-constrained-devices-not-multi-valued-ones">
+<h3>D12. The solver hook is for collision-constrained devices, not multi-valued ones<a class="headerlink" href="#d12-the-solver-hook-is-for-collision-constrained-devices-not-multi-valued-ones" title="Link to this heading">#</a></h3>
+<p>A 2-jack system needs no branch selection but still needs anti-collision on its
+<code class="docutils literal notranslate"><span class="pre">set</span></code>. Defaulting the factory’s solver to <code class="docutils literal notranslate"><span class="pre">None</span></code> for single-valued devices would
+leave the hole open on exactly the devices you’d assume were safe.</p>
+<p><strong>Zero branches and no checking are different states.</strong> Use an explicit null
+solver that raises, not <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</section>
+<section id="d13-failure-taxonomy">
+<h3>D13. Failure taxonomy<a class="headerlink" href="#d13-failure-taxonomy" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Infeasible</strong> — collision involves only choice-free devices. No search helps.
+Report immediately; also a pruning strategy, since it’s cheap to check first.</p></li>
+<li><p><strong>Unsatisfiable</strong> — choices exist, no assignment works. Report after search,
+naming the window and the binding constraint.</p></li>
+</ul>
+</section>
+<section id="d14-prepare-per-window-for-both-step-and-fly">
+<h3>D14. <code class="docutils literal notranslate"><span class="pre">prepare</span></code> per window, for both step and fly<a class="headerlink" href="#d14-prepare-per-window-for-both-step-and-fly" title="Link to this heading">#</a></h3>
+<p>scanspec2’s <code class="docutils literal notranslate"><span class="pre">_step_windows</span></code> yields one Window per setpoint, so per-window branch
+is per-point branch for step scans, with no special case.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">scan</span><span class="p">:</span>
+    <span class="n">prepare</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">certificate</span><span class="p">[</span><span class="n">window</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">window</span><span class="o">.</span><span class="n">moving_axes</span><span class="p">:</span>  <span class="n">kickoff</span> <span class="o">/</span> <span class="n">complete</span>
+    <span class="k">else</span><span class="p">:</span>                   <span class="nb">set</span><span class="p">(</span><span class="n">hkl</span><span class="p">)</span> <span class="o">/</span> <span class="n">trigger</span> <span class="o">/</span> <span class="n">read</span>
+</pre></div>
+</div>
+<p>Rule: <code class="docutils literal notranslate"><span class="pre">set</span></code> with a prepared branch applies it and skips checking (the certificate
+already validated that point and the path to it). <code class="docutils literal notranslate"><span class="pre">set</span></code> without a prepared branch
+selects and checks now. <code class="docutils literal notranslate"><span class="pre">bps.mv(h,</span> <span class="pre">...)</span></code> is the second case and needs no special
+handling.</p>
+</section>
+<section id="d15-prepare-is-consumed-not-sticky">
+<h3>D15. <code class="docutils literal notranslate"><span class="pre">prepare</span></code> is consumed, not sticky<a class="headerlink" href="#d15-prepare-is-consumed-not-sticky" title="Link to this heading">#</a></h3>
+<p>Stale-branch hazard: prepare for window 7, something intervenes, <code class="docutils literal notranslate"><span class="pre">set</span></code> applies
+window 7’s branch at a different position. Fails silently by moving somewhere
+plausible and wrong.</p>
+<ul class="simple">
+<li><p>Certificate entries carry the hkl they were solved for; <code class="docutils literal notranslate"><span class="pre">set</span></code> asserts the
+request matches before applying, and raises on desync.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prepare</span></code> clears after one <code class="docutils literal notranslate"><span class="pre">set</span></code>, so an unprepared <code class="docutils literal notranslate"><span class="pre">set</span></code> always falls through
+to select-and-check.</p></li>
+</ul>
+</section>
+<section id="d16-devices-with-injected-solvers-are-not-standalone">
+<h3>D16. Devices with injected solvers are not standalone<a class="headerlink" href="#d16-devices-with-injected-solvers-are-not-standalone" title="Link to this heading">#</a></h3>
+<p>A diffractometer with a multi-valued inverse and collision constraints cannot be
+pure device code. Sim and unit tests inject a trivial solver; production injects
+the real one.</p>
+<p>This is a departure from how ophyd-async devices work today and should be an
+explicit decision, not an implementation detail. The forward path stays pure —
+monitor updates, analysis and descriptors are unaffected.</p>
+<p><strong>Loop hazard:</strong> the validation subprocess instantiates devices; if devices
+reference a solver, and the solver is what the subprocess exists to serve, that
+is a cycle. It needs devices for <em>state</em>, not for <em>setting</em>, so it injects a null
+solver that raises on any inverse call. Absence of a solver must raise, never
+fall back to unchecked motion.</p>
+</section>
+<section id="d17-scanspec2-is-the-trajectory-representation">
+<h3>D17. scanspec2 is the trajectory representation<a class="headerlink" href="#d17-scanspec2-is-the-trajectory-representation" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">WindowGenerator.setpoints(indexes:</span> <span class="pre">np.ndarray)</span> <span class="pre">-&gt;</span> <span class="pre">dict[axis,</span> <span class="pre">np.ndarray]</span></code>
+evaluates at arbitrary fractional indexes, so you densify to 20 kHz, validate
+that array, and push that same array. No second interpolator to disagree with.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Window</span></code> is “a contiguous stretch of motion during which detectors are
+triggered”, windows separated by turnarounds, <code class="docutils literal notranslate"><span class="pre">calculate_turnaround</span></code> externalised
+to the caller. Branch changes happen in turnarounds.</p>
+<p><strong>Turnaround trajectories are in joint space and need collision checking, and
+scanspec does not produce them.</strong> Easy to forget for exactly that reason.</p>
+</section>
+<section id="d18-the-simplified-collision-model-must-be-conservative">
+<h3>D18. The simplified collision model must be conservative<a class="headerlink" href="#d18-the-simplified-collision-model-must-be-conservative" title="Link to this heading">#</a></h3>
+<p>The two-tier scheme (simplified fast path, fine model on flagged points) is only
+sound if the simplified model never produces a false negative. So it must be a
+strict over-approximation.</p>
+<p>This reframes the fine model: <strong>it is a false-positive filter, not a safety net.</strong>
+It recovers scans the conservative model over-flags; it does not catch what the
+conservative model missed. Do not “unpad” the simplified model — that trades
+soundness for a smaller fallback rate.</p>
+<p>Padding decomposes into independent sources, and which apply differs by phase:</p>
+<ul class="simple">
+<li><p><strong>Sampling gap</strong> — dominates at 10 Hz insertion, ~zero at 20 kHz runtime. This
+is the only component that legitimately shrinks.</p></li>
+<li><p><strong>Following error</strong> — same at both phases, does not shrink with sample rate.</p></li>
+<li><p><strong>Geometric conservatism</strong> — bounding volumes are already larger than the real
+bodies. Free, and it is what makes the fallback sound.</p></li>
+</ul>
+</section>
+<section id="d19-no-diffractometer-maths-at-runtime-in-either-direction">
+<h3>D19. No diffractometer maths at runtime, in either direction<a class="headerlink" href="#d19-no-diffractometer-maths-at-runtime-in-either-direction" title="Link to this heading">#</a></h3>
+<p>Forward diffcalc at 83 µs/point is 830 ms for a 10k chunk — over budget on its
+own. The only transform runtime can afford is forward kinematics, to place
+geometry.</p>
+</section>
+<section id="d20-vectorisation-is-mandatory-on-the-runtime-path">
+<h3>D20. Vectorisation is mandatory on the runtime path<a class="headerlink" href="#d20-vectorisation-is-mandatory-on-the-runtime-path" title="Link to this heading">#</a></h3>
+<p>Not an optimisation. A per-point callable API is disqualified — see M2.</p>
+</section>
+<section id="d21-anti-collision-here-is-soft-machine-protection-not-a-safety-function">
+<h3>D21. Anti-collision here is soft machine protection, not a safety function<a class="headerlink" href="#d21-anti-collision-here-is-soft-machine-protection-not-a-safety-function" title="Link to this heading">#</a></h3>
+<p>Catastrophic cases are guarded at the robot level and by door interlocks. This
+layer handles constraints too dynamic to guard there (e.g. detector must be 20 mm
+from sample, entry points within a 90° arc).</p>
+<p>State this in the ADR in these words. It determines whether independence of
+implementation is required, and it is the claim most likely to be quietly
+misunderstood by someone joining later.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="measurements">
+<h2>Measurements<a class="headerlink" href="#measurements" title="Link to this heading">#</a></h2>
+<p>All taken in a container against synthetic setups. Good for order of magnitude,
+<strong>not</strong> valid as design inputs for a real beamline. Re-measure on real geometry
+before sizing anything.</p>
+<section id="m1-diffcalc-si-lattice-identity-u">
+<h3>M1 — diffcalc (Si lattice, identity U)<a class="headerlink" href="#m1-diffcalc-si-lattice-identity-u" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Operation</p></th>
+<th class="head"><p>Cost</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_hkl</span></code> (angles → hkl)</p></td>
+<td><p>83 µs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">get_position</span></code> (hkl → angles)</p></td>
+<td><p>4162 µs, <strong>8 solutions</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HklCalculation</span></code> construction</p></td>
+<td><p>51 µs</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>~50× asymmetry, and it falls along the line that matters. The ~520 µs per
+solution is largely Python object overhead, which is the evidence behind O1.</p>
+<p>Note <code class="docutils literal notranslate"><span class="pre">_make_transform_from_readings</span></code> rebuilds the Transform on every reading, so
+the monitor path currently pays 51 µs + 83 µs. Caching the instance while its
+parameter readings are unchanged is a cheap win.</p>
+</section>
+<section id="m2-vectorised-vs-per-point-6-dof-chain-10-bodies-vs-8-obstacles">
+<h3>M2 — vectorised vs per-point, 6-DOF chain + 10 bodies vs 8 obstacles<a class="headerlink" href="#m2-vectorised-vs-per-point-6-dof-chain-10-bodies-vs-8-obstacles" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>10,000 points</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>vectorised FK</p></td>
+<td><p>20 ms</p></td>
+</tr>
+<tr class="row-odd"><td><p>vectorised collision</p></td>
+<td><p>71 ms</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>total</strong></p></td>
+<td><p><strong>92 ms</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>per-point Python loop</p></td>
+<td><p><strong>673 ms</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Budget is ~500 ms per chunk (1 Hz chunking). Vectorised fits in a fifth of it;
+per-point is over budget with a <em>toy</em> model. A realistic simplified model at ~30
+capsules vs ~20 obstacles is ~600 pairs rather than 80, so roughly 7× — around
+500 ms, right at the limit. That is the horizontal-scaling justification.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="strawman-results">
+<h2>Strawman results<a class="headerlink" href="#strawman-results" title="Link to this heading">#</a></h2>
+<p>Code in <code class="docutils literal notranslate"><span class="pre">strawman/</span></code>. 24 tests, all passing. Built specifically to settle O1 and
+O2; both are now answered, and the answer to O2 changes the architecture.</p>
+<section id="m3-o1-is-answered-the-branch-fixed-inverse-is-closed-form">
+<h3>M3 — O1 is answered: the branch-fixed inverse is closed-form<a class="headerlink" href="#m3-o1-is-answered-the-branch-fixed-inverse-is-closed-form" title="Link to this heading">#</a></h3>
+<p>Three independent lines of evidence:</p>
+<ol class="arabic simple">
+<li><p><strong>diffcalc contains no numerical root-finding in the inverse.</strong> The only
+<code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code> use in the entire package is <code class="docutils literal notranslate"><span class="pre">ub/fitting.py</span></code> — UB matrix
+refinement, not hkl→angles. So the 4.2 ms is Python object overhead and
+enumeration, not iteration.</p></li>
+<li><p><strong>A closed-form inverse was written and round-trips to 1e-15</strong> over 496
+reflections, for all four branches, in bisecting mode.</p></li>
+<li><p><strong>Cost is flat per point</strong> — 0.101 µs/point at both 10k and 100k points.
+Iteration would not do that. There is a test asserting this property.</p></li>
+</ol>
+<p>The branch structure turned out to be two independent binary sign choices:
+<code class="docutils literal notranslate"><span class="pre">delta_sign</span></code> and <code class="docutils literal notranslate"><span class="pre">chi_flip</span></code>. Note that <strong><code class="docutils literal notranslate"><span class="pre">delta_sign</span></code> changes the chi/phi solve</strong>,
+not just the sign of delta — the scattering vector points along −x in the eta
+frame rather than +x. Getting this wrong produced two branches that silently
+failed to round-trip; the property test caught it.</p>
+</section>
+<section id="m4-o2-is-answered-and-the-answer-is-not-what-was-expected">
+<h3>M4 — O2 is answered, and the answer is not what was expected<a class="headerlink" href="#m4-o2-is-answered-and-the-answer-is-not-what-was-expected" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>operation</p></th>
+<th class="head"><p>10,000-point chunk</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>branch-fixed inverse, vectorised</p></td>
+<td><p><strong>1.0 ms</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>diffcalc scalar inverse, same work</p></td>
+<td><p>41,600 ms</p></td>
+</tr>
+<tr class="row-even"><td><p>forward, vectorised</p></td>
+<td><p>5.9 ms</p></td>
+</tr>
+<tr class="row-odd"><td><p>full chunk: IK + simple collision (6 bodies)</p></td>
+<td><p><strong>12.2 ms</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>whole-scan insertion, 1-hour scan &#64;10 Hz (36k pts)</p></td>
+<td><p>44 ms</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Kinematics is not the constraint.</strong> A 41,000× speedup over the scalar path
+puts IK at 0.2% of the 500 ms chunk budget.</p>
+</section>
+<section id="m5-collision-checking-is-the-binding-constraint-and-it-is-o-n2">
+<h3>M5 — collision checking is the binding constraint, and it is O(n²)<a class="headerlink" href="#m5-collision-checking-is-the-binding-constraint-and-it-is-o-n2" title="Link to this heading">#</a></h3>
+<p>Best-of-7 timings, 2,000 points, extrapolated to a 10k chunk:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>pairs</p></th>
+<th class="head"><p>est. per 10k chunk</p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>100</p></td>
+<td><p>46 ms</p></td>
+<td><p>fits</p></td>
+</tr>
+<tr class="row-odd"><td><p>300</p></td>
+<td><p>137 ms</p></td>
+<td><p>fits</p></td>
+</tr>
+<tr class="row-even"><td><p>600</p></td>
+<td><p>274 ms</p></td>
+<td><p>fits</p></td>
+</tr>
+<tr class="row-odd"><td><p>1000</p></td>
+<td><p>457 ms</p></td>
+<td><p>at the limit</p></td>
+</tr>
+<tr class="row-even"><td><p>3000</p></td>
+<td><p>1371 ms</p></td>
+<td><p>over</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>In-process crossover is ~1000 pairs, roughly 47 bodies, with naive
+all-pairs.</strong> A two-level broad-phase sketch gave 4–8×, which would move the
+crossover to ~4000–8000 pairs. That sketch is <em>unsound</em> — it skips intra-group
+pairs — and was written only to size the speedup.</p>
+<p>⚠️ Container timings for collision varied up to 5× between runs and one
+configuration was OOM-killed. Best-of-7 figures are reported. The IK numbers were
+stable and repeatable; the collision numbers should be treated as
+order-of-magnitude only.</p>
+</section>
+<section id="what-this-changes">
+<h3>What this changes<a class="headerlink" href="#what-this-changes" title="Link to this heading">#</a></h3>
+<p><strong>The external multi-process/multi-machine compute service may not be needed.</strong>
+That was assumed from diffcalc’s 4.2 ms, which turned out to be the wrong number
+to design against. If it is not needed, the following all disappear:</p>
+<ul class="simple">
+<li><p>fail-closed-on-timeout semantics in a machine-protection path</p></li>
+<li><p>backpressure design and its coupling to scan rate</p></li>
+<li><p>latency budget decomposition (O8)</p></li>
+<li><p>an availability dependency where the validator being down stops flyscans</p></li>
+</ul>
+<p>That is a large simplification, and it now hinges on a single number nobody has
+measured: <strong>how many bodies are in a real DLS beamline collision model</strong> (O12).</p>
+</section>
+<section id="bugs-the-property-tests-found">
+<h3>Bugs the property tests found<a class="headerlink" href="#bugs-the-property-tests-found" title="Link to this heading">#</a></h3>
+<p>Both were in code written while designing this, and both would have shipped:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">delta_sign=-1</span></code> branches did not round-trip — the chi/phi solve needs to
+change with the sign, which was not obvious from the derivation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TwoJackTransform.derived_to_raw</span></code> had a malformed dict merge that no test
+reached until a round-trip test was added for the single-valued case.</p></li>
+</ol>
+<p><strong>Strong argument for making round-trip a framework-level property test</strong> over
+every registered transform (D7), rather than something each implementer
+remembers to write.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="open-questions">
+<h2>Open questions<a class="headerlink" href="#open-questions" title="Link to this heading">#</a></h2>
+<p><strong>O1. ~~Is the branch-fixed inverse closed-form?~~ ANSWERED — yes.</strong> See M3.
+D5, D6 and the solver split stand. Caveat: demonstrated for bisecting mode on a
+six-circle. Other constraint modes are analytic in diffcalc too (no root-finding
+anywhere), but each needs its own closed form written and tested.</p>
+<p><strong>O2. ~~Timing of the vectorised branch-fixed inverse?~~ ANSWERED — 1.0 ms per
+10k-point chunk.</strong> See M4. Kinematics is a non-issue. The question has moved to
+O12.</p>
+<p><strong>O12. How many bodies are in a real beamline collision model?</strong> <em>This is now the
+number that decides the architecture.</em> Under ~47 bodies (naive) or ~100 bodies
+(with a sound broad phase), everything runs in-process and a large amount of
+distributed-systems design evaporates. Above that, the scaled service returns.
+Nobody has measured it. It is probably a morning’s work with whoever owns the CAD
+models.</p>
+<p><strong>O13. Sound broad-phase implementation.</strong> The 4–8× sketch skips intra-group
+pairs and must not be used. A correct hierarchical or spatial-hash broad phase is
+standard practice and is the lever that moves O12’s threshold — more optimisation
+effort, not more machines.</p>
+<p><strong>O14. Constraint set as a Transform field.</strong> The strawman hardcodes bisecting
+mode. Production needs the constraint set carried as a field with dispatch to the
+right closed form. Note this <em>is</em> legitimately Transform state (it changes the
+mapping) whereas branch is not (it selects among solutions of a fixed mapping) —
+a distinction worth stating carefully, because they look alike.</p>
+<p><strong>O15. Branch count is mode-dependent.</strong> diffcalc returned 8 solutions for
+<code class="docutils literal notranslate"><span class="pre">{qaz:90,</span> <span class="pre">a_eq_b:True,</span> <span class="pre">mu:0}</span></code>; bisecting mode has 4. Combination growth in the
+machine-scoped solver (D11) depends on this: two devices at 8 branches each is 64
+per window, three is 512. The strawman caps combinations at 256 and raises.</p>
+<p><strong>O3. Raw motors in collision scope have no <code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code></strong>, so there is
+nowhere to inject a solver. <code class="docutils literal notranslate"><span class="pre">bps.mv(raw_motor,</span> <span class="pre">x)</span></code> inside the collision scope
+gets no checking.</p>
+<p>Two mechanisms, and you want one, not both:</p>
+<ul class="simple">
+<li><p>Per-device injection — invasive, easy to miss one.</p></li>
+<li><p>Plan-level <code class="docutils literal notranslate"><span class="pre">Msg('set')</span></code> preprocessor — uniform across raw and derived, and the
+bluesky-native idiom. But a derived <code class="docutils literal notranslate"><span class="pre">set</span></code> decomposes into raw sets <em>inside</em>
+<code class="docutils literal notranslate"><span class="pre">set_derived</span></code>, below the Msg layer, so the preprocessor sees the hkl target and
+must project it through the transform, which is the solver’s job again.</p></li>
+</ul>
+<p>Settle on the strawman, not the whiteboard.</p>
+<p><strong>O4. Does deferred move on the PMAC give coordinated <em>finish</em>, not just
+synchronised start?</strong> The straight-line-in-joint-space model requires axes to
+start and stop together. If each axis runs at its own velocity, fast axes arrive
+early and the path has corners in exactly the region being checked. State the
+answer explicitly in the ADR — it is too obvious to mention and therefore
+survives review unexamined.</p>
+<p><strong>O5. <code class="docutils literal notranslate"><span class="pre">prepare</span></code>-per-point overhead in step scans.</strong> One extra Msg per point. Free
+in wall-clock terms but it means the diffractometer participates in every step,
+which affects whether a plain <code class="docutils literal notranslate"><span class="pre">scan()</span></code> can be used unmodified.</p>
+<p><strong>O6. Fallback budget cap.</strong> If the simplified model flags 200 points and the
+fine check is 5 ms each, that is a second of unbudgeted work. Needs a hard cap
+plus defined behaviour on exceeding it — almost certainly “treat as collision and
+pause”. Without a cap, 500 ms is a best case rather than a bound.</p>
+<p><strong>O7. Chunk lookahead vs deceleration.</strong> At 1 Hz chunking you validate chunk N+1
+while executing N. If N+1 fails you must stop within what remains of N. Couples
+chunk duration to deceleration time; a lookahead requirement, not a padding one.</p>
+<p><strong>O8. Latency budget decomposition.</strong> 500 ms = RTT + queueing + transform +
+collision + margin. Numbers against each before committing to a mesh resolution.</p>
+<p><strong>O9. Collision scope declaration</strong> — format and ownership of the beamline config
+listing participating devices.</p>
+<p><strong>O10. Where <code class="docutils literal notranslate"><span class="pre">Transform</span></code> lives</strong> — ophyd-async vs standalone package (D8).</p>
+<p><strong>O11. Does <code class="docutils literal notranslate"><span class="pre">bps.mv(hkl,</span> <span class="pre">...)</span></code> stay?</strong> Confirmed required and must be
+collision-checked, which D14 handles. But it moves to opaque joint values under
+the hood; consider whether a plan stub carrying both intent and precomputed
+values is wanted for readability and debugging.</p>
+</section>
+<hr class="docutils" />
+<section id="corrections-made-during-the-conversation">
+<h2>Corrections made during the conversation<a class="headerlink" href="#corrections-made-during-the-conversation" title="Link to this heading">#</a></h2>
+<p>Recorded because each was argued confidently and then reversed on a fact from
+Tom. Anyone extending this should assume the same failure mode.</p>
+<ol class="arabic simple">
+<li><p><strong>“For a flyscan the chunk deadline is milliseconds.”</strong> Wrong. Chunking is at
+most 1 Hz, so ~500 ms. This was the load-bearing premise for “shared library,
+not a service”, and that conclusion collapsed with it.</p></li>
+<li><p><strong>“<code class="docutils literal notranslate"><span class="pre">derived_to_raw</span></code> is never called.”</strong> Wrong — called in
+<code class="docutils literal notranslate"><span class="pre">sim/_mirror_vertical.py:71</span></code> and <code class="docutils literal notranslate"><span class="pre">_mirror_horizontal.py:39</span></code>, inside
+user-supplied <code class="docutils literal notranslate"><span class="pre">set_derived</span></code>. Only the <em>backend</em> does not call it.</p></li>
+<li><p><strong>“Analysis needs sync because async needs an event loop.”</strong> Wrong — analysis
+needs <code class="docutils literal notranslate"><span class="pre">raw_to_derived</span></code> (forward), which was already sync for monitor-path
+reasons. Said nothing about the inverse. D5’s inverse half rests on purity,
+not on this.</p></li>
+<li><p><strong>“The certificate carries all positions.”</strong> True for step scans, false for
+fly. Overgeneralised from one case.</p></li>
+<li><p><strong>“The branch never needs to reach the Transform.”</strong> Same error — a step-scan
+argument presented as general.</p></li>
+<li><p><strong>“4.2 ms per inverse means you need a scaled external service.”</strong> The 4.2 ms
+was diffcalc’s <em>general</em> solve — enumerating 8 solutions with per-call Python
+object overhead. The branch-fixed vectorised inverse is 0.101 µs/point, 41,000×
+faster, and the whole external-service argument rested on measuring the wrong
+thing. Collision checking, which nobody had measured, turned out to be the
+binding constraint. See M4/M5.</p></li>
+</ol>
+<p>The pattern in all six: a number or an API shape assumed rather than checked,
+then used as a premise. The strawman exists because reasoning was not settling
+these; forty lines of code did.</p>
+</section>
+<hr class="docutils" />
+<section id="proposed-adrs">
+<h2>Proposed ADRs<a class="headerlink" href="#proposed-adrs" title="Link to this heading">#</a></h2>
+<p>Two classes. <strong>System ADRs</strong> are cross-cutting and live in this repo
+permanently. <strong>Component ADRs</strong> are destined for blueapi — draft them at the path
+and number they will eventually occupy, in blueapi’s Nygard template, with
+<code class="docutils literal notranslate"><span class="pre">Status:</span> <span class="pre">Proposed</span></code>, so landing them later is a file move. blueapi’s sequence ends
+at 0006, so start at 0007.</p>
+<p>System:</p>
+<ul class="simple">
+<li><p>Anti-collision is soft machine protection, not a safety function (D21)</p></li>
+<li><p>Validation requires device objects (the premise correction — <code class="docutils literal notranslate"><span class="pre">check_limits_async</span></code>
+iterates the real generator against real device objects; no serialised
+representation substitutes)</p></li>
+<li><p>Certificate structure: choices, preconditions, recipe-not-result (D3, D4)</p></li>
+<li><p>Transform/Solver split and the sync/async boundary (D5, D11, D12)</p></li>
+<li><p>Simplified model must be conservative; fine model is a false-positive filter
+(D18)</p></li>
+</ul>
+<p>Staged for blueapi (<code class="docutils literal notranslate"><span class="pre">staged/blueapi/docs/explanations/decisions/</span></code>):</p>
+<ul class="simple">
+<li><p>0007 — plan dry-run endpoint</p></li>
+<li><p>0008 — validation subprocess and device subset (D1, and the ADR-0005
+interaction)</p></li>
+</ul>
+<p>Also needed but with no ADR tradition to land in: the ophyd-async changes (D5–D8,
+D16). These stay system ADRs here and become design proposals or issues later.</p>
+</section>
+<hr class="docutils" />
+<section id="suggested-order-of-work">
+<h2>Suggested order of work<a class="headerlink" href="#suggested-order-of-work" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Measure O12</strong> — the body count of a real beamline collision model. It is
+now the only thing standing between you and knowing whether this is a
+single-process design or a distributed one, and it is probably a morning’s
+work. Everything else is cheaper to decide once you know.</p></li>
+<li><p><strong>Write the ADRs.</strong> Most are a page, and the strawman has now supplied
+evidence for the two that were previously speculative. This conversation
+plus <code class="docutils literal notranslate"><span class="pre">strawman/</span></code> is the only record.</p></li>
+<li><p><strong>Port the round-trip property test into ophyd-async.</strong> It found two real
+bugs in a few hundred lines of carefully-written code. It is cheap, it is
+framework-level, and it will immediately reveal which existing transforms
+were only ever written in one direction.</p></li>
+<li><p><strong>Traces of blueapi and bluesky-queueserver</strong>, still not built. Mermaid
+sequence diagrams in identical notation, process boundaries marked,
+permalinked to the pinned SHAs, plus a capability comparison table. These are
+for other people’s benefit — do them before the wider meetings, after the
+strawman.</p></li>
+<li><p><strong>Phase 0 reconciliation with <code class="docutils literal notranslate"><span class="pre">DiamondLightSource/daq-queuing-service</span></code></strong>,
+raised at the start and still not done. It is an existing DLS queue-in-front-
+of-blueapi service with per-beamline “converters”, ~99 commits, 21 open
+issues. Either it is the starting point for the queue work or there is a
+reasoned statement of why not.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="context-that-has-not-been-actioned">
+<h2>Context that has not been actioned<a class="headerlink" href="#context-that-has-not-been-actioned" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>blueapi ADR-0003 “No Queues”</strong> (2023-05-22, Accepted) says queueing is
+another service’s responsibility and the API must be kept queue-free. Likely to
+be superseded, but the validation endpoint does not depend on it. Do not couple
+them.</p></li>
+<li><p><strong>bluesky-queueserver already validates twice</strong> — at submission and immediately
+before execution. But validation is signature/type/permission checking driven
+from <code class="docutils literal notranslate"><span class="pre">existing_plans_and_devices.yaml</span></code>, deliberately namespace-free so queue
+operations work before the environment is open. The hooks exist; the
+device-aware world model does not.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manager.py</span></code> is 4,041 lines and <code class="docutils literal notranslate"><span class="pre">profile_ops.py</span></code> is 4,206 — largely the
+machinery for reconstructing plan signatures without the worker namespace. That
+is the price of a namespace-free validator, and the quantitative form of the
+“unwieldy” claim.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="decisions/0002-switched-to-python-copier-template.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">2. Adopt python-copier-template for project structure</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../reference.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pinned-references">Pinned references</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scope-note">Scope note</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decisions-taken">Decisions taken</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d1-validation-runs-in-a-second-read-only-subprocess">D1. Validation runs in a second, read-only subprocess</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d2-insertion-validation-is-a-solver-not-a-validator">D2. Insertion validation is a solver, not a validator</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d3-the-certificate-has-two-parts">D3. The certificate has two parts</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d4-the-certificate-is-a-recipe-not-a-result">D4. The certificate is a recipe, not a result</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d5-transform-stays-synchronous-both-directions">D5. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> stays synchronous, both directions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d6-transform-in-runstart-certificate-separate">D6. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> in RunStart; certificate separate</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d7-transform-must-be-array-safe">D7. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> must be array-safe</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d8-transform-needs-a-type-discriminator-and-probably-its-own-package">D8. <code class="docutils literal notranslate"><span class="pre">Transform</span></code> needs a type discriminator, and probably its own package</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d9-layered-transforms-not-merged">D9. Layered Transforms, not merged</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d10-the-collision-model-consumes-raw-axis-values-not-transforms">D10. The collision model consumes raw axis values, not Transforms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d11-selection-is-machine-scoped-enumeration-is-device-scoped">D11. Selection is machine-scoped; enumeration is device-scoped</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d12-the-solver-hook-is-for-collision-constrained-devices-not-multi-valued-ones">D12. The solver hook is for collision-constrained devices, not multi-valued ones</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d13-failure-taxonomy">D13. Failure taxonomy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d14-prepare-per-window-for-both-step-and-fly">D14. <code class="docutils literal notranslate"><span class="pre">prepare</span></code> per window, for both step and fly</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d15-prepare-is-consumed-not-sticky">D15. <code class="docutils literal notranslate"><span class="pre">prepare</span></code> is consumed, not sticky</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d16-devices-with-injected-solvers-are-not-standalone">D16. Devices with injected solvers are not standalone</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d17-scanspec2-is-the-trajectory-representation">D17. scanspec2 is the trajectory representation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d18-the-simplified-collision-model-must-be-conservative">D18. The simplified collision model must be conservative</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d19-no-diffractometer-maths-at-runtime-in-either-direction">D19. No diffractometer maths at runtime, in either direction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d20-vectorisation-is-mandatory-on-the-runtime-path">D20. Vectorisation is mandatory on the runtime path</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d21-anti-collision-here-is-soft-machine-protection-not-a-safety-function">D21. Anti-collision here is soft machine protection, not a safety function</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measurements">Measurements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#m1-diffcalc-si-lattice-identity-u">M1 — diffcalc (Si lattice, identity U)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#m2-vectorised-vs-per-point-6-dof-chain-10-bodies-vs-8-obstacles">M2 — vectorised vs per-point, 6-DOF chain + 10 bodies vs 8 obstacles</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#strawman-results">Strawman results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#m3-o1-is-answered-the-branch-fixed-inverse-is-closed-form">M3 — O1 is answered: the branch-fixed inverse is closed-form</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#m4-o2-is-answered-and-the-answer-is-not-what-was-expected">M4 — O2 is answered, and the answer is not what was expected</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#m5-collision-checking-is-the-binding-constraint-and-it-is-o-n2">M5 — collision checking is the binding constraint, and it is O(n²)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-changes">What this changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bugs-the-property-tests-found">Bugs the property tests found</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#open-questions">Open questions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corrections-made-during-the-conversation">Corrections made during the conversation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proposed-adrs">Proposed ADRs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#suggested-order-of-work">Suggested order of work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-that-has-not-been-actioned">Context that has not been actioned</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/handover.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/explanations/handover.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
