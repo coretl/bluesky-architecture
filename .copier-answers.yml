@@ -1,0 +1,17 @@
+# Changes here will be overwritten by Copier
+_commit: 5.3.0
+_src_path: /workspaces/python-copier-template
+author_email: tom.cobb@diamond.ac.uk
+author_name: Tom Cobb
+description: 'Validation architecture for Bluesky at Diamond: insertion-time and runtime
+    scan validation'
+distribution_name: bluesky-architecture
+docker: false
+docs_type: sphinx
+git_platform: github.com
+github_org: coretl
+package_name: bluesky_architecture
+pypi: false
+repo_name: bluesky-architecture
+strict_typing: true
+type_checker: pyright
