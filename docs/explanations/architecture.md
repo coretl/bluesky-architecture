@@ -32,9 +32,9 @@ flowchart TB
     GUI["Mapping GUI"]
     Script -- "insert and wait" --> Q
     GUI -- "insert" --> Q
-    Q{{"Queue<br/>a verdict per entry<br/>✓ &nbsp; ✗ &nbsp; ⏳ &nbsp; ?"}}
+    Q{{"Queue<br/>a verdict per entry<br/>⏳ &nbsp; ✓ &nbsp; ✗ &nbsp; ?"}}
 
-    Q -- "scan to validate<br/>↑ ✓/✗ + certificate" --> VS
+    Q -- "scan to validate<br/>↑ ⏳ / ✓ / ✗ / ? + certificate" --> VS
     Q -- "task + certificate<br/>↑ abort on failure" --> ES
 
     subgraph BA ["blueapi"]
@@ -65,10 +65,15 @@ Holds scans with a validation verdict per entry. Four states, not two:
 
 | state | meaning |
 |---|---|
+| ⏳ | queued for validation, or being validated |
 | ✓ | validated — will probably run |
 | ✗ | validation failed |
-| ⏳ | queued for validation; not checked yet, because validation is asynchronous |
 | ? | not validatable — the plan is adaptive and cannot be listified in advance |
+
+⏳ comes first because it is where every entry starts. The validator resolves it
+to one of the other three: it can return ✓ or ✗, it can discover that a plan
+cannot be listified and return ?, and it can return ⏳ again when it has taken
+the work but not finished it.
 
 Verdicts are **applied after insertion** and **revoked when control leaves the
 queue** — if anyone moves the beamline outside the queue, every tick disappears

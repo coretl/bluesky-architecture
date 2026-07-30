@@ -20,8 +20,10 @@ Validation verdicts are held on queue entries. The queue is the authority on
 whether the beamline is under its control, and therefore on whether a verdict is
 still meaningful.
 
-An entry has one of four states, not two: validated (✓), failed (✗), queued for
-validation (⏳), and not validatable (?).
+An entry has one of four states, not two: queued or in progress (⏳), validated
+(✓), failed (✗), and not validatable (?). Every entry starts at ⏳; the
+validator resolves it to one of the other three, or leaves it at ⏳ while it
+works.
 
 ## Consequences
 
