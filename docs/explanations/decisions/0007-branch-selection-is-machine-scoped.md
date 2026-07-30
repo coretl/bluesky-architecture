@@ -25,20 +25,26 @@ The null case is an explicit solver that raises, never `None`.
 
 ## Consequences
 
-Devices with injected solvers are not standalone. Sim and unit tests inject a
-trivial solver; production injects the real one. This is a departure from how
-ophyd-async devices work today and should be an explicit decision rather than an
-implementation detail. The forward path stays pure, so monitor updates, analysis
-and descriptors are unaffected.
+> **Amended by ADR-0011.** This originally required a solver to be *injected
+> into each device*, and noted that this made devices non-standalone — a
+> departure from how ophyd-async works. That is no longer the mechanism.
+> Selection happens in a plan preprocessor and the chosen branch reaches the
+> device wrapped around the value it applies to, so devices receive a branch
+> rather than owning a solver and stay standalone. The claim below that
+> selection is machine-scoped is unchanged and is now structural: the message
+> layer is the only place the whole machine is visible.
+
+The forward path stays pure regardless, so monitor updates, analysis and
+descriptors are unaffected.
 
 `None` would conflate "single-valued, nothing to choose" with "must not move" —
 two states with opposite required behaviour, where getting it wrong means an
 unchecked move. Hence the explicit null solver.
 
-There is a loop hazard: the validation process instantiates devices, and if
-devices reference a solver, and the solver is what the process exists to serve,
-that is a cycle. It is broken by the validator injecting the null solver, since
-it needs devices for state rather than for setting.
+The loop hazard that motivated a null solver — the validation process
+instantiates devices, which reference a solver, which is what the process exists
+to serve — no longer exists. The validator interprets messages rather than
+executing them, so it never reaches a device's write path at all.
 
 Failures have two shapes and the user's next action differs: **infeasible** (the
 collision involves only choice-free devices, so no search helps — report

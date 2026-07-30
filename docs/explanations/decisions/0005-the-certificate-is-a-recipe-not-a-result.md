@@ -32,12 +32,12 @@ Runtime must be able to run the inverse cheaply, which is only tolerable because
 the branch-fixed inverse is closed-form and vectorised — measured at 0.1 µs per
 point.
 
-Certificate entries carry the derived values they were solved for, and `set`
-asserts the request matches before applying the branch. Matching by a running
-counter would break silently under snaking, retries or restarts, with the
-failure mode being motion to another point's joint positions.
-
-`prepare` is consumed rather than sticky: it clears after one `set`, so an
-unprepared `set` always falls through to select-and-check.
+> **Superseded by ADR-0011 in its mechanism, not its substance.** This decision
+> originally specified that certificate entries carry the derived values they
+> were solved for, that `set` asserts a match before applying, and that
+> `prepare` clears after one use — all to stop a branch being applied at a
+> position it was not solved for. Wrapping the value in `Certified` makes the
+> branch and its target one object, so that desync is unrepresentable and none
+> of the machinery is needed. The hazard was real; the guard is now structural.
 
 Where a replacement certificate comes from mid-scan is not yet settled.

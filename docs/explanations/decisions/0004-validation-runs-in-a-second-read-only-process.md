@@ -17,8 +17,15 @@ needs devices.
 
 ## Decision
 
-Validation runs in a second blueapi process which instantiates devices but is
-**read-only**: it uses them for state, never to move them.
+Validation runs in a second blueapi worker process, seeing PVs through a
+**read-only gateway**. It creates devices, but only for introspection and
+reading.
+
+Crucially it **iterates the plan and inspects the messages rather than executing
+them**. `Msg("prepare", pmac, spec)` does not call `pmac.prepare(spec)`; the
+validator stashes the spec, and `Msg("kickoff", pmac)` then transforms the
+stashed values through the pmac's transforms and sends them to the
+anti-collision service.
 
 ## Consequences
 
@@ -26,16 +33,17 @@ The validator sees live PVs, so mid-scan it sees a machine in flight. It must
 therefore validate against the **projected end state** of the running task, not
 the instantaneous one.
 
-Devices in the validator are injected with a **null solver that raises** on any
-inverse call. Absence of a solver must raise rather than silently falling
-through to unchecked motion, so "no solver" and "nothing to choose" have to be
-distinguishable — see ADR-0006.
+**It needs no solver.** Because it interprets messages rather than executing
+them, it never calls a device's write path, so the question of injecting a
+solver into validator-side devices does not arise. This also removes the loop
+that would otherwise exist between devices and the service the validator exists
+to serve.
 
-This interacts with blueapi ADR-0005 ("connect all dodal devices during
-startup"): a second process connecting everything doubles the channel-access
-footprint. That probably needs a device-subset concept, which blueapi does not
-currently have.
+**If it meets a message whose effect it cannot predict, it raises**, and that is
+the sole origin of the "not validatable" verdict.
 
-Validation is non-blocking. Scans can be queued, and can start, before it
-finishes — so the queue needs a state for "not yet validated" and a rule for
-whether such an entry may run.
+Channel-access footprint is not a concern.
+
+The validator is a **blocking call**, but the queueing service does not block
+waiting on the result — it holds the entry at ⏳ and carries on. So the queue
+needs that state, and a rule for whether an entry may run before it resolves.

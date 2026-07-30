@@ -68,12 +68,21 @@ is not written down.
 
 ## Component-level
 
-**Q10. Raw motors in collision scope have no `DerivedSignalFactory`**, so there
-is nowhere to inject a solver, and `bps.mv(raw_motor, x)` inside the scope gets
-no checking. Two mechanisms and you want one: per-device injection (invasive,
-easy to miss one) or a plan-level `Msg('set')` preprocessor (uniform and
-bluesky-native, but a derived `set` decomposes into raw sets *inside*
-`set_derived`, below the Msg layer). Settle on a strawman, not a whiteboard.
+**Q10. How do generic plans get beamline-specific collaborators?** The
+preprocessor and `certified_move` both need to know which axes are collidable
+and which service owns them; a generic `scanspec_scan` needs a beamline's
+devices and triggering strategy. Same shape, and blueapi already solves it for
+devices — a `Device`-typed plan parameter arrives as a name and is resolved
+server-side, with the JSON schema enumerating valid names. Extending that to
+non-device collaborators would solve both and give the validator substitution
+for free. The blocker is concrete: `Device` is a union of bluesky protocols and
+`register_device` rejects anything failing `is_bluesky_compatible_device`.
+Whether that is a small extension or a rewrite is an hour's reading.
+
+Related and unmeasured: whether `_convert_type` can be taught to resolve
+`Spec[Movable]` by mapping axis names through the same machinery. If it can,
+`scanspec_scan` needs no device registry at all and only the trigger strategy
+remains beamline-specific.
 
 **Q11. Constraint set as a `Transform` field.** The strawman hardcodes bisecting
 mode. Production needs the constraint set carried as a field with dispatch to
@@ -139,3 +148,15 @@ equals batch duration — seconds. Remaining: pin the pipeline depth and confirm
 **Can the collision service run headless?** Yes — proven on real geometry with
 no WebGL context and no DOM. The apparent dependency was on `render()`'s side
 effect of refreshing world matrices, which is one line of pure CPU maths.
+
+**Where does checking hook in, for raw as well as derived axes?** A plan
+preprocessor on `RE.preprocessors`, passing its decision down by wrapping the
+value in `Certified[T]`. Raw motors are the degenerate case rather than a
+special one. See ADR-0011. What remains open is the per-beamline wiring, which
+is Q10.
+
+**Is there a hook for preprocessors on the RunEngine?** Yes —
+`RE.preprocessors`, applied in `RunEngine.__call__`. One caveat: the code
+composes them so that the *last* entry is outermost, while the docstring claims
+the opposite. A checker must be outermost, so the order matters and the
+discrepancy is worth resolving upstream.
