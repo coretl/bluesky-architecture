@@ -25,13 +25,22 @@ load-bearing.
    the design the coarse tier names the implicated pair and the fine tier runs
    only on that. The cost is (flagged points) x (pairs per flag), and the
    binding unknown is the coarse tier's false-positive rate, not its speed.
-4. **Use `coal` for both tiers.** It has capsules and meshes, it is ~6× faster
-   than tuned JavaScript on the case that dominates, and it carries the two
-   features that fix outstanding design problems (below). Note that 6× is a
-   correction: the first version of this document said 9×, which was measuring
-   three-mesh-bvh's default BVH split strategy rather than the language.
-5. **Don't write capsules in JavaScript.** The coarse tier should not be in
-   the browser at all.
+4. **Use `coal`, but for its bounding volumes rather than its speed.** It is
+   ~6× faster than tuned JavaScript on the dominant case — itself a correction,
+   the first version of this document said 9× and was partly measuring
+   three-mesh-bvh's default split strategy. The stronger argument is that
+   `coal`'s `OBBRSS` nodes are *oriented* boxes and rectangle-swept-spheres,
+   which rotate exactly, where three-mesh-bvh's axis-aligned nodes inflate. That
+   attacks the binding term rather than the fast one.
+5. **Nobody should be authoring a coarse model by hand.** Mech engineers export
+   meshes and every CAD revision would need re-authoring, so the coarse model
+   must be derived automatically. That rules out hand-built capsules and makes
+   the mesh's own BVH nodes attractive: conservative by construction, no second
+   artefact to version, and incapable of drifting out of sync.
+5b. **The binding constraint is coarse-model fit quality, not speed.** Fitted
+   spheres leave 63–173 mm of error on i16 meshes against 3.3 mm of motion
+   padding at 200 Hz. Until something automatic gets that into single digits,
+   tuning sample rates and checking methods is optimising the wrong term.
 6. **The velocity padding is unnecessary, but CCD is not why.** Measured, CCD
    is worth 2-3x, not the order of magnitude assumed. The real findings are
    that the executor at 5 kHz is already sound by 12-100x, and that the

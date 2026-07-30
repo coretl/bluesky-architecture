@@ -22,17 +22,24 @@ Source          | <https://github.com/coretl/bluesky-architecture>
 Documentation   | <https://coretl.github.io/bluesky-architecture>
 Releases        | <https://github.com/coretl/bluesky-architecture/releases>
 
-Start with the handover in `docs/explanations/`, which records what is decided,
-what is measured, and what is still open. Where a decision has reasoning
-attached, the reasoning matters more than the conclusion — several conclusions
-here were reversed when an assumption turned out to be wrong, and the reversals
-are recorded alongside the decisions.
+Start with **Where we are** in `docs/explanations/`, which is the current
+bottom line in a page. Behind it sit the original handover (kept for its
+reasoning, with twelve conclusions since reversed and marked inline) and a
+survey of collision libraries measured against real beamline geometry.
 
-Run the strawman's tests and benchmarks with:
+Where a decision has reasoning attached, the reasoning matters more than the
+conclusion — most conclusions here were reversed at some point, and the
+reasoning usually survived the reversal. Reversals are recorded next to what
+they reverse rather than edited away.
+
+Every number should have a script behind it or be labelled an estimate. The one
+figure that got sized against without an artefact turned out to be both
+unreproducible and wrong in premise, which is why `benchmarks/` exists.
 
 ```
-tox -e tests
-python -m bluesky_architecture.strawman.bench
+tox -e tests                                  # strawman property tests
+python -m bluesky_architecture.strawman.bench # kinematics benchmarks
+cat benchmarks/README.md                      # collision benchmarks
 ```
 
 <!-- README only content. Anything below this line won't be included in index.md -->

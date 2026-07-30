@@ -129,14 +129,30 @@ class BeamlineGeometry:
 
 
 class _PairModel:
-    """Shared vectorised sphere-sphere check."""
+    """Shared vectorised sphere-sphere check.
+
+    .. warning::
+
+       **Known API defect, kept deliberately.** ``check`` returns a boolean per
+       point, discarding *which* pair collided — see the ``.any(axis=-1)`` at
+       the end. That is exactly the information the fine tier needs in order to
+       be cheap: the whole point of the two-tier scheme is that exact triangle
+       checking runs only on the flagged pair, not on every pair at every point.
+       Throwing the pair identity away makes the fine tier pair-count driven
+       instead of flag-rate driven, which measured ~105 s per 15,000-point batch
+       against a few seconds for the correct arrangement.
+
+       The production contract must return ``(point, body_a, body_b)`` triples.
+       Left uncorrected here because this module is superseded (see the package
+       docstring) and the defect is more useful documented than silently fixed.
+    """
 
     def __init__(self, geometry: BeamlineGeometry, margin: float):
         self.geometry = geometry
         self.margin = margin
 
     def check(self, raw: dict[str, Array]) -> npt.NDArray[np.bool_]:
-        """-> boolean per point, True means collision."""
+        """-> boolean per point, True means collision. See the class warning."""
         centres, radii, names = self.geometry.place(raw)
         n = len(names)
         iu, ju = np.triu_indices(n, k=1)

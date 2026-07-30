@@ -1,14 +1,27 @@
 # Handover — validation architecture for Bluesky at DLS
 
-Seed document for `coretl/bluesky-architecture`. Written across a web session that
-worked out the shape of insertion-time and runtime scan validation, then built a
-strawman (`strawman/`) to settle the two load-bearing unknowns.
-session that worked out the shape of insertion-time and runtime scan validation.
-Everything below is either decided, measured, or explicitly open.
+Seed document for `coretl/bluesky-architecture`. Written across a web session
+that worked out the shape of insertion-time and runtime scan validation, then
+built a strawman to settle the two load-bearing unknowns.
 
-Read this before doing anything else in the repo. Where a decision has reasoning
-attached, the reasoning matters more than the conclusion — several conclusions in
-this conversation were reversed when an assumption turned out to be wrong.
+Where a decision has reasoning attached, the reasoning matters more than the
+conclusion — many conclusions here were reversed when an assumption turned out
+to be wrong, and the reasoning usually survived the reversal.
+
+:::{admonition} Status: partially superseded
+:class: warning
+
+This is the **original seed document**, kept for its reasoning. Since it was
+written, twelve of its conclusions have been reversed — six by facts from Tom,
+six by measurement on real beamline geometry. Superseded passages are marked
+inline; the reversals are catalogued under *Corrections*, and the evidence is
+in [](collision-libraries.md) with runnable scripts in `benchmarks/`.
+
+**The two biggest reversals:** the queue and validation questions are *not*
+orthogonal (see Scope note), and the collision model's binding constraint is
+neither kinematics nor body count but the tightness of the coarse geometric
+model (see D18, O12, O18).
+:::
 
 ---
 
@@ -22,6 +35,7 @@ this conversation were reversed when an assumption turned out to be wrong.
 | ophyd-async | 0.20.1 |
 | bluesky | 1.15.1 |
 | diffcalc-core | as on PyPI, July 2026 |
+| anti-collision service (`garethnisbet/Robot`) | `f7875dd`, master |
 
 Use these for permalinks so meeting attendees are looking at the same code.
 
@@ -30,14 +44,21 @@ Use these for permalinks so meeting attendees are looking at the same code.
 ## Scope note
 
 The task as set was "add queueing to blueapi, plus validation". What emerged is
-that **the queue question and the validation question are nearly orthogonal**.
+that ~~the queue question and the validation question are nearly orthogonal~~.
 
-The validation endpoint does not require ADR-0003 ("No Queues") to be superseded —
-a stateless dry-run endpoint is queue-free. And the substance of the design turned
-out to sit in ophyd-async and scanspec, not in blueapi.
+> **Superseded (correction 8).** They are not orthogonal. Validation verdicts
+> are held *on queue entries* and are revoked when control leaves the queue, so
+> validation state is owned by the queue. That makes it stateful and
+> queue-coupled, and it is the strongest available argument for superseding
+> blueapi ADR-0003 — stronger than "users want queueing", because you cannot
+> express "this scan is validated, and here is what would invalidate it"
+> without somewhere stateful to hang it. It also promotes the
+> `daq-queuing-service` reconciliation from last on the list to an early
+> decision, since that is the obvious place for the verdicts to live.
 
-Worth communicating to whoever set the task: the piece with real design risk is
-not the one on the ticket.
+The substance of the design does still sit in ophyd-async and scanspec rather
+than in blueapi, and the piece with real design risk is still not the one on
+the ticket. That part stands.
 
 ---
 
@@ -248,6 +269,35 @@ Padding decomposes into independent sources, and which apply differs by phase:
 - **Geometric conservatism** — bounding volumes are already larger than the real
   bodies. Free, and it is what makes the fallback sound.
 
+> **Amended (corrections 9, 11, 12).** The decomposition is right and the
+> soundness argument is right, but three things have changed underneath it.
+>
+> *The production scheme deliberately breaks it.* Padding is for **typical**
+> rather than maximum velocity, knowingly accepting occasional false negatives,
+> because maximum-velocity padding would reject too many legitimate scans. That
+> is exactly what this decision forbids, and it is defensible only because D21
+> says this is soft machine protection. D18 and D21 have to be rewritten as a
+> pair: D18 alone reads as a safety argument, and D21 is what licenses breaking
+> it.
+>
+> *The trade is in the opposite direction from the one assumed.* Measured, the
+> sound sampling-gap term at 10 Hz reaches **263 mm** on i16, against the ~50 mm
+> the current scheme pads. The scheme is under-padded by roughly 5x in the worst
+> case, not over-padded. And the sound term is *computable* per interval from
+> commanded motion rather than guessed — see `bench_validator.mjs`.
+>
+> *Geometric conservatism is not free, and it dominates.* This bullet assumes
+> bounding volumes are only slightly larger than the bodies. Measured on i16,
+> approximating the meshes with fitted spheres leaves a mean error of
+> **63-173 mm** depending on sphere count — 20-50x the sampling-gap term at
+> 200 Hz. Whichever coarse primitive is chosen, its fit quality is the binding
+> constraint, not the padding. See O18.
+>
+> One thing to add rather than correct: the coarse tier must report **which
+> pair** is implicated, not just a boolean per point, or the fine tier cannot be
+> restricted to the flagged pairs and the two-tier scheme buys nothing. The
+> strawman's `SimpleModel.check()` returns `.any(axis=-1)` and gets this wrong.
+
 ### D19. No diffractometer maths at runtime, in either direction
 
 Forward diffcalc at 83 µs/point is 830 ms for a 10k chunk — over budget on its
@@ -258,6 +308,12 @@ geometry.
 
 Not an optimisation. A per-point callable API is disqualified — see M2.
 
+> **Still true, weaker justification.** M2 measured in-process per-point
+> collision checking, which is no longer the design. What remains on the
+> per-point path is the coarse geometric tier, and that is still emphatically
+> vectorisation-bound: measured at 7-24 us/pose vectorised against milliseconds
+> per pose for anything per-point.
+
 ### D21. Anti-collision here is soft machine protection, not a safety function
 
 Catastrophic cases are guarded at the robot level and by door interlocks. This
@@ -267,6 +323,13 @@ from sample, entry points within a 90° arc).
 State this in the ADR in these words. It determines whether independence of
 implementation is required, and it is the claim most likely to be quietly
 misunderstood by someone joining later.
+
+> **Promoted to load-bearing.** This started as a scoping remark. It is now the
+> decision that licenses two others: the deliberate under-padding in D18, and
+> making flyscan execution depend on an external network service. Neither is
+> defensible for a safety function. If anyone ever reclassifies this layer, both
+> have to be revisited — and that reclassification is exactly the kind of thing
+> that happens quietly.
 
 ---
 
@@ -366,6 +429,14 @@ configuration was OOM-killed. Best-of-7 figures are reported. The IK numbers wer
 stable and repeatable; the collision numbers should be treated as
 order-of-magnitude only.
 
+> **Superseded, and a process lesson.** This table has **no runnable artefact** —
+> it was never in `bench.py` and existed only in a chat transcript, despite
+> being the number the whole architecture was then sized against. It is also
+> wrong in premise: it models in-process sphere-vs-sphere all-pairs, and the
+> real question turned out to be the fit quality of the coarse model, not the
+> pair count. `benchmarks/` exists so this cannot recur; every figure in
+> [](collision-libraries.md) has a script behind it.
+
 ### What this changes
 
 **The external multi-process/multi-machine compute service may not be needed.**
@@ -379,6 +450,21 @@ to design against. If it is not needed, the following all disappear:
 
 That is a large simplification, and it now hinges on a single number nobody has
 measured: **how many bodies are in a real DLS beamline collision model** (O12).
+
+> **Reversed twice (corrections 7 and 10).** First: collision checking *is* an
+> external GPU-backed service, decided independently of this analysis, so
+> everything in the "disappears" list is back — fail-closed-on-timeout,
+> backpressure, O8, and the availability dependency.
+>
+> Then, measured: the body count is small (i16 has 18 meshes, 10 movable
+> joints), so it was never going to be the constraint. And the service's
+> collision maths is CPU, not GPU — three-mesh-bvh in a Web Worker, with no GPU
+> resource in its Helm chart. The genuine GPU case is ray-traced narrow-phase on
+> RT cores, which is a different argument from the one originally made.
+>
+> The net position: the service exists and is a hard runtime dependency, so
+> design for it; but the reason is organisational and geometric, not the
+> arithmetic in M4/M5.
 
 ### Bugs the property tests found
 
@@ -406,17 +492,48 @@ anywhere), but each needs its own closed form written and tested.
 10k-point chunk.** See M4. Kinematics is a non-issue. The question has moved to
 O12.
 
-**O12. How many bodies are in a real beamline collision model?** *This is now the
-number that decides the architecture.* Under ~47 bodies (naive) or ~100 bodies
-(with a sound broad phase), everything runs in-process and a large amount of
-distributed-systems design evaporates. Above that, the scaled service returns.
-Nobody has measured it. It is probably a morning's work with whoever owns the CAD
-models.
+**O12. ~~How many bodies are in a real beamline collision model?~~ ANSWERED —
+small, and it was the wrong question.** Read straight out of the collision
+service's own configs: i16 has 18 meshes and 10 movable joints, i19 has 9 links
+and 4. Well inside anything tractable. The binding constraint turned out to be
+the *fit quality* of the coarse model, not the number of bodies — see O18.
 
-**O13. Sound broad-phase implementation.** The 4–8× sketch skips intra-group
-pairs and must not be used. A correct hierarchical or spatial-hash broad phase is
-standard practice and is the lever that moves O12's threshold — more optimisation
-effort, not more machines.
+**O13. ~~Sound broad-phase implementation.~~ ANSWERED — two of them, both
+measured.** A sound hierarchical sphere broad phase (body bounding sphere
+provably enclosing its leaves, descend only on overlap) took a 15,000-point
+batch from 9.3 s to ~1.3 s. Separately, a depth-limited descent of the mesh's
+*own* BVH needs no second model at all, is conservative by construction, and
+costs the same at any depth. See `bench_coarse2.py` and `bench_bvhdepth.mjs`.
+
+**O16. What are the actual joint angular velocities on DLS diffractometers?**
+*This is now the number that decides the validator.* Every padding and sample
+rate figure scales linearly with it, and the answer swings the required
+validator rate by 8x between the two regimes tested (1.6 vs 8 rad/s). An
+afternoon with whoever owns the motion controllers.
+
+**O17. The exemption set.** The articulated i16 reports 8-12 exact triangle
+collisions per pose *at the demoPose its own config ships as valid* — permanently
+touching parts, mounting faces, base against first stage. The config's
+link-level adjacency rules do not cover them. Until this is right, no
+false-positive rate measured on this model is trustworthy, and both the two-tier
+and temporal-tree results are held back by it.
+
+**O18. How tight can the coarse model be made, automatically?** The binding
+constraint on the whole design. Fitted spheres leave 63-173 mm of error on i16
+meshes, against 3.3 mm of motion padding at 200 Hz. Hand-authored capsules are
+ruled out on cost — mech engineers export meshes and every CAD revision would
+need re-authoring. So the coarse model must be derived automatically, and the
+question is whether anything automatic reaches single-digit mm on plate-like and
+open-frame geometry. Candidates: medial-axis sphere trees, and the mesh's own
+BVH nodes at depth 3-4.
+
+**O19. Oriented vs axis-aligned coarse volumes.** BVH-depth rejection saturates
+at 80-82% by depth 3-4, which says the limit is the volume's *shape*, not the
+count: `three-mesh-bvh` nodes are axis-aligned in the mesh's local frame, so a
+rotated arm's world box inflates however finely you subdivide. `coal`'s `OBBRSS`
+nodes are oriented boxes and rectangle-swept-spheres, which rotate exactly.
+Measuring an OBB descent is the strongest remaining argument for coal over the
+JS stack — stronger than its 6x raw speed, because it attacks the binding term.
 
 **O14. Constraint set as a Transform field.** The strawman hardcodes bisecting
 mode. Production needs the constraint set carried as a field with dispatch to the
@@ -453,20 +570,38 @@ survives review unexamined.
 in wall-clock terms but it means the diffractometer participates in every step,
 which affects whether a plain `scan()` can be used unmodified.
 
-**O6. Fallback budget cap.** If the simplified model flags 200 points and the
-fine check is 5 ms each, that is a second of unbudgeted work. Needs a hard cap
-plus defined behaviour on exceeding it — almost certainly "treat as collision and
-pause". Without a cap, 500 ms is a best case rather than a bound.
+**O6. Fallback budget cap.** *Promoted — this may be the answer to O18 rather
+than a detail.* If the simplified model flags 200 points and the fine check is
+5 ms each, that is a second of unbudgeted work. Needs a hard cap plus defined
+behaviour on exceeding it — almost certainly "treat as collision and pause".
+Without a cap, 500 ms is a best case rather than a bound.
 
-**O7. Chunk lookahead vs deceleration.** At 1 Hz chunking you validate chunk N+1
-while executing N. If N+1 fails you must stop within what remains of N. Couples
-chunk duration to deceleration time; a lookahead requirement, not a padding one.
+A cap also converts an *unmeasurable* quantity into a bounded one. The coarse
+tier's false-positive rate cannot currently be measured (O17) and may never be
+reliably predictable. With a cap the design does not need it to be small — it
+needs to stay correct when it is not. That is a stronger position than getting
+the number, and it should be stated that way in the ADR.
 
-**O8. Latency budget decomposition.** 500 ms = RTT + queueing + transform +
-collision + margin. Numbers against each before committing to a mesh resolution.
+**O7. ~~Chunk lookahead vs deceleration.~~ LARGELY ANSWERED.** Checking happens
+*ahead* of the motion: the first batch is validated while the motors move to
+start, and each subsequent batch while the previous one executes. Lookahead
+therefore equals batch duration, a few seconds, comfortably more than
+deceleration time. What remains is pinning the pipeline depth and confirming
+`check latency + stop time <= batch duration`.
 
-**O9. Collision scope declaration** — format and ownership of the beamline config
-listing participating devices.
+**O8. Latency budget decomposition.** *Reframed and relaxed.* The budget is not
+500 ms: batches are a few seconds of motion at 5 kHz (~15,000 points), checked
+ahead of execution, so the budget is roughly one batch period. That is an order
+of magnitude more headroom than assumed. Still needs numbers against RTT,
+queueing, compute and margin before committing.
+
+**O9. ~~Collision scope declaration~~ MOSTLY ANSWERED.** The anti-collision
+service declares which axes are "collidable" — typically a handful of motors per
+beamline that can reach each other; everything else is static and lives in the
+point cloud. What remains open is the *mapping* from those names to dodal
+devices and EPICS PVs, and who owns it. The service's config joint names
+(`Gamma`, `Merlin`, `Crystal`, ...) are recognisable but not yet tied to
+anything.
 
 **O10. Where `Transform` lives** — ophyd-async vs standalone package (D8).
 
@@ -507,6 +642,51 @@ The pattern in all six: a number or an API shape assumed rather than checked,
 then used as a premise. The strawman exists because reasoning was not settling
 these; forty lines of code did.
 
+### Corrections 7-12, after the seed document
+
+7-8 came from Tom; 9-12 from measurement on real i16 geometry. Same pattern,
+same lesson.
+
+7. **"The external service may not be needed."** It exists and is a hard runtime
+   dependency of flyscan execution. Everything the "What this changes" section
+   said would disappear is back. *But* the stated reason — GPU compute — does
+   not hold up: the service's collision maths is three-mesh-bvh in a Web Worker,
+   which is CPU, and its Helm chart requests no GPU. The real GPU case is
+   ray-traced narrow phase on RT cores.
+8. **"Queue and validation are nearly orthogonal."** Verdicts live on queue
+   entries and are revoked when control leaves the queue. Validation state is
+   queue state. See the Scope note.
+9. **"Padding for maximum velocity would over-reject; typical is the pragmatic
+   trade."** The trade runs the other way. At 10 Hz the sound padding reaches
+   263 mm against the ~50 mm actually applied, so the scheme is *under*-padded
+   by ~5x, and the tick means "probably" for a bigger reason than assumed.
+10. **"The fine tier does not fit in any language"** (~105 s per batch). That
+    measured triangle checking on every pair at every pose — the fine tier as
+    the *primary* path, which nobody proposed. In the design the coarse tier
+    names the pair and the fine tier runs only on that, so the cost is flag-rate
+    driven. The conclusion was circular.
+11. **"coal is 9x faster than the JavaScript."** It is ~6x. The rest was
+    three-mesh-bvh's default `CENTER` split strategy; `SAH` is a one-line change
+    worth ~1.5x. Part of what was reported as a property of the language was a
+    property of my defaults.
+12. **"Continuous collision detection removes the padding compromise."** CCD is
+    worth 2-3x, not the order of magnitude assumed. The compromise does go away,
+    but because the sound sample rates are low (50-400 Hz) and the executor at
+    5 kHz already exceeds them by 12-100x — not because of CCD.
+
+Two further near-misses worth recording, both caught by a check rather than by
+review:
+
+- The natural arc-inflation bound, `sum_j d_j (1 - cos(dtheta_j/2))`, is **not
+  conservative for a kinematic chain** — rotating an upstream joint moves the
+  downstream axes, so arc deviations do not compose additively. Violated by
+  3.9 mm on i16. The path-length form `L/2` is rigorous and holds.
+- A cross-language comparison on decimated meshes said JavaScript beat C++,
+  contradicting the real-geometry result. Taking every k-th face destroys
+  spatial coherence and the two libraries degrade differently under it. The
+  experiment measured the decimation; it is kept in `benchmarks/` labelled as
+  discarded.
+
 ---
 
 ## Proposed ADRs
@@ -538,6 +718,39 @@ D16). These stay system ADRs here and become design proposals or issues later.
 ---
 
 ## Suggested order of work
+
+> **Superseded.** The original list led with O12, which has since been answered
+> and turned out to be the wrong question. Kept below for the reasoning; the
+> current list is first.
+
+### Current
+
+1. **Get the exemption set right (O17).** Nothing downstream can be trusted
+   until the model stops reporting 8-12 collisions per pose at its own valid
+   pose. Every false-positive figure, the two-tier result and the temporal-tree
+   result are all gated on this. It is a conversation with whoever owns the CAD
+   and the config, not a computation.
+2. **Get the joint velocities (O16).** One afternoon, and every padding and
+   sample-rate number scales linearly with it.
+3. **Try one automatic coarse model properly (O18/O19).** Take a single detector
+   arm, fit it with a medial-axis sphere tree *and* read off `coal`'s OBB/RSS
+   BVH nodes at depth 3-4, and run the same fit-error metric on both. This is
+   the binding constraint on the whole design and it is a half-day.
+4. **Write the ADRs.** Most are a page and the evidence now exists. D18 and D21
+   have to be rewritten as a pair, and the failure-mode taxonomy needs the
+   flag-rate framing rather than the pair-count one.
+5. **Traces of blueapi and bluesky-queueserver.** Unchanged from the original
+   list and still not done — mermaid sequence diagrams in identical notation,
+   process boundaries marked, permalinked to the pinned SHAs, plus a capability
+   comparison table. For other people's benefit, before the wider meetings.
+6. **Phase 0 reconciliation with `DiamondLightSource/daq-queuing-service`.**
+   Promoted from last: correction 8 makes the queue the owner of validation
+   state, so where the verdicts live is an early architectural decision rather
+   than a later one.
+7. **Port the round-trip property test into ophyd-async.** Unchanged, still
+   cheap, still worth it.
+
+### Original
 
 1. **Measure O12** — the body count of a real beamline collision model. It is
    now the only thing standing between you and knowing whether this is a
