@@ -35,27 +35,28 @@ flowchart TB
     Script -- "insert and wait" --> Q
     GUI -- "insert" --> Q
 
-    subgraph shared [" "]
-        direction LR
-        KIN["<b>Transform</b><br/>pure sync maths<br/>forward + branch-fixed inverse"]
-    end
-
-    subgraph V ["blueapi VALIDATOR &mdash; read-only, offline"]
-        VS["sample scan function<br/>~10 Hz (open)"]
-    end
-    subgraph E ["blueapi EXECUTOR &mdash; owns the devices"]
-        ES["sample scan function<br/>5 kHz"]
+    subgraph BA ["blueapi"]
+        subgraph V ["VALIDATOR &mdash; read-only, non-blocking"]
+            VS["sample scan function<br/>~10 Hz (open)"]
+        end
+        subgraph E ["EXECUTOR &mdash; owns the devices"]
+            ES["sample scan function<br/>5 kHz"]
+        end
+        KIN["<b>Transform</b> &mdash; shared by both<br/>pure sync maths, no I/O<br/>forward + branch-fixed inverse"]
     end
 
     Q --> VS
     Q --> ES
     VS --> KIN
     ES --> KIN
-    KIN -- "joint arrays,<br/>batched" --> AC
+    KIN -- "joint arrays, batched" --> AC
 
     AC["<b>ANTI-COLLISION SERVICE</b><br/>external, owns the geometry<br/>coarse tier every point<br/>exact tier on flagged pairs only"]
 
-    AC -- "verdict" --> Q
+    AC -- "per-point verdicts" --> VS
+    AC -- "per-point verdicts" --> ES
+    VS -- "✓ / ✗" --> Q
+    ES -- "abort and stop motors<br/>if a batch fails" --> Q
     VS -. "certificate<br/>(branch selection)" .-> ES
     KIN -- "serialised into RunStart" --> AN["analysis"]
 ```
