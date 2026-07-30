@@ -245,6 +245,68 @@ maximum and typical angular velocity per axis, per beamline. It is a
 one-afternoon question for whoever owns the motion controllers, and it decides
 the validator's sample rate.
 
+## Ray casting as the fine pass
+
+Gareth describes the intended design as capsules first, ray casting second.
+Capsules first is right and agrees with everything above. Ray casting second
+needs care, because its error direction is the opposite of the one the
+two-tier scheme assumes.
+
+Note first what is committed today: the collision path calls
+`intersectsGeometry` (triangle-triangle BVH) and `closestPointToPoint` (point
+cloud). The string "capsule" does not appear in any JavaScript file — capsules
+exist only in `planner.py`. The only raycasting is VR controller pointing and
+click-to-select. So this is a description of intent, not of the current code.
+
+**Ray casting samples.** It finds what a ray happens to hit, and a feature
+between two rays is invisible to it. Measured on the i16 geometry
+(`benchmarks/bench_raycast.mjs`, 8.3 µs/ray against the largest mesh, objects
+reused and the BVH called directly):
+
+| rays/pose | time/pose | angular spacing | feature it can miss at 1 m |
+|---|---|---|---|
+| 256 | 2.1 ms | 7.17° | 252 mm |
+| 1024 | 8.5 ms | 3.58° | 125 mm |
+| 4096 | 34 ms | 1.79° | 63 mm |
+| 16384 | 137 ms | 0.90° | 31 mm |
+
+**At any affordable ray density the missable feature is larger than the
+clearances this system exists to enforce.** D21 gives "detector must be 20 mm
+from the sample" as a motivating constraint; 16,384 rays per pose costs 137 ms
+and can still miss 31 mm.
+
+This matters because of what the fine tier is *for* (D18). The coarse tier
+over-approximates and flags; the fine tier clears the ones flagged only because
+of padding. The fine tier therefore gets the last word, and a technique with
+false negatives will confidently clear real collisions. Triangle-triangle
+intersection is exact, so "fine says clear" is trustworthy. Ray casting is a
+sampling estimate, so it is not — unless the ray spacing is bounded against the
+smallest feature in the model, which is a geometry-dependent argument that has
+to be made explicitly rather than assumed.
+
+There is a sound use for rays here: casting *along the direction of motion* to
+find time-of-impact is a legitimate CCD formulation, and is what the literature
+below does. That is a different thing from spraying rays at a mesh to test
+overlap.
+
+### The first coherent GPU argument
+
+If the fine pass is ray casting, then RTX ray-tracing cores are purpose-built
+silicon for exactly that operation — and this is the first GPU justification
+for this project that holds together. [Hardware-Accelerated Ray Tracing for
+Discrete and Continuous Collision Detection on GPUs](https://arxiv.org/abs/2409.09918)
+(ICRA 2025) reports up to 3× over state-of-the-art GPU sphere-based methods for
+batched discrete-pose queries, and up to 9× for continuous, at 24k robot
+triangles against 190k obstacle triangles — almost exactly i16's scale.
+
+Two things worth noting from it. Its continuous variant uses a **sphere** robot
+representation against obstacle meshes, so spheres-on-the-hot-path survives even
+in the ray-traced design. And its discrete variant is *exact* mesh-to-mesh, not
+a sampled overlap test, which is the distinction drawn above.
+
+If Gareth is heading here, the GPU instinct is right — it was just explained by
+scene assembly earlier, which is not where the parallelism is.
+
 ## Proposed re-architecture
 
 Gareth's project grew anti-collision out of a visualiser, and the two roles
