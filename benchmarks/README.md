@@ -32,6 +32,18 @@ Both matter: the default `CENTER` split is ~1.5x slower on the dominant case,
 and the first version of this benchmark reported a language gap that was partly
 a tuning gap.
 
+`bench_articulated.mjs` and `bench_twotier.mjs` build a properly articulated
+i16 from the config (joint chain, mesh reparenting, adjacency exemption) rather
+than posing meshes arbitrarily. `bench_twotier.mjs` is the one that measures the
+actual proposed architecture: conservative spheres on every pose, exact BVH only
+on the pairs the spheres flag. Takes `K` (spheres per mesh) and `DELTA` (degrees
+of perturbation around the config's demoPose) as environment variables.
+
+Caveat on both: the articulated model reports 8-12 exact collisions per pose even
+at the shipped demoPose, so it has permanently-touching parts the real system must
+exempt and these scripts do not. Coarse-tier timings are trustworthy;
+false-positive rates from them are not.
+
 `bench_lang_prep.py` + `bench_lang.mjs` are a cross-language comparison on
 byte-identical decimated geometry. **Its result is discarded** - see the survey
 - because decimating by taking every k-th face destroys spatial coherence and

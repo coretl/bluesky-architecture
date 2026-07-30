@@ -18,8 +18,13 @@ load-bearing.
 2. **The coarse tier fits the batch budget in plain numpy** — 1.1-1.6 s for a
    15,000-point batch, single core, with a sound hierarchical broad phase. No
    GPU required to meet the deadline for the tier that runs on every point.
-3. **The fine tier does not fit, in any language.** Triangle-level checking is
-   ~100 s per 15,000-point batch even in C++. It is an exception-path tool.
+3. **The fine tier is flag-rate driven, not pair-count driven.** An earlier
+   version of this document said it "does not fit in any language" on the basis
+   of ~100 s per 15,000-point batch. That measured triangle checking on *every
+   pair at every pose*, which is not the design and which nobody proposed. In
+   the design the coarse tier names the implicated pair and the fine tier runs
+   only on that. The cost is (flagged points) x (pairs per flag), and the
+   binding unknown is the coarse tier's false-positive rate, not its speed.
 4. **Use `coal` for both tiers.** It has capsules and meshes, it is ~6× faster
    than tuned JavaScript on the case that dominates, and it carries the two
    features that fix outstanding design problems (below). Note that 6× is a
@@ -67,7 +72,7 @@ point" as an alternative to a margin.
 
 | approach | time | verdict |
 |---|---|---|
-| triangle meshes, coal/FCL, 28 near-miss pairs | ~105 s | ✗ two orders of magnitude over |
+| ~~triangle meshes on every pair, every pose~~ | ~~105 s~~ | **measures the wrong architecture — see below** |
 | spheres, naive all-pairs (17,721 pairs) | 9.3 s | ✗ memory-bound, 2 GB intermediates |
 | **spheres, sound hierarchical broad phase** | **1.1-1.6 s** | ✓ |
 | **spheres vs 200,000-point cloud, KD-tree** | **0.16 s** | ✓ |
@@ -82,6 +87,45 @@ the sense O13 asked for: each body gets a bounding sphere that provably
 encloses all its leaf spheres, and a body pair is skipped only when those
 bounding spheres are separated. No leaf pair is skipped for any other reason.
 The unsound sketch in the handover skipped intra-group pairs; this does not.
+
+### The two tiers, measured together
+
+`benchmarks/bench_twotier.mjs` builds a properly articulated i16 — joint chain
+from `restPos`/`restQuat`/`parent`, link meshes reparented onto rot groups,
+statics kept as world obstacles, the viewer's `buildAdjacencyPairs` exemption
+reproduced — fits conservative spheres to each mesh, and runs the fine BVH only
+on pairs the sphere tier flags.
+
+**The coarse tier is very cheap.** 67–198 spheres over 136 pairs costs
+**7–24 µs per pose**, so a 15,000-point batch is **0.1–0.4 s**. That is the
+robust result here and it comfortably fits the budget.
+
+**The false-positive rate is what decides the fine tier, and this model cannot
+measure it.** The articulated i16 reports 8–12 exact triangle collisions per
+pose even at the `demoPose` the config ships as a valid configuration. Those
+are almost certainly permanently-touching parts — mounting faces, the base
+against the first rotating stage — that the production system must exempt and
+that the config's link-level adjacency rules do not cover. With the machine
+"in collision" at rest, any false-positive figure is meaningless, so the 85%
+measured is not reported as a finding.
+
+Two consequences:
+
+- Getting a trustworthy fine-tier cost needs either a real scan trajectory or
+  the complete exemption set, ideally both. This is a question for whoever owns
+  the model, not something to derive from the GLB.
+- **It may not need answering.** O6 already calls for a hard cap on fallback
+  work. A cap converts an unmeasured cost into a bounded one: if the coarse
+  tier flags more than N points in a batch, treat it as a collision and stop
+  rather than trying to clear them all. The design should not depend on the
+  false-positive rate being small — it should stay correct when it isn't.
+
+The sphere count barely matters over the range tested — K=4 and K=16 per mesh
+flag 55.2 and 52.1 pairs per pose respectively. Tightness comes from where the
+spheres are, not how many, and a medial-axis sphere tree would do better than
+the Lloyd-relaxed clustering used here. Note the fine tier confirms exactly the
+same collision count at both K, which is the consistency check that the coarse
+tier is not changing the answer, only the amount of work.
 
 ## What the industry does
 
