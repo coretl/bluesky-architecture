@@ -194,4 +194,7 @@ lint.select = [
 #   N818 - Infeasible and Unsatisfiable are the vocabulary of the failure
 #          taxonomy in the ADRs (D13). The code and the prose should agree.
 "src/bluesky_architecture/strawman/*" = ["N806", "E741", "N818"]
+# Same reasoning for the benchmarks: T is a homogeneous transform, not a variable
+# that wants renaming to `t`.
+"benchmarks/*" = ["N803", "N806"]
 "tests/test_strawman.py" = ["SLF001", "E741"]

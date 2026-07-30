@@ -24,7 +24,19 @@ The relevant files are `i16_scene.glb` / `i16_config.json` (10 movable joints,
 
 `probe.mjs` establishes that the collision path runs with no WebGL context and
 no DOM. `micro.mjs` decomposes the per-pair cost into AABB reject, BVH descent
-proving no intersection, and BVH descent finding one.
+proving no intersection, and BVH descent finding one. `bench_raycast.mjs` sizes
+ray casting as a fine pass, in both speed and what it can miss.
+
+`micro.mjs` builds its BVHs with `strategy: SAH` and warms up before timing.
+Both matter: the default `CENTER` split is ~1.5x slower on the dominant case,
+and the first version of this benchmark reported a language gap that was partly
+a tuning gap.
+
+`bench_lang_prep.py` + `bench_lang.mjs` are a cross-language comparison on
+byte-identical decimated geometry. **Its result is discarded** - see the survey
+- because decimating by taking every k-th face destroys spatial coherence and
+the two libraries degrade differently under it. Kept because the negative
+result is worth not repeating.
 
 Needs node 18+ and the same versions the prototype pins:
 

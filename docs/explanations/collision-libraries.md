@@ -20,9 +20,11 @@ load-bearing.
    GPU required to meet the deadline for the tier that runs on every point.
 3. **The fine tier does not fit, in any language.** Triangle-level checking is
    ~100 s per 15,000-point batch even in C++. It is an exception-path tool.
-4. **Use `coal` for both tiers.** It has capsules and meshes, it is 9× faster
-   than the JavaScript on the case that dominates, and it carries the two
-   features that fix outstanding design problems (below).
+4. **Use `coal` for both tiers.** It has capsules and meshes, it is ~6× faster
+   than tuned JavaScript on the case that dominates, and it carries the two
+   features that fix outstanding design problems (below). Note that 6× is a
+   correction: the first version of this document said 9×, which was measuring
+   three-mesh-bvh's default BVH split strategy rather than the language.
 5. **Don't write capsules in JavaScript.** The coarse tier should not be in
    the browser at all.
 6. **The velocity padding is unnecessary, but CCD is not why.** Measured, CCD
@@ -39,13 +41,19 @@ Both implementations classify the i16 scene identically — 110 AABB-disjoint
 pairs, 28 with overlapping AABBs but no intersection, 15 intersecting — which
 is a useful cross-check that they are doing the same work.
 
-| regime | three-mesh-bvh (JS) | coal/FCL (C++) | ratio |
-|---|---|---|---|
-| AABB reject, disjoint | 0.5 µs | 0.2 µs | 2.5× |
-| BVH descent, **no** intersection | 2302 µs | 250 µs | **9.2×** |
-| BVH descent, intersecting | 965 µs | 51 µs | 19× |
-| exact distance | — | 2593 µs | — |
-| `scene.updateMatrixWorld()` per pose | 2.5 µs | — | — |
+| regime | JS, default (CENTER) | JS, tuned (SAH) | coal/FCL | ratio tuned:FCL |
+|---|---|---|---|---|
+| AABB reject, disjoint | 0.5 µs | 0.3 µs | 0.2 µs | 1.5× |
+| BVH descent, **no** intersection | 2302 µs | ~1550 µs | 250 µs | **6.2×** |
+| BVH descent, intersecting | 965 µs | ~735 µs | 51 µs | 14× |
+| exact distance | — | — | 2593 µs | — |
+| `scene.updateMatrixWorld()` per pose | 2.5 µs | 1.8 µs | — | — |
+
+**The JS column was originally measured with three-mesh-bvh's default `CENTER`
+split strategy.** Switching to `SAH` is a one-line change worth ~1.5× on the
+dominant case, and it moves the language gap from 9.2× to 6.2×. The first
+number in this document was partly measuring my own defaults. Both sides return
+the same verdict on every pair, and both are warmed up before timing.
 
 The counterintuitive result is that **proving two meshes don't touch is the
 expensive case**. A real collision exits at the first intersecting triangle; a
@@ -123,10 +131,14 @@ runs inside the budget. The measurements above do not justify it.
 
 ### Should the triangles be a Python library?
 
-Yes. `coal` (`pip install coal`, 3.0.3 on PyPI) is 9× faster than
-three-mesh-bvh on near misses and 19× on intersections, and it is the same
-library Pinocchio uses. `python-fcl` is the older binding and measures the same
-within noise.
+Yes, but by less than first reported. `coal` (`pip install coal`, 3.0.3 on
+PyPI) is ~6× faster than *tuned* three-mesh-bvh on near misses and ~14× on
+intersections, and it is the same library Pinocchio uses. `python-fcl` is the
+older binding and measures the same within noise.
+
+Six times is worth having but it is not the difference between viable and not,
+and it should be weighed against the convention risk of maintaining a second
+implementation. See the note on geometry agreement below.
 
 Two features make it a better fit than raw speed suggests:
 
@@ -151,6 +163,57 @@ matter if the fine tier ever needed swept mesh checks.
 Note that `curobo` on PyPI (version 0.2, "A simple python package") is **not**
 NVIDIA's cuRobo, which installs from source. Worth knowing before someone pip
 installs it.
+
+### Do the two worlds actually agree?
+
+The reason for considering headless JavaScript in the first place was
+convention drift — euler angle order, units, axis handedness — between the
+three.js scene and anything reimplementing it in Python. If the two disagree
+about where a body is, a faster checker is worse than useless.
+
+Measured directly: load `i16_scene.glb` in three.js and in trimesh, compute
+each mesh's world AABB, and compare.
+
+**They agree to 1.55e-15 m — floating point noise, across all 18 meshes.**
+
+That is expected once you look at why: glTF stores node transforms as matrices
+or explicit TRS with a fixed specification, so there is no euler convention to
+get wrong. Both loaders reproduce the same scene graph.
+
+Two practical wrinkles, neither affecting placement:
+
+- **Node naming differs.** three.js sanitises (`detector carriage` becomes
+  `detector_carriage`) and exposes mesh names; trimesh uses node names with
+  hash suffixes for uniqueness (`base_10b53f`). The name sets do not intersect
+  for 11 of 18 meshes. Any cross-implementation check must match on geometry,
+  not on names — matching by name silently pairs the wrong bodies, which is how
+  this comparison first appeared to show a 1.77 m disagreement.
+- The convention risk is real but it lives in the **hand-written WebSocket API**
+  (degrees, millimetres, Z-up, orientation relative to a home of `[0, 90, 0]`)
+  and in the joint definitions in `*_config.json`, not in the GLB.
+
+So consuming the GLB directly carries no convention risk, and that argument for
+headless JavaScript does not survive contact with the measurement. The argument
+that does survive is having one implementation rather than two — which is about
+maintenance, not correctness.
+
+### A discarded experiment
+
+To separate "JavaScript is slower" from "three-mesh-bvh's `intersectsGeometry`
+is a weaker algorithm" — it restarts a traversal from the root of B's tree at
+every leaf of A, rather than descending both trees together — I decimated the
+meshes to 500/2000/8000/20000 triangles and timed both sides on byte-identical
+geometry. That experiment said JavaScript was *faster* than FCL above 1000
+triangles, contradicting the full-scene result.
+
+It is discarded. Taking every k-th face scatters triangles across the original
+surface and destroys spatial coherence, and the two libraries degrade
+differently under that: FCL fits oriented boxes, three-mesh-bvh axis-aligned
+ones. The measurement was of the decimation, not of the libraries. The
+real-geometry numbers in the table above are the ones to use.
+
+The algorithmic question is therefore still open. It matters, because if the
+gap is `intersectsGeometry` rather than the language, it is fixable in place.
 
 ### What is the rest of the industry using?
 

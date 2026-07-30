@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { computeBoundsTree } from 'three-mesh-bvh';
+import { computeBoundsTree, SAH } from 'three-mesh-bvh';
 import { readFileSync } from 'node:fs';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -17,7 +17,7 @@ scene.updateMatrixWorld(true);
 
 const meshes = [];
 scene.traverse(o => { if (o.isMesh && o.geometry?.getAttribute('position')) meshes.push(o); });
-for (const m of meshes) { m.geometry.computeBoundingBox(); m.geometry.computeBoundsTree(); }
+for (const m of meshes) { m.geometry.computeBoundingBox(); m.geometry.computeBoundsTree({ strategy: SAH }); }
 
 const _c = Array.from({ length: 8 }, () => new THREE.Vector3());
 const bA = new THREE.Box3(), bB = new THREE.Box3(), mat = new THREE.Matrix4();
@@ -57,6 +57,8 @@ function time(list, label, iters) {
 }
 
 console.log(`${process.argv[2].split('/').pop()}  (${meshes.length} meshes)`);
+// warm up before timing - V8 needs the path hot
+for (let k = 0; k < 30; k++) { for (const [a,b] of [...clear, ...hit]) { aabb(a,bA); aabb(b,bB); mat.copy(a.matrixWorld).invert().multiply(b.matrixWorld); a.geometry.boundsTree.intersectsGeometry(b.geometry, mat); } }
 time(reject, 'AABB reject (disjoint)', 200);
 time(clear,  'BVH descent, no intersection', 20);
 time(hit,    'BVH descent, intersecting', 20);
