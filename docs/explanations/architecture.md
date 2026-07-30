@@ -34,7 +34,7 @@ flowchart TB
     GUI -- "insert" --> Q
     Q{{"Queue<br/>a verdict per entry<br/>⏳ &nbsp; ✓ &nbsp; ✗ &nbsp; ?"}}
 
-    Q -- "scan to validate<br/>↑ ⏳ / ✓ / ✗ / ? + certificate" --> VS
+    Q -- "scan to validate, held ⏳<br/>↑ ✓ / ✗ / ? + certificate" --> VS
     Q -- "task + certificate<br/>↑ abort on failure" --> ES
 
     subgraph BA ["blueapi"]
@@ -70,10 +70,14 @@ Holds scans with a validation verdict per entry. Four states, not two:
 | ✗ | validation failed |
 | ? | not validatable — the plan is adaptive and cannot be listified in advance |
 
-⏳ comes first because it is where every entry starts. The validator resolves it
-to one of the other three: it can return ✓ or ✗, it can discover that a plan
-cannot be listified and return ?, and it can return ⏳ again when it has taken
-the work but not finished it.
+⏳ comes first because it is where every entry starts, and it is **the queue's
+own bookkeeping** — the queue holds an entry at ⏳ while the validator works on
+it. The validator never returns ⏳. It returns exactly one of ✓, ✗, or ? (the
+last when it discovers the plan cannot be listified).
+
+That split is worth keeping straight: the validator produces *results*, the
+queue tracks *progress*. It is the same division that makes validation state
+queue state.
 
 Verdicts are **applied after insertion** and **revoked when control leaves the
 queue** — if anyone moves the beamline outside the queue, every tick disappears

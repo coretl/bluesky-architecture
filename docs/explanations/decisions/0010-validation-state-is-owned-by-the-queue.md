@@ -21,9 +21,12 @@ whether the beamline is under its control, and therefore on whether a verdict is
 still meaningful.
 
 An entry has one of four states, not two: queued or in progress (⏳), validated
-(✓), failed (✗), and not validatable (?). Every entry starts at ⏳; the
-validator resolves it to one of the other three, or leaves it at ⏳ while it
-works.
+(✓), failed (✗), and not validatable (?).
+
+Every entry starts at ⏳, and **⏳ is the queue's own bookkeeping** — the queue
+holds an entry there while the validator works. The validator never returns it;
+it returns exactly one of ✓, ✗ or ?. The validator produces results, the queue
+tracks progress.
 
 ## Consequences
 
