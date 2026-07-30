@@ -1,9 +1,14 @@
-# Collision checking: library survey and re-architecture
+# Collision libraries: survey and re-architecture
 
 Research into what to build the anti-collision service out of, prompted by
 three questions: is there a JavaScript capsule library we should use, should
 the triangle-level check be a Python library, and what does the rest of the
 industry do.
+
+The figures here are reproduced and cross-referenced in [](measurements.md);
+the conclusions that were later overturned are catalogued in [](reversals.md).
+This page keeps the survey of what exists outside DLS, which the other two do
+not cover.
 
 All measurements below are on the **real i16 geometry** from
 `garethnisbet/Robot` (`i16_scene.glb`, 18 meshes, 233,034 triangles), in a
@@ -95,7 +100,7 @@ The sound broad phase is the difference between 9.3 s and ~1.3 s. It is sound in
 the sense O13 asked for: each body gets a bounding sphere that provably
 encloses all its leaf spheres, and a body pair is skipped only when those
 bounding spheres are separated. No leaf pair is skipped for any other reason.
-The unsound sketch in the handover skipped intra-group pairs; this does not.
+The earlier unsound sketch skipped intra-group pairs; this does not.
 
 ### The two tiers, measured together
 
@@ -565,7 +570,7 @@ therefore over-count collisions; the per-pair regime costs do not depend on
 that, which is why they are the ones quoted.
 
 Container timings, single machine, no GPU available to test cuRobo or CAPT
-claims directly. The handover's own warning applies: re-measure on real
+claims directly. The standing warning applies: re-measure on real
 geometry before sizing anything.
 
 ## Sources

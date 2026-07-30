@@ -1,6 +1,6 @@
 """Coarse tier with a SOUND two-level broad phase.
 
-The handover (O13) notes that the earlier broad-phase sketch was unsound
+An earlier broad-phase sketch was unsound
 because it skipped intra-group pairs. This one is sound by construction:
 
   level 1: each body gets a bounding sphere that provably encloses all of its

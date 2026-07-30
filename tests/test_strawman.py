@@ -1,4 +1,4 @@
-"""Property tests for the decisions in docs/explanations/handover.md.
+"""Property tests for the decisions in docs/explanations/decisions/.
 
 Each test names the decision it protects. Several of these would have caught
 errors made while designing this — the round-trip test found a genuine bug in

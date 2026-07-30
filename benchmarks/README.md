@@ -2,7 +2,7 @@
 
 The scripts behind the numbers in `docs/explanations/collision-libraries.md`.
 
-They exist because the handover records a measurement (M5) whose only artefact
+They exist because one early measurement's only artefact
 was a chat transcript, and which turned out to be the number the whole
 architecture was being sized against — and to be wrong in premise. Every figure
 in that document should be reproducible by running something here.

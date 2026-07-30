@@ -2,7 +2,7 @@
 
 Built to settle two questions that reasoning was not settling: whether the
 branch-fixed inverse is closed-form (O1) and whether it is fast enough to stay
-in-process (O2). Both are answered — see ``docs/explanations/handover.md``.
+in-process. Both are answered — see ``docs/explanations/exploration/``.
 
 **Read this before using any of it as a design input.** The modules divide into
 two halves with very different status:
