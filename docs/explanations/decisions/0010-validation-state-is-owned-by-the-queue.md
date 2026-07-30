@@ -28,6 +28,13 @@ holds an entry there while the validator works. The validator never returns it;
 it returns exactly one of ✓, ✗ or ?. The validator produces results, the queue
 tracks progress.
 
+**? can only come from the validator**, because the validator is the only thing
+that listifies a plan and so the only thing that can find out a plan cannot be
+listified. An entry therefore cannot be marked ? at insertion: every plan is
+dispatched and held at ⏳ until it validates, fails, or turns out to be
+unlistifiable. There is no way to declare a plan adaptive in advance and skip
+the round trip.
+
 ## Consequences
 
 **Validation is not separable from queueing.** You cannot express "this scan is

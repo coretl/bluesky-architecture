@@ -72,12 +72,18 @@ Holds scans with a validation verdict per entry. Four states, not two:
 
 ⏳ comes first because it is where every entry starts, and it is **the queue's
 own bookkeeping** — the queue holds an entry at ⏳ while the validator works on
-it. The validator never returns ⏳. It returns exactly one of ✓, ✗, or ? (the
-last when it discovers the plan cannot be listified).
+it. The validator never returns ⏳. It returns exactly one of ✓, ✗ or ?.
 
 That split is worth keeping straight: the validator produces *results*, the
 queue tracks *progress*. It is the same division that makes validation state
 queue state.
+
+**? has exactly one source.** The validator is the only thing that listifies a
+plan, so it is the only thing that can discover a plan cannot be listified.
+Which means an entry cannot be marked ? at insertion — the queue has no way to
+know. Every plan goes to the validator and is held at ⏳ until it either
+validates, fails, or turns out to be unlistifiable. There is no shortcut for
+adaptive plans, and no way to declare one in advance.
 
 Verdicts are **applied after insertion** and **revoked when control leaves the
 queue** — if anyone moves the beamline outside the queue, every tick disappears
