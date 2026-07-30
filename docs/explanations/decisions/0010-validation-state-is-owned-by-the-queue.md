@@ -20,8 +20,8 @@ Validation verdicts are held on queue entries. The queue is the authority on
 whether the beamline is under its control, and therefore on whether a verdict is
 still meaningful.
 
-An entry has one of four states, not two: validated, failed, validation-queued,
-and not-validatable.
+An entry has one of four states, not two: validated (✓), failed (✗), queued for
+validation (⏳), and not validatable (?).
 
 ## Consequences
 
@@ -35,12 +35,19 @@ It promotes reconciliation with the existing `daq-queuing-service` from a late
 task to an early architectural decision, since that service is the obvious place
 for verdicts to live.
 
+The certificate travels the same way. The validator returns it to the queue
+rather than handing it to the executor, and the queue pushes it down with the
+task — so it is held against the entry and revoked by the same rule that revokes
+the tick. The two processes never talk to each other directly, which keeps the
+validator's read-only isolation intact and means there is one place that knows
+whether a scan is ready to run.
+
 The fourth state matters more than it looks. An adaptive plan cannot be
-listified in advance and so can never be validated up front, but it must still
-run. That makes the **unvalidated path the base case** and the certificate an
+listified in advance and so can never be validated up front (?), but it must
+still run. That makes the **unvalidated path the base case** and the certificate an
 optimisation on top of it — not a prerequisite. It also means the runtime check
 and the select-and-check-now path carry the real weight, and must be correct on
 their own.
 
-A rule is still needed for whether the queue may start an entry that is queued
-for validation but not yet validated.
+A rule is still needed for whether the queue may start a ⏳ entry — queued for
+validation, but not yet validated.

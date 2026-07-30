@@ -30,23 +30,27 @@ because the beamline can change underneath a decision made earlier.
 flowchart TB
     Script["Script<br/><i>for: scan</i>"]
     GUI["Mapping GUI"]
-    Q{{"Queue<br/>one verdict per entry<br/>✓ / ✗ / queued / unvalidatable"}}
+    Q{{"Queue<br/>one verdict per entry<br/>✓ &nbsp; ✗ &nbsp; ⏳ &nbsp; ?"}}
 
     Script -- "insert and wait" --> Q
     GUI -- "insert" --> Q
 
     subgraph BA ["blueapi"]
-        subgraph V ["VALIDATOR &mdash; read-only, non-blocking"]
-            VS["sample scan function<br/>~10 Hz (open)"]
-        end
-        subgraph E ["EXECUTOR &mdash; owns the devices"]
-            ES["sample scan function<br/>5 kHz"]
+        direction TB
+        subgraph procs [" "]
+            direction LR
+            subgraph V ["VALIDATOR &mdash; read-only, non-blocking"]
+                VS["sample scan function<br/>~10 Hz (open)"]
+            end
+            subgraph E ["EXECUTOR &mdash; owns the devices"]
+                ES["sample scan function<br/>5 kHz"]
+            end
         end
         KIN["<b>Transform</b> &mdash; shared by both<br/>pure sync maths, no I/O<br/>forward + branch-fixed inverse"]
     end
 
-    Q --> VS
-    Q --> ES
+    Q -- "scan to validate" --> VS
+    Q -- "task + certificate" --> ES
     VS --> KIN
     ES --> KIN
     KIN -- "joint arrays, batched" --> AC
@@ -55,10 +59,13 @@ flowchart TB
 
     AC -- "per-point verdicts" --> VS
     AC -- "per-point verdicts" --> ES
-    VS -- "✓ / ✗" --> Q
+    VS -- "✓ / ✗ &nbsp;+&nbsp; certificate<br/>(branch selection)" --> Q
     ES -- "abort and stop motors<br/>if a batch fails" --> Q
-    VS -. "certificate<br/>(branch selection)" .-> ES
     KIN -- "serialised into RunStart" --> AN["analysis"]
+
+    %% layout-only wrapper: keeps VALIDATOR and EXECUTOR on one rank
+    %% without drawing a third box around them
+    style procs fill:none,stroke:none
 ```
 
 *The validator's sample rate is **open** — 10 Hz is the current premise and is
@@ -72,8 +79,8 @@ Holds scans with a validation verdict per entry. Four states, not two:
 |---|---|
 | ✓ | validated — will probably run |
 | ✗ | validation failed |
-| validation queued | not yet checked; validation is asynchronous |
-| not validatable | plan is adaptive and cannot be listified in advance |
+| ⏳ | queued for validation; not checked yet, because validation is asynchronous |
+| ? | not validatable — the plan is adaptive and cannot be listified in advance |
 
 Verdicts are **applied after insertion** and **revoked when control leaves the
 queue** — if anyone moves the beamline outside the queue, every tick disappears
@@ -162,8 +169,13 @@ Failure has two shapes, and the user's next action differs:
 
 ### Certificate
 
-What the validator emits and the executor consumes. It carries **branch
-selection only**, per window.
+What the validator emits and the executor consumes — but not directly. The
+validator returns it to the **queue**, where it is held against the entry
+alongside the verdict, and the queue pushes it down to the executor with the
+task. The certificate is part of an entry's validation state, so it is revoked
+by the same rule that revokes the tick.
+
+It carries **branch selection only**, per window.
 
 It is a **recipe, not a result**. It does not carry joint positions, because for
 a fly scan they do not exist yet — an hour at 20 kHz is ~72M points, chunk N+1
