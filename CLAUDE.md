@@ -71,8 +71,8 @@ each.
   are built with `--fail-on-warning`.
 - **Sphinx does not validate mermaid.** It embeds the source for client-side
   rendering, so a broken or badly-laid-out diagram builds clean and fails only
-  in a browser. To actually see one, base64url-encode the diagram body and
-  fetch `https://mermaid.ink/img/<b64>?type=png`, then look at the PNG. Do not
+  in a browser. `tools/render_diagram.sh diagram.mmd out.png` renders one so
+  you can look at it. Do not
   iterate on layout blind — dagre's ranking is not obvious, and back edges
   (anything pointing "up" the flow) will invert the whole diagram. Prefer
   encoding returns as `↑` in a forward edge's label over drawing a real

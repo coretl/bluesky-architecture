@@ -39,15 +39,6 @@ call the anti-collision service.
 `StandardMovable` and `StandardFlyable` support wrapped values. A collidable
 axis given a **bare** value raises; there is no fallback to self-certification.
 
-It is also **the solver**. Selection and checking are not separate concerns:
-selection is checking with a search over branches. The preprocessor considers
-transforms with branches, position limits, velocity limits, and — optionally —
-an anti-collision service.
-
-The same component runs in **three modes**, differing only in the state they
-read: the validator over a whole plan against projected state, the preprocessor
-inline against live state, and a direct call for interactive use.
-
 ## Consequences
 
 **A standard `bps.mv` plan works unmodified.** `RunEngine.__call__` composes
@@ -89,22 +80,10 @@ rejected: there is not enough stopping distance to abort usefully once a
 collision is detected. The design is a gatekeeper with nothing behind it, which
 is defensible only under the classification in ADR-0003.
 
-**The three modes must never differ in algorithm, only in state.** If the
-validator picks one branch and the preprocessor would pick another, the
-certificate is worthless — the executor either ignores it or moves somewhere
-nothing checked. Same transforms, same targets, same limits ⟹ same branch. That
-is a property test, not a convention, and it should exist from the start because
-this kind of agreement decays silently.
-
 **The preprocessor reads the certificate when there is one**, taking the branch
 decision rather than repeating the search. That makes the certificate an
 optimisation on the unvalidated path rather than a prerequisite — which it has
 to be, since adaptive plans never have one.
-
-**The service is optional.** Without it, the same component still does
-transforms, branch selection and limit checking, with selection falling back to
-limits plus continuity. So branch selection is not solely a collision concern,
-and the preprocessor can be deployed before anti-collision exists on a beamline.
 
 **It is a class, exported from the beamline module** the way devices are, rather
 than a function plus an instruction to keep a reference. One instance by
@@ -123,3 +102,5 @@ rejects anything that is not a bluesky protocol, so that is not free today.
 it and should not have to install ophyd-async. The checker plausibly belongs in
 ophyd-async — it is in scope there and needs `DerivedSignalFactory` internals —
 and can be split out later if that turns out wrong.
+
+What the checker *is*, as opposed to how it hooks in, is ADR-0012.

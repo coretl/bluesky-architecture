@@ -266,6 +266,10 @@ Which primitive the coarse tier uses is **open**, and is the binding constraint
 on the whole design. Hand-authored capsule models are ruled out on cost, so it
 must be derived automatically from the mesh.
 
+Everything known about the service as it exists — what the prototype does, what
+was measured against it, and what remains to settle with its author — is in
+[](anti-collision-service.md).
+
 ## How checking is hooked in
 
 Collision checking has to cover **every** move of a collidable axis, whether it

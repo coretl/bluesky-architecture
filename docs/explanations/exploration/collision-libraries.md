@@ -6,9 +6,10 @@ the triangle-level check be a Python library, and what does the rest of the
 industry do.
 
 The figures here are reproduced and cross-referenced in [](measurements.md);
-the conclusions that were later overturned are catalogued in [](reversals.md).
-This page keeps the survey of what exists outside DLS, which the other two do
-not cover.
+the conclusions that were later overturned are catalogued in [](reversals.md);
+and everything specific to the DLS anti-collision service is gathered in
+[](../anti-collision-service.md). This page keeps the survey of what exists
+*outside* DLS, which the others do not cover.
 
 All measurements below are on the **real i16 geometry** from
 `garethnisbet/Robot` (`i16_scene.glb`, 18 meshes, 233,034 triangles), in a

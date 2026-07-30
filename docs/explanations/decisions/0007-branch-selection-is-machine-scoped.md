@@ -2,7 +2,13 @@
 
 ## Status
 
-Accepted
+**Superseded by [ADR-0012](0012-the-checker-is-the-solver.md).**
+
+Kept for its reasoning. Its substance — enumeration is device-scoped, selection
+is machine-scoped, and the Infeasible/Unsatisfiable taxonomy — survives intact
+in 0012. What changed is that there is no longer a solver to be machine-scoped:
+selection and checking turned out to be one component, so the property is now
+structural rather than a rule about where to put an object.
 
 ## Context
 
