@@ -30,42 +30,33 @@ because the beamline can change underneath a decision made earlier.
 flowchart TB
     Script["Script<br/><i>for: scan</i>"]
     GUI["Mapping GUI"]
-    Q{{"Queue<br/>one verdict per entry<br/>✓ &nbsp; ✗ &nbsp; ⏳ &nbsp; ?"}}
-
     Script -- "insert and wait" --> Q
     GUI -- "insert" --> Q
+    Q{{"Queue<br/>a verdict per entry<br/>✓ &nbsp; ✗ &nbsp; ⏳ &nbsp; ?"}}
+
+    Q -- "scan to validate<br/>↑ ✓/✗ + certificate" --> VS
+    Q -- "task + certificate<br/>↑ abort on failure" --> ES
 
     subgraph BA ["blueapi"]
-        direction TB
-        subgraph procs [" "]
-            direction LR
-            subgraph V ["VALIDATOR &mdash; read-only, non-blocking"]
-                VS["sample scan function<br/>~10 Hz (open)"]
-            end
-            subgraph E ["EXECUTOR &mdash; owns the devices"]
-                ES["sample scan function<br/>5 kHz"]
-            end
+        subgraph V ["VALIDATOR &mdash; read-only, non-blocking"]
+            VS["sample scan function<br/>~10 Hz (open)"]
         end
-        KIN["<b>Transform</b> &mdash; shared by both<br/>pure sync maths, no I/O<br/>forward + branch-fixed inverse"]
+        subgraph E ["EXECUTOR &mdash; owns the devices"]
+            ES["sample scan function<br/>5 kHz"]
+        end
+        KIN["<b>Transform</b><br/>pure sync maths, no I/O"]
     end
 
-    Q -- "scan to validate" --> VS
-    Q -- "task + certificate" --> ES
+    subgraph EXT ["outside blueapi"]
+        AN["analysis"]
+        AC["<b>ANTI-COLLISION SERVICE</b><br/>external, owns the geometry<br/>coarse tier every point<br/>exact tier on flagged pairs"]
+        AN ~~~ AC
+    end
+
     VS --> KIN
     ES --> KIN
-    KIN -- "joint arrays, batched" --> AC
-
-    AC["<b>ANTI-COLLISION SERVICE</b><br/>external, owns the geometry<br/>coarse tier every point<br/>exact tier on flagged pairs only"]
-
-    AC -- "per-point verdicts" --> VS
-    AC -- "per-point verdicts" --> ES
-    VS -- "✓ / ✗ &nbsp;+&nbsp; certificate<br/>(branch selection)" --> Q
-    ES -- "abort and stop motors<br/>if a batch fails" --> Q
-    KIN -- "serialised into RunStart" --> AN["analysis"]
-
-    %% layout-only wrapper: keeps VALIDATOR and EXECUTOR on one rank
-    %% without drawing a third box around them
-    style procs fill:none,stroke:none
+    KIN -- "serialised into RunStart" --> AN
+    KIN -- "joint arrays, batched<br/>↑ per-point verdicts" --> AC
 ```
 
 *The validator's sample rate is **open** — 10 Hz is the current premise and is
