@@ -324,6 +324,55 @@ Either way the velocity-guess padding disappears, D18 and D21 stop being in
 tension, and a tick can mean "will run" rather than "probably" — which was the
 conclusion, reached by a different route than predicted.
 
+### Sound padding for the validator, measured
+
+`benchmarks/bench_validator.mjs` builds the articulated i16, fits spheres, and
+tests swept capsules against densely-sampled ground truth at several rates.
+
+A sphere on a rotating link sweeps an arc, so the exact swept volume is a torus
+segment. Bounding the arc by its chord plus a radius inflation turns it back
+into a capsule and the test into segment-segment distance.
+
+**The obvious inflation is wrong.** The single-arc sagitta,
+`d_j (1 - cos(dtheta_j/2))` summed over ancestor joints, is *not* conservative
+for a chain: rotating an upstream joint also moves the downstream axes, so
+individual arc deviations do not compose additively. Measured, it is violated
+by up to 3.9 mm on i16. The check caught this before it was written down.
+
+What is rigorous is the path-length bound. A point `q` on a path of length `L`
+from `p0` to `p1` satisfies `|q-p0| + |q-p1| <= L`, so its distance to the chord
+is at most `min(|q-p0|, |q-p1|) <= L/2`. With `L = sum_j d_j |dtheta_j|` that
+gives an inflation that holds at every rate tested, worst-case overshoot
+-0.0074 mm — tight, never violated.
+
+| validator rate | inflation (mean) | (max) | 1-hour scan | bound |
+|---|---|---|---|---|
+| 10 Hz | 66 mm | **263 mm** | 1.6 s | holds |
+| 50 Hz | 13 mm | 53 mm | 5.7 s | holds |
+| 200 Hz | 3.3 mm | 13 mm | 32 s | holds |
+| 1000 Hz | 0.66 mm | 2.6 mm | 117 s | holds |
+
+Two things follow.
+
+**The current scheme is under-padded, not over-padded.** At 10 Hz the sound
+inflation reaches 263 mm. Padding ~50 mm for typical velocity is roughly 5x
+short in the worst case, which is the concrete content of "the tick means it
+will probably run".
+
+**Sample rate is the lever, not the checking method.** Inflation scales as
+1/rate and cost scales as rate, so the product is fixed and the choice is where
+on that line to sit. 200 Hz gives 3.3 mm mean inflation for 32 s per 1-hour
+scan — sound, tight enough not to reject real scans, and trivially affordable
+because validation is offline. Swept checking costs about 2x discrete
+(32-45 us/interval), which is noise at these totals.
+
+Feasibility in JavaScript is not in question: the whole thing is 32-45 us per
+interval in plain three.js with no BVH involved.
+
+Caveat: this assumes |omega| <= 1.6 rad/s. Inflation scales linearly with joint
+speed, so at robot-arm speeds every figure above is ~5x worse. The real
+per-axis velocities remain unmeasured.
+
 ### The arc correction
 
 Both CCD variants assume the sphere travels in a straight line between samples.
