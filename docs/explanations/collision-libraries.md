@@ -127,6 +127,55 @@ the Lloyd-relaxed clustering used here. Note the fine tier confirms exactly the
 same collision count at both K, which is the consistency check that the coarse
 tier is not changing the answer, only the amount of work.
 
+### Rejection rate vs BVH depth
+
+If hand-authored capsule models are unaffordable — mech engineers export
+meshes, and every CAD revision would need re-authoring — the coarse tier has to
+be derived automatically. A mesh's BVH already is a fitted hierarchy of
+bounding volumes: built automatically, conservative by construction, and
+incapable of drifting out of sync because it *is* the mesh's structure.
+
+So the coarse tier becomes a depth knob on the existing BVH: descend both trees
+together, and flag the pair if the boxes still overlap at the limit. Depth 0 is
+exactly what the prototype does today. `benchmarks/bench_bvhdepth.mjs`,
+articulated i16, 136 pairs after exemption:
+
+| depth | nodes/mesh | rejected | flagged/pose | ms/pose |
+|---|---|---|---|---|
+| 0 | 1 | 71.3% | 39.1 | ~0.12 |
+| 1 | 3 | 76.5% | 32.0 | 0.115 |
+| 2 | 7 | 78.2% | 29.7 | 0.112 |
+| 3 | 15 | 80.2% | 27.0 | 0.127 |
+| 4 | 28 | 81.1% | 25.7 | ~0.12 |
+| 6 | 94 | 82.2% | 24.2 | ~0.12 |
+
+**Cost is flat with depth.** Descending deeper is free, because the descent
+prunes as it goes — the extra nodes are only visited where boxes already
+overlap. Depth 3-4 is the knee.
+
+Against 8.01 genuinely-colliding pairs per pose in this model, false positives
+fall from 31.1 to 16.2 — **halved, for nothing**. That is worth taking, and it
+is a small change to code that already exists rather than a new subsystem.
+
+But it does not on its own make exact checking viable at 200 Hz. Sixteen
+near-miss pairs per pose at coal's 250 us is 4 ms/pose, and 720,000 intervals
+in an hour-long scan is roughly an hour of compute. The coarse tier has to flag
+far less than that.
+
+**The saturation is the interesting part.** Rejection stops improving after
+depth 3-4, which says the limit is the *shape* of the bounding volume rather
+than how many of them there are. `three-mesh-bvh` nodes are axis-aligned in the
+mesh's local frame, so a rotated arm's world AABB is loose no matter how finely
+the tree is subdivided. That is precisely what `coal`'s `OBBRSS` nodes fix:
+oriented boxes and rectangle-swept-spheres rotate exactly instead of inflating.
+Measuring an OBB-node descent is the obvious next step, and it is the strongest
+remaining argument for coal over the JavaScript stack.
+
+Caveat: the 8.01 collisions per pose are the permanently-touching parts this
+model has at its own demoPose, so absolute false-positive rates here remain
+untrustworthy. The *relative* improvement with depth, and the flat cost, do not
+depend on that.
+
 ## What the industry does
 
 **NVIDIA cuRobo** approximates the robot as a set of spheres attached to links
