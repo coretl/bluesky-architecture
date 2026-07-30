@@ -25,25 +25,31 @@ The null case is an explicit solver that raises, never `None`.
 
 ## Consequences
 
-> **Amended by ADR-0011.** This originally required a solver to be *injected
-> into each device*, and noted that this made devices non-standalone — a
-> departure from how ophyd-async works. That is no longer the mechanism.
-> Selection happens in a plan preprocessor and the chosen branch reaches the
-> device wrapped around the value it applies to, so devices receive a branch
-> rather than owning a solver and stay standalone. The claim below that
-> selection is machine-scoped is unchanged and is now structural: the message
-> layer is the only place the whole machine is visible.
+> **Amended by ADR-0011, twice over.** This originally required a solver to be
+> *injected into each device*, which made devices non-standalone. That is no
+> longer the mechanism: selection happens in a plan preprocessor and the branch
+> reaches the device wrapped around the value it applies to.
+>
+> Further: **there is no separate solver at all.** Selection and collision
+> checking are one component, because selection *is* checking with a search over
+> branches — same inputs, same service, same answer shape. The claim below that
+> selection is machine-scoped survives and is now structural rather than
+> conventional, since the message layer is the only place the whole machine is
+> visible.
 
 The forward path stays pure regardless, so monitor updates, analysis and
 descriptors are unaffected.
 
 `None` would conflate "single-valued, nothing to choose" with "must not move" —
 two states with opposite required behaviour, where getting it wrong means an
-unchecked move. Hence the explicit null solver.
+unchecked move. That distinction survives the amendment above, but it is now
+expressed as a bare value being rejected rather than as a null solver object:
+"nothing to choose" is a single-member branch set, "must not move" is an
+uncertified value, and they are no longer representable by the same thing.
 
-The loop hazard that motivated a null solver — the validation process
-instantiates devices, which reference a solver, which is what the process exists
-to serve — no longer exists. The validator interprets messages rather than
+The loop hazard that motivated all this — the validation process instantiates
+devices, which reference a solver, which is what the process exists to serve —
+no longer exists. The validator interprets messages rather than
 executing them, so it never reaches a device's write path at all.
 
 Failures have two shapes and the user's next action differs: **infeasible** (the

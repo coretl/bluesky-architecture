@@ -39,6 +39,15 @@ call the anti-collision service.
 `StandardMovable` and `StandardFlyable` support wrapped values. A collidable
 axis given a **bare** value raises; there is no fallback to self-certification.
 
+It is also **the solver**. Selection and checking are not separate concerns:
+selection is checking with a search over branches. The preprocessor considers
+transforms with branches, position limits, velocity limits, and — optionally —
+an anti-collision service.
+
+The same component runs in **three modes**, differing only in the state they
+read: the validator over a whole plan against projected state, the preprocessor
+inline against live state, and a direct call for interactive use.
+
 ## Consequences
 
 **A standard `bps.mv` plan works unmodified.** `RunEngine.__call__` composes
@@ -70,9 +79,9 @@ condition.
 Plans moving axes that cannot reach anything are unaffected, which is what makes
 this deployable against an existing estate.
 
-**Interactive use needs `certified_move` to be a one-liner.** If the sanctioned
-route is more awkward than a raw `caput`, the bypass wins and is worse than what
-was banned. Ergonomics here is a design requirement, not documentation.
+**Interactive use must be a one-liner.** If the sanctioned route is more awkward
+than a raw `caput`, the bypass wins and is worse than what was banned.
+Ergonomics here is a design requirement, not documentation.
 
 **There is no backstop for motion outside this RunEngine** — another hutch,
 engineering mode, a direct `caput`. A service-side watchdog was considered and
@@ -80,11 +89,37 @@ rejected: there is not enough stopping distance to abort usefully once a
 collision is detected. The design is a gatekeeper with nothing behind it, which
 is defensible only under the classification in ADR-0003.
 
-**Per-beamline wiring is unsolved.** The preprocessor and `certified_move` both
-need to know which axes are collidable and which service owns them, and the same
-shape recurs for a generic `scanspec_scan` needing a beamline's devices and
-triggering strategy. blueapi already resolves `Device`-typed plan parameters
-from names against a per-process context; extending that to non-device
-collaborators would solve both, and would give the validator substitution for
-free. But `register_device` currently rejects anything that is not a bluesky
-protocol, so this is not free today.
+**The three modes must never differ in algorithm, only in state.** If the
+validator picks one branch and the preprocessor would pick another, the
+certificate is worthless — the executor either ignores it or moves somewhere
+nothing checked. Same transforms, same targets, same limits ⟹ same branch. That
+is a property test, not a convention, and it should exist from the start because
+this kind of agreement decays silently.
+
+**The preprocessor reads the certificate when there is one**, taking the branch
+decision rather than repeating the search. That makes the certificate an
+optimisation on the unvalidated path rather than a prerequisite — which it has
+to be, since adaptive plans never have one.
+
+**The service is optional.** Without it, the same component still does
+transforms, branch selection and limit checking, with selection falling back to
+limits plus continuity. So branch selection is not solely a collision concern,
+and the preprocessor can be deployed before anti-collision exists on a beamline.
+
+**It is a class, exported from the beamline module** the way devices are, rather
+than a function plus an instruction to keep a reference. One instance by
+construction, and the same object serves the interactive path — one policy, no
+second implementation to drift. It does bypass the RunEngine when used that way,
+so it cannot see a scan in flight.
+
+**Per-beamline wiring is narrower than it first looked.** The checker needs no
+injection mechanism — it is wired at RunEngine construction and reached
+interactively by import, so it is never a plan parameter. What remains is a
+generic `scanspec_scan` needing a beamline's trigger strategy, for which
+blueapi's existing name resolution is the obvious fit; but `register_device`
+rejects anything that is not a bluesky protocol, so that is not free today.
+
+**Where it lives.** `Transform` belongs in its own package, since analysis needs
+it and should not have to install ophyd-async. The checker plausibly belongs in
+ophyd-async — it is in scope there and needs `DerivedSignalFactory` internals —
+and can be split out later if that turns out wrong.

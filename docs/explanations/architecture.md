@@ -165,17 +165,44 @@ separate, so the collision model never needs to know hkl was involved. The same
 `Transform` classes are reused across beamlines: a robot-arm diffractometer
 stacks three, a kappa geometry stacks two.
 
-### Solver
+### Checker — selection and checking are one component
 
-Branch **enumeration** is device-scoped — each device knows its own kinematics.
+Branch **enumeration** is device-scoped: each device knows its own kinematics.
 Branch **selection** is machine-scoped, because two diffractometers give 8×8
 combinations per window and a combination can work when neither device's locally
 preferred choice does.
 
-The solver hook is for **collision-constrained** devices, not multi-valued ones.
-A two-jack system has nothing to choose but still needs its `set` checked. "Zero
-branches" and "no checking" are different states, so the null case is an
-explicit solver that raises, not `None`.
+Selection and collision checking are **the same component**, because selection
+*is* checking with a search over branches — same inputs, same service, same
+answer shape. There is no separate solver.
+
+One component with three modes, differing **only in the state they read**:
+
+| mode | reads | emits | on failure |
+|---|---|---|---|
+| validator | whole plan, projected state | certificate + verdict | ✗ or ? |
+| preprocessor | Msg stream, live state | wrapped values | raise |
+| interactive | one call, live state | the move | raise |
+
+That constraint is a testable property rather than a convention: same
+transforms, same targets, same limits ⟹ same branch, whichever mode is running.
+If the validator picks one branch and the preprocessor would pick another, the
+certificate is worthless — the executor either ignores it or moves somewhere
+nothing checked.
+
+It considers four things, only the last of which is remote:
+
+- **transforms with branches** — projecting derived targets to joint space
+- **position limits**
+- **velocity limits** — also needed to compute the swept-path inflation, so the
+  two uses should share the number rather than each fetching it
+- **an anti-collision service, optionally**
+
+The service being optional matters for deployment: a beamline gets transforms,
+branch selection and limit checking from the same preprocessor whether or not
+anti-collision exists there yet. Without a service, selection falls back to
+limits plus continuity — stay on the branch you are on — which means branch
+selection is not solely a collision concern.
 
 Failure has two shapes, and the user's next action differs:
 
@@ -201,9 +228,17 @@ construction. So the branch must reach runtime IK; it cannot be resolved away at
 insertion.
 
 It is invalidated by any state change in the collision scope. If invalid, get a
-new one. Entries carry the derived values they were solved for, and `set`
-asserts the request matches before applying, so a stale branch raises rather
-than moving somewhere plausible and wrong.
+new one.
+
+**The preprocessor reads it to avoid repeating the validator's work.** Given a
+certificate it takes the branch decision straight from it rather than searching
+again; without one it searches. That is what makes the certificate an
+optimisation on the unvalidated path rather than a prerequisite for it — which
+matters, because adaptive plans never have one.
+
+There is no machinery guarding against a branch being applied at a position it
+was not solved for. Because the decision travels wrapped around the value it
+applies to, rather than stashed beside it, that desync is unrepresentable.
 
 ### Anti-collision service
 
@@ -265,8 +300,10 @@ same way `Certified[float]` carries a single axis.
 
 ### Installed on `RE.preprocessors`
 
-The checker is a plan preprocessor, added to `RE.preprocessors` at startup by
-the beamline's configuration. `RunEngine.__call__` composes it over every plan
+The checker is a **class**, instantiated with the beamline's scope and exported
+from the beamline module the way devices already are, so there is one instance
+by construction rather than an instruction to hold a reference. Its instance is
+added to `RE.preprocessors` at startup. `RunEngine.__call__` composes it over every plan
 it runs, so **a standard `bps.mv` plan works unmodified** — the preprocessor
 sees the `set` messages, certifies them as a group, and passes the wrapped
 values down.
@@ -293,9 +330,21 @@ Non-collidable axes are unaffected — the ban is scoped by the collision-scope
 declaration, so existing plans that move things which cannot reach anything keep
 working.
 
-For interactive use there is a `certified_move` helper, so the sanctioned path
-is a one-liner. That matters: if the blessed route is more awkward than the
-bypass, people will find the bypass, and it will be worse than what was banned.
+For interactive use the same object provides the move:
+
+```python
+from dodal.beamlines.i16 import checker
+await checker.set(mirror, HorizontalMirrorDerived(x=3, roll=12))
+```
+
+One object, one policy, no second implementation to drift. That the sanctioned
+route is a one-liner matters: if the blessed path is more awkward than a raw
+`caput`, the bypass wins and is worse than what was banned.
+
+It does bypass the RunEngine, which is right for interactive use but means it
+cannot see a scan in flight — live PVs say where things are now, not where a
+running scan is about to put them. Either the checker holds a reference to the
+RE and refuses while a plan is running, or that is a documented hazard.
 
 ### Per-beamline wiring
 
@@ -304,70 +353,110 @@ which axes are collidable, which service owns them. The same problem exists for
 a generic `scanspec_scan`, which needs a beamline's devices and triggering
 strategy while the rest of the plan stays generic.
 
-blueapi already solves this shape for devices: a plan parameter typed as a
-`Device` is submitted over the API as a *name* and resolved server-side against
-that beamline's context, with the JSON schema enumerating valid names. Extending
-the same name-resolution to non-device collaborators — a trigger strategy, a
-collision scope — would let generic plans declare what they need in their
-signature and have the beamline supply it, without global state.
+The checker itself needs no such mechanism: it is wired at RunEngine
+construction and reached interactively by import, so it is never a plan
+parameter.
 
-Name resolution against a per-process context also gives the validator
-substitution for free: it registers different implementations under the same
-names and runs the same plans unchanged.
+What still needs it is a generic `scanspec_scan`, which needs a beamline's
+devices and triggering strategy while the rest of the plan stays generic.
+blueapi already solves that shape for devices — a plan parameter typed as a
+`Device` arrives over the API as a *name* and is resolved server-side against
+that beamline's context, with the JSON schema enumerating valid names.
 
 **Open:** blueapi's `Device` is a union of bluesky protocols and
 `register_device` rejects anything failing `is_bluesky_compatible_device`, so a
-strategy or scope object cannot be registered today. Whether that is a small
-extension or a rewrite is unmeasured — see [](open-questions.md).
+trigger strategy cannot be registered today. See [](open-questions.md).
+
+### Where it lives
+
+`Transform` belongs in **its own package**, because analysis needs it to convert
+recorded raw values to derived coordinates and should not have to install
+ophyd-async to do so.
+
+The checker plausibly belongs in **ophyd-async** — it is within scope there, and
+it needs `DerivedSignalFactory` internals. It may be worth splitting out later,
+but starting it there avoids inventing a package before the shape is settled.
 
 ## Execution contract
 
-```
-for window in scan:
-    prepare(device, window, certificate[window])
-    if window.moving_axes:  kickoff / complete
-    else:                   set(hkl) / trigger / read
-```
+Every move of a collidable axis arrives already certified. The device checks the
+certificate is still valid, applies the branch it carries, moves, and discards
+it.
 
 ```{mermaid}
 sequenceDiagram
     autonumber
     participant P as plan
+    participant C as checker<br/>(preprocessor)
     participant D as device
-    participant S as solver
     participant AC as anti-collision
 
-    Note over P,AC: prepared path — certificate already validated this point
-    P->>D: prepare(window, certificate[window])
-    D->>D: store branch (consumed, not sticky)
-    P->>D: set(h, k, l)
-    D->>D: assert request matches what the branch was solved for
-    D->>D: derived_to_raw(branch, hkl) — closed form
-    D-->>P: raw setpoints, no check needed
+    Note over P,AC: every move in a plan, certified as a group
+    P->>C: Msg("set", mirror, HorizontalMirrorDerived(...))
+    C->>C: project through Transform, search branches
+    C->>AC: candidate joint positions
+    AC-->>C: verdict
+    C->>D: set(Certified(value, branch))
+    D->>D: check_valid() — cheap, PVs against thresholds
+    D->>D: derived_to_raw(branch, value)
+    D->>D: one deferred move, then discard the certificate
 
-    Note over P,AC: unprepared path — bps.mv, or an adaptive plan
-    P->>D: set(h, k, l)
-    D->>S: select(targets)
-    S->>AC: check candidate joint positions
-    AC-->>S: verdict per candidate
-    S-->>D: consistent branch assignment
-    D-->>P: raw setpoints
+    Note over P,AC: with a certificate, the search is skipped
+    P->>C: Msg("set", mirror, value)
+    C->>C: take the branch from the certificate
+    C->>D: set(Certified(value, branch))
 
-    Note over P,AC: stale branch — prepare, then something intervenes
-    P->>D: prepare(window 7)
-    P->>D: set(different hkl)
-    D--xP: StaleBranch — refuses rather than moving somewhere plausible
+    Note over P,AC: bare value on a collidable axis
+    P->>D: set(3.0)
+    D--xP: raise — there is no self-certification
 ```
 
-`set` with a prepared branch applies it and skips checking, because the
-certificate already validated that point and the path to it. `set` without a
-prepared branch selects and checks now — which is what `bps.mv(h, k, l)` does,
-so it keeps working with no special handling.
+### Coordinated moves are one value, not several
 
-`prepare` is **consumed, not sticky**: it clears after one `set`, so an
-unprepared `set` always falls through to select-and-check. Without that, a
-prepare for window 7 followed by an intervening move would apply window 7's
-branch at a different position and fail silently.
+A device that can move several axes together exposes **one** settable taking a
+composite value:
+
+```python
+async def set(self, value: HorizontalMirrorDerived) -> None: ...
+```
+
+so the whole mirror moves as a single deferred move. Which means:
+
+```python
+bps.mv(mirror.x, 3, mirror.roll, 12)   # WRONG
+```
+
+This is broken for a reason that has nothing to do with collisions: it issues
+two independent moves, the axes no longer start and stop together, and the path
+acquires corners. Every straight-line-in-joint-space assumption in this design
+depends on the composite move being used.
+
+The certified form is therefore `Certified[HorizontalMirrorDerived]`, not a
+`Certified[float]` per axis — which keeps the incentive pointing at the API that
+preserves coordination, rather than nudging people toward the one that breaks
+it.
+
+### What the device does with it
+
+`DerivedSignalFactory` extracts the branch from the certificate and applies it to
+the transform; `StandardFlyable` does the same for a trajectory. That is new
+plumbing in ophyd-async — the branch has to reach `derived_to_raw`, which today
+takes no such argument.
+
+The rest is nearly free: `SignalTransformer` already holds the transform class,
+the raw devices and the transform parameter sources. What is missing is public
+access to them, and to the derived axis names, so the checker can be told about
+a `DerivedSignalFactory` and work out the rest itself.
+
+### Registration takes two overlapping sets
+
+The checker needs **every factory with branches**, so it can project; and the
+**collidable scope**, so it knows what to check. A mirror with a single-valued
+transform outside the scope is in neither. A raw collidable motor is only in the
+second. Keeping them distinct in the registration API is worth doing from the
+start, because assuming one list works right up until a beamline has both.
+
+### Windows and turnarounds
 
 scanspec2's `_step_windows` yields one window per setpoint, so per-window branch
 is per-point branch for step scans with no special case.

@@ -58,8 +58,9 @@ The fourth state matters more than it looks. An adaptive plan cannot be
 listified in advance and so can never be validated up front (?), but it must
 still run. That makes the **unvalidated path the base case** and the certificate an
 optimisation on top of it — not a prerequisite. It also means the runtime check
-and the select-and-check-now path carry the real weight, and must be correct on
-their own.
+and the uncertificated path carry the real weight, and must be correct on their
+own — the preprocessor searches for a branch rather than reading one, and
+everything else is identical.
 
 A rule is still needed for whether the queue may start a ⏳ entry — queued for
 validation, but not yet validated.
