@@ -25,8 +25,11 @@ load-bearing.
    features that fix outstanding design problems (below).
 5. **Don't write capsules in JavaScript.** The coarse tier should not be in
    the browser at all.
-6. **Continuous collision detection removes the padding compromise entirely.**
-   This is the most consequential finding here and it reopens D18.
+6. **The velocity padding is unnecessary, but CCD is not why.** Measured, CCD
+   is worth 2-3x, not the order of magnitude assumed. The real findings are
+   that the executor at 5 kHz is already sound by 12-100x, and that the
+   validator at 10 Hz misses up to 32% of collisions. Raising the validator's
+   rate fixes it without CCD. D18's compromise goes away either way.
 
 ## Measurements
 
@@ -98,8 +101,11 @@ shapes. **Drake** uses FCL. **Pinocchio** and the Humanoid Path Planner use
 margins, and a Nesterov-accelerated variant reporting up to 2× over FCL.
 
 The pattern across all of them: primitives (spheres, capsules, convex hulls)
-for anything on a hot path, meshes reserved for final verification, and
-continuous checking rather than dense sampling where correctness matters.
+for anything on a hot path, and meshes reserved for final verification. They
+also favour continuous over discrete checking — but note that those libraries
+are built for planners searching sparse configuration space, where samples are
+far apart. We are handed a dense trajectory at 5 kHz, which is a different
+regime, and the measurements below show it changes the answer.
 
 ## Answering the three questions
 
@@ -135,6 +141,13 @@ parameter, not of a separately-maintained model.
 with early exit, which is much cheaper than the 2.6 ms exact distance query
 while still answering "how close did it get".
 
+One caveat against it: **`coal` has dropped continuous collision detection.**
+`python-fcl` still exposes `continuousCollide`, `CCDMotionType` and
+`CCDSolverType`; `coal` exposes none of them. On the measurements below that
+does not matter much for the coarse tier, where swept checking is a
+segment-segment distance we can write in six lines of numpy, but it would
+matter if the fine tier ever needed swept mesh checks.
+
 Note that `curobo` on PyPI (version 0.2, "A simple python package") is **not**
 NVIDIA's cuRobo, which installs from source. Worth knowing before someone pip
 installs it.
@@ -144,35 +157,93 @@ installs it.
 Covered above. In short: FCL/coal and Bullet on CPU, cuRobo on GPU, spheres for
 the hot path, and continuous rather than discrete checking.
 
-## The finding that reopens D18
+## D18 revisited: the padding is unnecessary, but not because of CCD
 
 The current plan pads the coarse model for *typical* joint velocity over 0.1 s,
 knowingly accepting that a fast segment can slip between samples and be caught
-later by the fine check. That is a deliberate trade of soundness for usability
-— padding for maximum velocity would reject too many legitimate scans — and it
-is only defensible because D21 says this is soft machine protection.
+later by the fine check. That is a deliberate trade of soundness for usability,
+defensible only because D21 says this is soft machine protection.
 
-**Continuous collision detection makes the trade unnecessary.** Instead of
-checking discrete samples and padding to cover the gap, CCD checks the swept
-volume between consecutive samples. It answers exactly the question the padding
-was approximating, without the guess, and it is standard practice: it is why
-MoveIt added Bullet, and cuRobo's `horizon` dimension exists to support it.
+I expected continuous collision detection to remove the trade, and predicted it
+would let the validator stay at 10 Hz. **Measured, that prediction is wrong in
+its reasoning and right in its conclusion.** `benchmarks/bench_ccd.py`.
 
-If this holds, the consequences are large:
+Three methods on sphere-approximated bodies, against dense-sampled ground
+truth. A sphere swept along a straight line is exactly a capsule, so swept
+checking is segment-segment distance and needs no library; under linear
+interpolation the relative displacement is also linear, so the exact test is
+point-to-segment on the relative motion.
 
-- The validator can sample at 10 Hz and still be **sound**, rather than
-  probabilistic, because the swept check covers the intervening motion.
-- A ✓ stops meaning "probably" and starts meaning "will run, given the
-  preconditions hold".
-- The velocity-dependent padding parameter disappears, along with the tuning
-  problem where one number serves as padding, deadband and sample gap.
-- D18's soundness requirement and D21's licence to break it stop being in
-  tension, because nothing needs to be traded.
+**Lowest sample rate at which each method missed nothing**, over 20,000 random
+intervals:
 
-This needs measuring before it is believed — swept checks cost more per pair
-than discrete ones, and the whole point is that the coarse tier is cheap. But
-it is the difference between a system that is sound by construction and one
-that relies on a runtime backstop, and that is worth a day of benchmarking.
+| | discrete | swept | relative |
+|---|---|---|---|
+| diffractometer speeds (\|ω\| ≤ 1.6 rad/s) | 50 Hz | ≤10 Hz | ≤10 Hz |
+| robot-arm speeds (\|ω\| ≤ 8 rad/s) | 400 Hz | 25 Hz | 100 Hz |
+
+Cost per point, relative to discrete: relative CCD 2.5×, swept CCD 5.1×. So the
+comparison that matters is rate × per-point cost, each method at a rate where it
+is actually sound:
+
+| | discrete | relative | swept |
+|---|---|---|---|
+| diffractometer speeds | 0.011 s/s | **0.006 s/s** | 0.012 s/s |
+| robot-arm speeds | 0.090 s/s | 0.056 s/s | **0.029 s/s** |
+
+**CCD wins by 2× at diffractometer speeds and 3× at robot speeds.** Real, but
+nothing like the order of magnitude I assumed when I recommended benchmarking
+it. It does not on its own justify rebuilding the coarse tier around swept
+volumes.
+
+The genuinely useful findings are the other two:
+
+**The executor is already sound and the padding there is redundant.** Discrete
+checking needs 50 Hz at diffractometer speeds and 400 Hz at robot speeds. The
+executor samples at 5 kHz — 12× to 100× more than soundness requires. Whatever
+the padding is protecting against at 5 kHz, it is not the sampling gap.
+
+**The validator at 10 Hz is where the problem actually is.** Discrete checking
+at 10 Hz missed 9 of 850 real collisions at diffractometer speeds and 538 of
+1689 — 32% — at robot speeds. That is what the velocity padding is compensating
+for, and it is compensating for a lot.
+
+The fix does not require CCD. Sampling the validator at 50–400 Hz instead of
+10 Hz is sound by measurement, and validation is offline and non-blocking, so
+5–40× more points is affordable. Relative CCD at 10 Hz is roughly half the cost
+again if that turns out to matter.
+
+Either way the velocity-guess padding disappears, D18 and D21 stop being in
+tension, and a tick can mean "will run" rather than "probably" — which was the
+conclusion, reached by a different route than predicted.
+
+### The arc correction
+
+Both CCD variants assume the sphere travels in a straight line between samples.
+Joints rotate, so it travels on an arc, and the chord misses the arc by the
+sagitta, `r(1 - cos(θ/2))` for `θ = ω/R`. This is why swept checking still
+missed 26 intervals at 10 Hz and robot speeds — at ω = 8 rad/s the sagitta is
+39 mm, which dwarfs the geometry.
+
+Unlike a velocity guess this is **computable**, and it shrinks quadratically:
+
+| sample rate | ω = 1 rad/s | ω = 8 rad/s | current velocity padding |
+|---|---|---|---|
+| 10 Hz | 625 µm | 39469 µm | 50 mm |
+| 200 Hz | 1.6 µm | 100 µm | 50 mm |
+| 5000 Hz | 0.0 µm | 0.2 µm | 50 mm |
+
+At any rate above ~200 Hz the exact arc correction is micrometres against a
+50 mm guess. The padding term should be this expression, evaluated per segment
+from the actual commanded velocity, not a constant.
+
+### The number this all hinges on
+
+The answer swings by 8× between the two velocity regimes, and **nobody has told
+us what DLS diffractometer axes actually do**. That is a new open question — the
+maximum and typical angular velocity per axis, per beamline. It is a
+one-afternoon question for whoever owns the motion controllers, and it decides
+the validator's sample rate.
 
 ## Proposed re-architecture
 
