@@ -47,15 +47,12 @@ flowchart TB
         KIN["<b>Transform</b><br/>pure sync maths, no I/O"]
     end
 
-    subgraph EXT ["outside blueapi"]
-        AN["analysis"]
-        AC["<b>ANTI-COLLISION SERVICE</b><br/>external, owns the geometry<br/>coarse tier every point<br/>exact tier on flagged pairs"]
-        AN ~~~ AC
-    end
+    AN["analysis"]
+    AC["<b>ANTI-COLLISION SERVICE</b><br/>external, owns the geometry<br/>coarse tier every point<br/>exact tier on flagged pairs"]
 
     VS --> KIN
     ES --> KIN
-    KIN -- "serialised into RunStart" --> AN
+    ES -- "RunStart document with<br/>serialized Transform" --> AN
     KIN -- "joint arrays, batched<br/>↑ per-point verdicts" --> AC
 ```
 
@@ -126,7 +123,9 @@ references, no I/O.
 - **Forward** (`raw_to_derived`) is called from the monitor callback path, so it
   cannot be async without putting task scheduling and backpressure on every
   derived signal update. It is also what analysis needs, which is why the
-  `Transform` is serialised into RunStart.
+  executor serialises the `Transform` into the RunStart document — carrying the
+  forward maths and its geometry parameters (UB, wavelength, offsets) to
+  everything downstream.
 - **Inverse** (`derived_to_raw`) is closed-form once the branch is fixed —
   measured at 0.1 µs/point, flat from 10k to 100k points. Keeping it sync
   enforces that a `Transform` is pure maths: portable to analysis, cacheable,
