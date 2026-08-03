@@ -1,4 +1,4 @@
-# 11. Collision checking is a plan preprocessor and a Certified value wrapper
+# 9. Checking is a plan preprocessor, and the certificate is a recipe
 
 ## Status
 
@@ -21,6 +21,13 @@ occupies. And it made devices non-standalone, which created a loop where the
 validator instantiates devices that reference the solver the validator exists to
 serve.
 
+Separately, insertion-time validation emits state that execution depends on: the
+kinematic branch each window will run on. The obvious design is for it to emit
+the joint positions it validated. That works for step scans and fails for fly
+scans, for three independent reasons — size (an hour at 20 kHz is ~72M points ×
+6 axes), streaming (chunk N+1 is generated while N executes), and densification
+happening at runtime by construction.
+
 ## Decision
 
 Checking happens in a **plan preprocessor**, installed on `RE.preprocessors` by
@@ -39,6 +46,11 @@ call the anti-collision service.
 `StandardMovable` and `StandardFlyable` support wrapped values. A collidable
 axis given a **bare** value raises; there is no fallback to self-certification.
 
+The certificate the validator emits carries **branch selection per window**, not
+positions. The branch must reach runtime inverse kinematics; it cannot be
+resolved away at insertion. It is invalidated by any state change within the
+declared collision scope, and if invalid, execution obtains a new one.
+
 ## Consequences
 
 **A standard `bps.mv` plan works unmodified.** `RunEngine.__call__` composes
@@ -50,10 +62,21 @@ what makes it robust rather than conventional.
 
 **The branch and its target cannot desync.** Because the decision travels *as*
 the value rather than beside it, the failure mode where a branch prepared for
-one window is applied at a different position becomes unrepresentable. The
-machinery that previously guarded against it — recording the coordinates a
-certificate entry was solved for, asserting a match on `set`, clearing a stashed
-branch after one use — is no longer needed.
+one window is applied at a different position becomes unrepresentable.
+
+> **What this superseded, recorded rather than deleted.** The certificate was
+> previously its own decision, and it guarded that desync hazard with machinery:
+> certificate entries recorded the derived values they were solved for, `set`
+> asserted a match before applying, and `prepare` cleared the stashed branch
+> after one use. Wrapping the value in `Certified` makes the branch and its
+> target one object, so none of that is needed. **The hazard was real; the guard
+> is now structural rather than asserted.** The earlier version is why anyone
+> thought about the hazard at all, which is the reason it is written down here
+> instead of edited away.
+
+**Runtime must be able to run the inverse cheaply**, which is only tolerable
+because the branch-fixed inverse is closed-form and vectorised — measured at
+0.1 µs per point.
 
 **Devices become standalone again.** They receive a branch rather than owning a
 solver, which removes the loop hazard. Selection sits at the message layer,
@@ -103,4 +126,7 @@ it and should not have to install ophyd-async. The checker plausibly belongs in
 ophyd-async — it is in scope there and needs `DerivedSignalFactory` internals —
 and can be split out later if that turns out wrong.
 
-What the checker *is*, as opposed to how it hooks in, is ADR-0012.
+Where a replacement certificate comes from mid-scan is not settled — Q6 in
+[](../open-questions.md).
+
+What the checker *is*, as opposed to how it hooks in, is ADR-0010.

@@ -50,34 +50,42 @@ mints its own, the validator/executor split blurs and the executor is now
 solving. If it calls the validator, mid-scan execution depends on a process
 that is meant to be non-blocking. Currently unstated either way.
 
-**Q7. Fallback budget cap.** Needs a hard cap plus defined behaviour on
-exceeding it — almost certainly "treat as collision and pause". This may be the
-*answer* to Q1 rather than a detail: a cap converts an unmeasurable
-false-positive rate into a bounded cost, so the design does not need the rate to
-be small, only to stay correct when it is not.
+**Q7. Fallback budget cap.** Needs a hard cap on exact-tier work per batch, plus
+defined behaviour on exceeding it. The behaviour is settled in kind — **treat as
+collision**, which at insertion time means ✗ and at runtime means the stop in
+ADR-0006 — so what is open is the number. This may be the *answer* to Q1 rather
+than a detail: a cap converts an unmeasurable false-positive rate into a bounded
+cost, so the design does not need the rate to be small, only to stay correct
+when it is not.
 
 **Q8. Latency budget decomposition.** Batches are a few seconds of motion at
 5 kHz checked ahead of execution, so the budget is roughly one batch period —
-an order of magnitude more headroom than the original 500 ms premise. Still
-needs numbers against RTT, queueing, compute and margin.
+an order of magnitude more headroom than the 500 ms premise this was originally
+sized against (see reversal 1). Still needs numbers against RTT, queueing,
+compute and margin.
 
-**Q9. Can a `?` scan start?** Validation is asynchronous and happens after
-insertion, so unvalidated entries exist. Adaptive plans can never be validated
-and must still run. The rule for when the queue may start an unvalidated entry
-is not written down.
+**Q9. When may the queue start an entry that is not ✓?** Two cases, and they
+are not the same question. An entry at **⏳** is merely not validated *yet*, so
+the rule could be "wait" — but validation is asynchronous, and a queue that
+stalls on it has serialised itself behind the validator. An entry at **?** can
+*never* be validated, and must still run, so "wait" is not available at all.
+Neither rule is written down. ADR-0008 raises the ⏳ half and leaves it open.
 
 ## Component-level
 
-**Q10. How do generic plans get beamline-specific collaborators?** The
-preprocessor and `certified_move` both need to know which axes are collidable
-and which service owns them; a generic `scanspec_scan` needs a beamline's
-devices and triggering strategy. Same shape, and blueapi already solves it for
-devices — a `Device`-typed plan parameter arrives as a name and is resolved
-server-side, with the JSON schema enumerating valid names. Extending that to
-non-device collaborators would solve both and give the validator substitution
-for free. The blocker is concrete: `Device` is a union of bluesky protocols and
+**Q10. How do generic plans get beamline-specific collaborators?** A generic
+`scanspec_scan` needs a beamline's devices and triggering strategy while the
+rest of the plan stays generic. blueapi already solves that shape for devices —
+a `Device`-typed plan parameter arrives as a name and is resolved server-side,
+with the JSON schema enumerating valid names. Extending that to non-device
+collaborators would solve it and give the validator substitution for free. The
+blocker is concrete: `Device` is a union of bluesky protocols and
 `register_device` rejects anything failing `is_bluesky_compatible_device`.
 Whether that is a small extension or a rewrite is an hour's reading.
+
+The checker is *not* in this question, which is a narrowing since ADR-0009: it
+is wired at RunEngine construction and reached interactively by import, so it
+never travels as a plan parameter.
 
 Related and unmeasured: whether `_convert_type` can be taught to resolve
 `Spec[Movable]` by mapping axis names through the same machinery. If it can,
@@ -152,8 +160,8 @@ effect of refreshing world matrices, which is one line of pure CPU maths.
 **Where does checking hook in, for raw as well as derived axes?** A plan
 preprocessor on `RE.preprocessors`, passing its decision down by wrapping the
 value in `Certified[T]`. Raw motors are the degenerate case rather than a
-special one. See ADR-0011. What remains open is the per-beamline wiring, which
-is Q10.
+special one. See ADR-0009. What remains open is the per-beamline wiring for
+generic plans, which is Q10.
 
 **Is there a hook for preprocessors on the RunEngine?** Yes —
 `RE.preprocessors`, applied in `RunEngine.__call__`. One caveat: the code

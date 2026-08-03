@@ -1,4 +1,4 @@
-# 12. The checker is the solver, and runs in three modes
+# 10. The checker is the solver, and runs in three modes
 
 ## Status
 
@@ -68,13 +68,39 @@ give 8×8 combinations per window and a combination can work when neither
 device's locally preferred choice does. Living at the message layer makes that
 structural — it is the only place the whole machine is visible.
 
+> **What this superseded, recorded rather than deleted.** Machine-scoped
+> selection was previously its own decision, and it put the machine-scoped
+> *solver* somewhere: injected into each collision-constrained device, with the
+> null case an explicit solver that raises rather than `None`. `None` would have
+> conflated "single-valued, nothing to choose" with "must not move" — two states
+> with opposite required behaviour, where getting it wrong means an unchecked
+> move.
+>
+> Two things replaced it. Selection moved to the message layer (ADR-0009), so
+> devices no longer own a solver and the loop hazard — the validation process
+> instantiates devices, which reference the solver the process exists to serve —
+> disappeared. And selection turned out not to be a separate thing from
+> checking at all, which is this ADR.
+>
+> **The `None` distinction survives, in a different shape.** "Nothing to choose"
+> is a single-member branch set; "must not move" is an uncertified value. They
+> are no longer representable by the same thing, so the conflation is now
+> impossible rather than forbidden.
+
 **The failure taxonomy is unchanged and still matters.** *Infeasible* means the
 collision involves only choice-free devices, so no search helps — report
 immediately, and check it first because it is cheap. *Unsatisfiable* means
 choices exist but no assignment works — report after the search, naming the
 window and the binding constraint. The user's next action differs.
 
-**Registration takes two overlapping sets**, not one: every `DerivedSignalFactory`
-with branches, so it can project; and the collidable scope, so it knows what to
-check. A single-valued transform outside the scope is in neither; a raw
-collidable motor is only in the second.
+**A device can need checking without having anything to choose.** A two-jack
+system has a single-valued inverse and can still crash, which is why the
+collidable scope and the set of branched transforms are different sets.
+
+**Registration therefore takes two overlapping sets**, not one: every
+`DerivedSignalFactory` with branches, so it can project; and the collidable
+scope, so it knows what to check. A single-valued transform outside the scope is
+in neither; a raw collidable motor is only in the second.
+
+The forward path stays pure regardless, so monitor updates, analysis and
+descriptors are unaffected.

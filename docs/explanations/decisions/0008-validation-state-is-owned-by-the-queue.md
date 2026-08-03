@@ -1,4 +1,4 @@
-# 10. Validation state is owned by the queue
+# 8. Validation state is owned by the queue
 
 ## Status
 
@@ -7,8 +7,10 @@ Accepted
 ## Context
 
 The original design assumed validation could be a stateless dry-run endpoint,
-which would have kept it independent of queueing and avoided touching blueapi
-ADR-0003 ("No Queues").
+which would have kept it independent of queueing and avoided touching *blueapi's
+own* ADR-0003, "No Queues". (Numbering collision, unfortunately: that is
+blueapi's third ADR, not this project's, which is the machine-protection
+classification. Every "blueapi ADR-0003" below means blueapi's.)
 
 That is not how it works. A verdict is applied to a queue entry after insertion,
 and is revoked when control leaves the queue — if anyone moves the beamline

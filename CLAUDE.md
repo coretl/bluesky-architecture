@@ -9,7 +9,7 @@ a strawman kept for its measurements.
 | | |
 |---|---|
 | `docs/explanations/architecture.md` | how the design works now. Not a history. |
-| `docs/explanations/decisions/` | ADRs, Nygard format, numbered |
+| `docs/explanations/decisions/` | ADRs, Nygard format, numbered — see below |
 | `docs/explanations/open-questions.md` | what is not settled, ranked by impact |
 | `docs/explanations/exploration/` | what was measured, and what was wrong |
 | `benchmarks/` | the script behind every number |
@@ -19,6 +19,19 @@ If you learn something, put it in the place that matches its kind. A new
 measurement goes in `exploration/measurements.md` *and* gets a script. A
 reversal goes in `exploration/reversals.md`. A settled choice becomes an ADR and
 is reflected in `architecture.md`.
+
+## ADR numbers are permanent
+
+They were renumbered once, in a single pass before the repo was first pushed,
+which is when two superseded ADRs were folded into the ones that superseded them
+and the reasoning they carried was preserved as notes there. **That was the only
+time.** From now on an ADR keeps its number, and a superseded one is marked
+superseded in place — never deleted, never renumbered, never quietly rewritten.
+The rationale is in `decisions.md`.
+
+Note the numbering collision with blueapi's own ADR-0003 ("No Queues"), which is
+referenced from ADR-0008 and is a different document from this project's
+ADR-0003. Always write "blueapi ADR-0003" when you mean theirs.
 
 ## The one rule
 

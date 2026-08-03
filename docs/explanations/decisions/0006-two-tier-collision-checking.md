@@ -1,4 +1,4 @@
-# 8. Collision checking is two tiers, split by geometry type
+# 6. Collision checking is two tiers, split by geometry type
 
 ## Status
 
