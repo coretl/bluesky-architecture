@@ -3,49 +3,44 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-# bluesky_architecture
+<!-- index start. Everything below here is also the front page of the docs -->
 
-Validation architecture for Bluesky at Diamond: insertion-time and runtime scan validation
+# Scan validation architecture
 
-Design work for validating scans before and during execution: checking that a
-scan can run without a collision, choosing the kinematic branch it will run on,
-and re-checking that decision against the machine while it executes.
+Design work for validating Bluesky scans at Diamond before and during
+execution: checking that a scan can run without a collision, choosing the
+kinematic branch it will run on, and re-checking that decision against the
+machine while it executes.
 
-The deliverable is the architecture decision records in `docs/explanations/`.
-The Python package is supporting evidence, not a product — a strawman built to
-settle questions that argument was not settling, kept because its measurements
-are the reason several decisions went the way they did.
+**This is a design record, not software.** The deliverable is the documents and
+the evidence behind them. The Python package is a strawman, built to settle
+questions that argument was not settling, and kept because its measurements are
+the reason several decisions went the way they did.
 
-What            | Where
-:---:           | :---:
-Source          | <https://github.com/coretl/bluesky-architecture>
-Documentation   | <https://coretl.github.io/bluesky-architecture>
-Releases        | <https://github.com/coretl/bluesky-architecture/releases>
+Two things shape everything here.
 
-The documentation is in three parts:
+**Every number has a script behind it, or a label saying it is an estimate.**
+The one figure this architecture was originally sized against lived only in a
+chat transcript, was never reproducible, and turned out to be wrong in premise.
+`benchmarks/` exists so that cannot happen twice.
 
-- **The working architecture** — how scan validation is currently understood to
-  work, and what it rests on.
-- **Decisions** — ADRs for the load-bearing choices, with their consequences.
-- **Exploration** — what was measured, and the fourteen conclusions that were
-  argued confidently and then reversed. Reversals are recorded next to what they
-  reverse rather than edited away, because the reasoning usually survives the
-  reversal and is worth reading.
+**Reversals are recorded next to what they reverse.** Fourteen conclusions here
+were argued confidently and then overturned — every one of them by a fact or a
+measurement, none by further argument. The wrong versions are not edited away,
+because the reasoning that produced them usually survives and is worth reading.
 
-Plus a ranked list of what is still open. The binding question is whether a
-coarse collision model derived automatically from CAD meshes can be made tight
-enough — not kinematics, not body count, not the sample rate.
+<!-- README only content. Anything below this line won't be included in index.md -->
 
-Every number should have a script behind it or be labelled an estimate. The one
-figure that got sized against without an artefact turned out to be both
-unreproducible and wrong in premise, which is why `benchmarks/` exists.
+| What | Where |
+|---|---|
+| Source | <https://github.com/coretl/bluesky-architecture> |
+| Documentation | <https://coretl.github.io/bluesky-architecture> |
+| Releases | <https://github.com/coretl/bluesky-architecture/releases> |
 
 ```
-tox -e tests                                  # strawman property tests
+uv run pytest                                 # strawman property tests
 python -m bluesky_architecture.strawman.bench # kinematics benchmarks
 cat benchmarks/README.md                      # collision benchmarks
 ```
 
-<!-- README only content. Anything below this line won't be included in index.md -->
-
-See https://coretl.github.io/bluesky-architecture for more detailed documentation.
+See <https://coretl.github.io/bluesky-architecture> for the documents themselves.

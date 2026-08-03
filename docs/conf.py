@@ -30,19 +30,12 @@ if "+" in release:
 else:
     version = release
 
+# This is a design record, not a library. There are no API docs on purpose —
+# the only Python here is the strawman, which is superseded and kept for its
+# measurements, so autodoc output would advertise it as something to use.
 extensions = [
-    # Use this for generating API docs
-    "sphinx.ext.autodoc",
-    # and making summary tables at the top of API docs
-    "sphinx.ext.autosummary",
-    # This can parse google style docstrings
-    "sphinx.ext.napoleon",
     # For linking to external sphinx documentation
     "sphinx.ext.intersphinx",
-    # Add links to source code in API docs
-    "sphinx.ext.viewcode",
-    # Adds the inheritance-diagram generation directive
-    "sphinx.ext.inheritance_diagram",
     # Add a copy button to each code block
     "sphinx_copybutton",
     # For the card element
@@ -75,25 +68,6 @@ nitpick_ignore = [
     ("py:class", "typing_extensions.Literal"),
 ]
 
-# Both the class’ and the __init__ method’s docstring are concatenated and
-# inserted into the main body of the autoclass directive
-autoclass_content = "both"
-
-# Order the members by the order they appear in the source code
-autodoc_member_order = "bysource"
-
-# Don't inherit docstrings from baseclasses
-autodoc_inherit_docstrings = False
-
-# Document only what is in __all__
-autosummary_ignore_module_all = False
-
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
-
-# Output graphviz directive produced images in a scalable format
-graphviz_output_format = "svg"
-
 # The name of a reST role (builtin or Sphinx extension) to use as the default
 # role, that is, for text marked up `like this`
 default_role = "any"
@@ -104,7 +78,7 @@ master_doc = "index"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # These patterns also affect html_static_path and html_extra_path
-exclude_patterns = ["_build"]
+exclude_patterns = ["_build", "_api"]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -112,9 +86,6 @@ pygments_style = "sphinx"
 # This means you can link things like `str` and `asyncio` to the relevant
 # docs in the python documentation.
 intersphinx_mapping = {"python": ("https://docs.python.org/3/", None)}
-
-# A dictionary of graphviz graph attributes for inheritance diagrams.
-inheritance_graph_attrs = {"rankdir": "TB"}
 
 # Ignore localhost links for periodic check that links in docs are valid
 linkcheck_ignore = [r"http://localhost:\d+/"]
@@ -158,13 +129,8 @@ html_theme_options = {
     },
     "use_edit_page_button": True,
     "github_url": f"https://github.com/{github_user}/{github_repo}",
-    "icon_links": [
-        {
-            "name": "PyPI",
-            "url": f"https://pypi.org/project/{project}",
-            "icon": "fas fa-cube",
-        }
-    ],
+    # No PyPI link: nothing here is published as a package, and offering one
+    # invites a reader to install the strawman.
     "switcher": {
         "json_url": switcher_json,
         "version_match": version,
