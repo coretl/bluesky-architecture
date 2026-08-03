@@ -236,9 +236,9 @@ again; without one it searches. That is what makes the certificate an
 optimisation on the unvalidated path rather than a prerequisite for it — which
 matters, because adaptive plans never have one.
 
-There is no machinery guarding against a branch being applied at a position it
-was not solved for. Because the decision travels wrapped around the value it
-applies to, rather than stashed beside it, that desync is unrepresentable.
+Nothing guards against a branch being applied at a position it was not solved
+for, because nothing needs to: the decision travels wrapped around the value it
+applies to rather than stashed beside it, so that desync is unrepresentable.
 
 ### Anti-collision service
 
@@ -352,16 +352,12 @@ RE and refuses while a plan is running, or that is a documented hazard.
 
 ### Per-beamline wiring
 
-Both the preprocessor and `certified_move` need beamline-specific knowledge —
-which axes are collidable, which service owns them. The same problem exists for
-a generic `scanspec_scan`, which needs a beamline's devices and triggering
-strategy while the rest of the plan stays generic.
-
-The checker itself needs no such mechanism: it is wired at RunEngine
+The checker needs beamline-specific knowledge — which axes are collidable, which
+service owns them — but no mechanism to inject it: it is wired at RunEngine
 construction and reached interactively by import, so it is never a plan
 parameter.
 
-What still needs it is a generic `scanspec_scan`, which needs a beamline's
+What does need one is a generic `scanspec_scan`, which needs a beamline's
 devices and triggering strategy while the rest of the plan stays generic.
 blueapi already solves that shape for devices — a plan parameter typed as a
 `Device` arrives over the API as a *name* and is resolved server-side against

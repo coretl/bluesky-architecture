@@ -61,8 +61,10 @@ round-trip, and the property test caught it.
 | forward, vectorised | 5.9 ms |
 | whole-scan insertion, 1-hour scan @10 Hz | 44 ms |
 
-A 41,000× speedup over the scalar path puts inverse kinematics at 0.2% of a
-500 ms budget. *Reproduce:* `python -m bluesky_architecture.strawman.bench`.
+A 41,000× speedup over the scalar path. Against the runtime budget as it is now
+understood — one batch period, seconds, not the 500 ms this was first sized
+against — inverse kinematics is nowhere near being a constraint.
+*Reproduce:* `python -m bluesky_architecture.strawman.bench`.
 
 ## Collision — geometry and scale
 
