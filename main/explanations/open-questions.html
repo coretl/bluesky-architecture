@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Open questions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>Open questions &#8212; bluesky-architecture 0.1.dev29+gc73f3de56 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=476db245"></script>
+    <script src="../_static/documentation_options.js?v=a43cce0e"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -159,16 +159,9 @@
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="decisions.html">
     Decisions
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    Open questions
   </a>
 </li>
 
@@ -179,37 +172,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
-    The anti-collision service
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="pinned-references.html">
-    Pinned references
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="session-notes.html">
-    Where the work stands
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -332,16 +294,9 @@
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="decisions.html">
     Decisions
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    Open questions
   </a>
 </li>
 
@@ -349,27 +304,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="exploration.html">
     Exploration
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
-    The anti-collision service
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="pinned-references.html">
-    Pinned references
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="session-notes.html">
-    Where the work stands
   </a>
 </li>
 
@@ -450,7 +384,20 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Open questions</a></li>
+</ul>
+</div>
 </nav></div>
     </div>
   
@@ -489,6 +436,9 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
+    
+    <li class="breadcrumb-item"><a href="decisions.html" class="nav-link">Decisions</a></li>
+    
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Open questions</span></li>
   </ul>
 </nav>

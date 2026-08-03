@@ -35,26 +35,9 @@ somebody's time.
 disagreement is already in there, along with whatever settled it.
 
 ```{toctree}
-:maxdepth: 1
-:caption: The design
+:maxdepth: 2
 
 explanations/architecture
 explanations/decisions
-explanations/open-questions
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: The evidence
-
 explanations/exploration
-explanations/anti-collision-service
-explanations/pinned-references
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: Status
-
-explanations/session-notes
 ```

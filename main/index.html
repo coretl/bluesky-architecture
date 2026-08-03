@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Scan validation architecture &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>Scan validation architecture &#8212; bluesky-architecture 0.1.dev29+gc73f3de56 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="_static/documentation_options.js?v=476db245"></script>
+    <script src="_static/documentation_options.js?v=a43cce0e"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -166,49 +166,11 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/open-questions.html">
-    Open questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="explanations/exploration.html">
     Exploration
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/anti-collision-service.html">
-    The anti-collision service
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="explanations/pinned-references.html">
-    Pinned references
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="explanations/session-notes.html">
-    Where the work stands
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -337,36 +299,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/open-questions.html">
-    Open questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="explanations/exploration.html">
     Exploration
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/anti-collision-service.html">
-    The anti-collision service
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/pinned-references.html">
-    Pinned references
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/session-notes.html">
-    Where the work stands
   </a>
 </li>
 
@@ -505,25 +439,39 @@ somebody’s time.</p>
 <a class="reference internal" href="explanations/exploration/reversals.html"><span class="std std-doc">What we got wrong</span></a> first. There is a fair chance the
 disagreement is already in there, along with whatever settled it.</p>
 <div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">The design</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="explanations/architecture.html">The working architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="explanations/decisions.html">Decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="explanations/open-questions.html">Open questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/architecture.html">The working architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanations/architecture.html#the-problem">The problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/architecture.html#components">Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/architecture.html#how-checking-is-hooked-in">How checking is hooked in</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/architecture.html#execution-contract">Execution contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/architecture.html#what-this-rests-on">What this rests on</a></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">The evidence</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="explanations/exploration.html">Exploration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="explanations/anti-collision-service.html">The anti-collision service</a></li>
-<li class="toctree-l1"><a class="reference internal" href="explanations/pinned-references.html">Pinned references</a></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/decisions.html">Decisions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/open-questions.html">Open questions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/decisions.html#a-note-on-the-numbering">A note on the numbering</a></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Status</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="explanations/session-notes.html">Where the work stands</a></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/exploration.html">Exploration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanations/exploration/measurements.html">Measurements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/exploration/reversals.html">What we got wrong</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/exploration/collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/anti-collision-service.html">The anti-collision service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/pinned-references.html">Pinned references</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/session-notes.html">Where the work stands</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>

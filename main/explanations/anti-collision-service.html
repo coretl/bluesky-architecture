@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The anti-collision service &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>The anti-collision service &#8212; bluesky-architecture 0.1.dev29+gc73f3de56 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=476db245"></script>
+    <script src="../_static/documentation_options.js?v=a43cce0e"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Pinned references" href="pinned-references.html" />
-    <link rel="prev" title="What we got wrong" href="exploration/reversals.html" />
+    <link rel="prev" title="Collision libraries: survey and re-architecture" href="exploration/collision-libraries.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -166,50 +166,12 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
-    Open questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="exploration.html">
     Exploration
   </a>
 </li>
 
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    The anti-collision service
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="pinned-references.html">
-    Pinned references
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="session-notes.html">
-    Where the work stands
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -339,37 +301,9 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
-    Open questions
-  </a>
-</li>
-
-
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="exploration.html">
     Exploration
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    The anti-collision service
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="pinned-references.html">
-    Pinned references
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="session-notes.html">
-    Where the work stands
   </a>
 </li>
 
@@ -450,7 +384,15 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="exploration/measurements.html">Measurements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/reversals.html">What we got wrong</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">The anti-collision service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pinned-references.html">Pinned references</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session-notes.html">Where the work stands</a></li>
+</ul>
+</div>
 </nav></div>
     </div>
   
@@ -489,6 +431,9 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
+    
+    <li class="breadcrumb-item"><a href="exploration.html" class="nav-link">Exploration</a></li>
+    
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The anti-collision service</span></li>
   </ul>
 </nav>
@@ -751,12 +696,12 @@ and the checking engine becomes headless against the same configs and GLBs. The
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="exploration/reversals.html"
+       href="exploration/collision-libraries.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">What we got wrong</p>
+        <p class="prev-next-title">Collision libraries: survey and re-architecture</p>
       </div>
     </a>
     <a class="right-next"
