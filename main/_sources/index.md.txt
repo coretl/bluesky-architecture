@@ -3,54 +3,58 @@ html_theme.sidebar_secondary.remove: true
 ---
 
 ```{include} ../README.md
+:start-after: <!-- index start
 :end-before: <!-- README only content
 ```
 
+## Where to start
 
-How the documentation is structured
------------------------------------
+These documents are meant to be readable with nobody to ask. Each links to the
+evidence behind it, so if a claim looks wrong you can go and check it rather
+than take it on trust.
 
-Documentation is split into [four categories](https://diataxis.fr), also accessible from links in the top bar.
+**If you have twenty minutes**, read [](explanations/architecture.md). It is the
+design as it currently stands, and it is self-contained.
 
-<!-- https://sphinx-design.readthedocs.io/en/latest/grids.html -->
+**If you are here about queueing**, read
+[](explanations/decisions/0008-validation-state-is-owned-by-the-queue.md) first.
+It is the finding with the widest blast radius outside this project: validation
+verdicts turn out to be queue state, which makes validation and queueing
+inseparable and promotes reconciliation with the existing queuing service from a
+late task to an early architectural decision. Then the *Queue* section of
+[](explanations/architecture.md), and Q9 in [](explanations/open-questions.md),
+which is the rule nobody has written down yet.
 
-::::{grid} 2
-:gutter: 4
+**If you want to know what is not settled**, read
+[](explanations/open-questions.md). It is ranked by how much each answer would
+move the design, and the top three are each worth about an afternoon of
+somebody's time.
 
-:::{grid-item-card} {material-regular}`directions_walk;2em`
+**If you are about to disagree with something**, read
+[](explanations/exploration/reversals.md) first. There is a fair chance the
+disagreement is already in there, along with whatever settled it.
+
 ```{toctree}
-:maxdepth: 2
-tutorials
-```
-+++
-Tutorials for installation and typical usage. New users start here.
-:::
+:maxdepth: 1
+:caption: The design
 
-:::{grid-item-card} {material-regular}`directions;2em`
+explanations/architecture
+explanations/decisions
+explanations/open-questions
+```
+
 ```{toctree}
-:maxdepth: 2
-how-to
-```
-+++
-Practical step-by-step guides for the more experienced user.
-:::
+:maxdepth: 1
+:caption: The evidence
 
-:::{grid-item-card} {material-regular}`info;2em`
+explanations/exploration
+explanations/anti-collision-service
+explanations/pinned-references
+```
+
 ```{toctree}
-:maxdepth: 2
-explanations
-```
-+++
-Explanations of how it works and why it works that way.
-:::
+:maxdepth: 1
+:caption: Status
 
-:::{grid-item-card} {material-regular}`menu_book;2em`
-```{toctree}
-:maxdepth: 2
-reference
+explanations/session-notes
 ```
-+++
-Technical reference material including APIs and release notes.
-:::
-
-::::

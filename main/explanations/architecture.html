@@ -1,0 +1,1481 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The working architecture &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=476db245"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/architecture';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Decisions" href="decisions.html" />
+    <link rel="prev" title="Scan validation architecture" href="../index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">bluesky-architecture</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    The working architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
+    Decisions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="open-questions.html">
+    Open questions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="exploration.html">
+    Exploration
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="anti-collision-service.html">
+    The anti-collision service
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="pinned-references.html">
+    Pinned references
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="session-notes.html">
+    Where the work stands
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    The working architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
+    Decisions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="open-questions.html">
+    Open questions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="exploration.html">
+    Exploration
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="anti-collision-service.html">
+    The anti-collision service
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pinned-references.html">
+    Pinned references
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="session-notes.html">
+    Where the work stands
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The working architecture</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="the-working-architecture">
+<h1>The working architecture<a class="headerlink" href="#the-working-architecture" title="Link to this heading">#</a></h1>
+<p>How scan validation is currently understood to work. This is the design as it
+stands, not a history — for what was tried and discarded see
+<a class="reference internal" href="exploration.html"><span class="std std-doc">Exploration</span></a>, and for why each choice was made see <a class="reference internal" href="decisions.html"><span class="std std-doc">Decisions</span></a>.</p>
+<p>Anything marked <strong>open</strong> is not settled; the ranked list is in
+<a class="reference internal" href="open-questions.html"><span class="std std-doc">Open questions</span></a>.</p>
+<section id="the-problem">
+<h2>The problem<a class="headerlink" href="#the-problem" title="Link to this heading">#</a></h2>
+<p>A scan moves several motors along a trajectory. Two things can go wrong that
+ordinary limit-checking will not catch:</p>
+<ol class="arabic simple">
+<li><p><strong>Collision.</strong> Parts of the diffractometer, the detector, the sample
+environment and the hutch can reach each other. Clearances are of order
+millimetres to tens of millimetres.</p></li>
+<li><p><strong>Branch selection.</strong> A diffractometer’s inverse kinematics is multi-valued:
+several joint configurations reach the same reciprocal-space point. Which one
+you pick determines whether the rest of the scan is reachable, and it has to
+be chosen consistently across devices.</p></li>
+</ol>
+<p>Both need answering <em>before</em> the scan runs, so a user is not told at 3 a.m. that
+the scan they queued cannot work. Both also need re-checking <em>while</em> it runs,
+because the beamline can change underneath a decision made earlier.</p>
+</section>
+<section id="components">
+<h2>Components<a class="headerlink" href="#components" title="Link to this heading">#</a></h2>
+<pre  class="mermaid">
+        flowchart TB
+    Script[&quot;Script&lt;br/&gt;&lt;i&gt;for: scan&lt;/i&gt;&quot;]
+    GUI[&quot;Mapping GUI&quot;]
+    Script -- &quot;insert and wait&quot; --&gt; Q
+    GUI -- &quot;insert&quot; --&gt; Q
+    Q{{&quot;Queue&lt;br/&gt;a verdict per entry&lt;br/&gt;⏳ &amp;nbsp; ✓ &amp;nbsp; ✗ &amp;nbsp; ?&quot;}}
+
+    Q -- &quot;scan to validate, held ⏳&lt;br/&gt;↑ ✓ / ✗ / ? + certificate&quot; --&gt; VS
+    Q -- &quot;task + certificate&lt;br/&gt;↑ abort on failure&quot; --&gt; ES
+
+    subgraph BA [&quot;blueapi&quot;]
+        subgraph V [&quot;VALIDATOR &amp;mdash; read-only, non-blocking&quot;]
+            VS[&quot;sample scan function&lt;br/&gt;~10 Hz (open)&quot;]
+        end
+        subgraph E [&quot;EXECUTOR &amp;mdash; owns the devices&quot;]
+            ES[&quot;sample scan function&lt;br/&gt;5 kHz&quot;]
+        end
+        KIN[&quot;&lt;b&gt;Transform&lt;/b&gt;&lt;br/&gt;pure sync maths, no I/O&quot;]
+    end
+
+    AN[&quot;analysis&quot;]
+    AC[&quot;&lt;b&gt;ANTI-COLLISION SERVICE&lt;/b&gt;&lt;br/&gt;external, owns the geometry&lt;br/&gt;coarse tier every point&lt;br/&gt;exact tier on flagged pairs&quot;]
+
+    VS --&gt; KIN
+    ES --&gt; KIN
+    ES -- &quot;RunStart document with&lt;br/&gt;serialized Transform&quot; --&gt; AN
+    KIN -- &quot;joint arrays, batched&lt;br/&gt;↑ per-point verdicts&quot; --&gt; AC
+    </pre><p>*The validator’s sample rate is <strong>open</strong> — 10 Hz is the current premise and is
+measured to be unsound; see <a class="reference internal" href="open-questions.html"><span class="std std-doc">Open questions</span></a>.</p>
+<section id="queue">
+<h3>Queue<a class="headerlink" href="#queue" title="Link to this heading">#</a></h3>
+<p>Holds scans with a validation verdict per entry. Four states, not two:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>state</p></th>
+<th class="head"><p>meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>⏳</p></td>
+<td><p>queued for validation, or being validated</p></td>
+</tr>
+<tr class="row-odd"><td><p>✓</p></td>
+<td><p>validated — will probably run</p></td>
+</tr>
+<tr class="row-even"><td><p>✗</p></td>
+<td><p>validation failed</p></td>
+</tr>
+<tr class="row-odd"><td><p>?</p></td>
+<td><p>not validatable — the plan is adaptive and cannot be listified in advance</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>⏳ comes first because it is where every entry starts, and it is <strong>the queue’s
+own bookkeeping</strong> — the queue holds an entry at ⏳ while the validator works on
+it. The validator never returns ⏳. It returns exactly one of ✓, ✗ or ?.</p>
+<p>That split is worth keeping straight: the validator produces <em>results</em>, the
+queue tracks <em>progress</em>. It is the same division that makes validation state
+queue state.</p>
+<p><strong>? has exactly one source.</strong> The validator is the only thing that listifies a
+plan, so it is the only thing that can discover a plan cannot be listified.
+Which means an entry cannot be marked ? at insertion — the queue has no way to
+know. Every plan goes to the validator and is held at ⏳ until it either
+validates, fails, or turns out to be unlistifiable. There is no shortcut for
+adaptive plans, and no way to declare one in advance.</p>
+<p>Verdicts are <strong>applied after insertion</strong> and <strong>revoked when control leaves the
+queue</strong> — if anyone moves the beamline outside the queue, every tick disappears
+and scans are rechecked. That makes validation state queue state, which is why
+the queue and validation questions are not separable.</p>
+<p>The last row matters: an adaptive plan can never be validated up front, and must
+still run. So the unvalidated path is the base case and the certificate is an
+optimisation on top of it, not a prerequisite.</p>
+</section>
+<section id="validator">
+<h3>Validator<a class="headerlink" href="#validator" title="Link to this heading">#</a></h3>
+<p>A separate worker process running under blueapi, seeing PVs through a
+<strong>read-only gateway</strong>. It has to be separate because the task worker runs one
+task at a time in the process that owns the devices, and validation must work
+while a scan is running.</p>
+<p><strong>It does not execute the plan — it iterates it and inspects the messages.</strong>
+That is the key to how it works, and it is why the validator needs no solver at
+all:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Msg(&quot;prepare&quot;,</span> <span class="pre">pmac,</span> <span class="pre">spec)</span></code> does <strong>not</strong> call <code class="docutils literal notranslate"><span class="pre">pmac.prepare(spec)</span></code>. The
+validator stashes the spec.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Msg(&quot;kickoff&quot;,</span> <span class="pre">pmac)</span></code> then transforms the stashed values through the pmac’s
+own transforms and sends the result to the anti-collision service.</p></li>
+<li><p>If it meets a message whose effect it cannot predict, it raises — and that is
+where <strong>?</strong> comes from.</p></li>
+</ul>
+<p>It creates devices, but only for introspection and reading. CA footprint is not
+a concern.</p>
+<p>It still sees live PVs, so mid-scan it sees a machine in flight, and must
+validate against the <strong>projected end state</strong> of the running task rather than the
+instantaneous one.</p>
+<p>The validator is a <strong>blocking call</strong>. The queueing service does not block
+waiting on the result — it holds the entry at ⏳ and carries on.</p>
+</section>
+<section id="executor">
+<h3>Executor<a class="headerlink" href="#executor" title="Link to this heading">#</a></h3>
+<p>The normal blueapi task worker. It samples the same continuous scan function at
+the servo rate (5 kHz typical, up to 20 kHz), runs the kinematics with the
+branch taken from the certificate, and submits batches of a few seconds of
+motion to the collision service.</p>
+<p>Checking runs <strong>ahead of the motion</strong>: the first batch is validated while the
+motors move to start, and each subsequent batch while the previous one executes.
+Lookahead therefore equals batch duration — seconds, comfortably more than
+deceleration time.</p>
+<p>If the collision service is unavailable the executor fails and stops the motors
+on the way out.</p>
+</section>
+<section id="kinematics-transform">
+<h3>Kinematics — <code class="docutils literal notranslate"><span class="pre">Transform</span></code><a class="headerlink" href="#kinematics-transform" title="Link to this heading">#</a></h3>
+<p>Pure, synchronous, array-safe maths shared by both processes. No device
+references, no I/O.</p>
+<ul>
+<li><p><strong>Forward</strong> (<code class="docutils literal notranslate"><span class="pre">raw_to_derived</span></code>) is called from the monitor callback path, so it
+cannot be async without putting task scheduling and backpressure on every
+derived signal update. It is also what analysis needs, which is why the
+executor serialises the <code class="docutils literal notranslate"><span class="pre">Transform</span></code> into the RunStart document — carrying the
+forward maths and its geometry parameters (UB, wavelength, offsets) to
+everything downstream.</p>
+<p><strong>Analysis only ever runs <code class="docutils literal notranslate"><span class="pre">raw_to_derived</span></code>.</strong> It reads recorded raw values and
+converts them to derived coordinates. It never runs the inverse, and the
+inverse is not part of the analysis contract — a conflation worth naming
+because it recurred repeatedly while this was being designed.</p>
+</li>
+<li><p><strong>Inverse</strong> (<code class="docutils literal notranslate"><span class="pre">derived_to_raw</span></code>) is closed-form once the branch is fixed —
+measured at 0.1 µs/point, flat from 10k to 100k points. Keeping it sync
+enforces that a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> is pure maths: portable to analysis, cacheable,
+testable without hardware.</p></li>
+<li><p><strong>Branch is an argument, never a field</strong>, because the instance is what gets
+serialised and the branch must not reach analysis.</p></li>
+</ul>
+<p>Transforms stack rather than merge — hkl→cartesian and cartesian→joint stay
+separate, so the collision model never needs to know hkl was involved. The same
+<code class="docutils literal notranslate"><span class="pre">Transform</span></code> classes are reused across beamlines: a robot-arm diffractometer
+stacks three, a kappa geometry stacks two.</p>
+</section>
+<section id="checker-selection-and-checking-are-one-component">
+<h3>Checker — selection and checking are one component<a class="headerlink" href="#checker-selection-and-checking-are-one-component" title="Link to this heading">#</a></h3>
+<p>Branch <strong>enumeration</strong> is device-scoped: each device knows its own kinematics.
+Branch <strong>selection</strong> is machine-scoped, because two diffractometers give 8×8
+combinations per window and a combination can work when neither device’s locally
+preferred choice does.</p>
+<p>Selection and collision checking are <strong>the same component</strong>, because selection
+<em>is</em> checking with a search over branches — same inputs, same service, same
+answer shape. There is no separate solver.</p>
+<p>One component with three modes, differing <strong>only in the state they read</strong>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>mode</p></th>
+<th class="head"><p>reads</p></th>
+<th class="head"><p>emits</p></th>
+<th class="head"><p>on failure</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>validator</p></td>
+<td><p>whole plan, projected state</p></td>
+<td><p>certificate + verdict</p></td>
+<td><p>✗ or ?</p></td>
+</tr>
+<tr class="row-odd"><td><p>preprocessor</p></td>
+<td><p>Msg stream, live state</p></td>
+<td><p>wrapped values</p></td>
+<td><p>raise</p></td>
+</tr>
+<tr class="row-even"><td><p>interactive</p></td>
+<td><p>one call, live state</p></td>
+<td><p>the move</p></td>
+<td><p>raise</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>That constraint is a testable property rather than a convention: same
+transforms, same targets, same limits ⟹ same branch, whichever mode is running.
+If the validator picks one branch and the preprocessor would pick another, the
+certificate is worthless — the executor either ignores it or moves somewhere
+nothing checked.</p>
+<p>It considers four things, only the last of which is remote:</p>
+<ul class="simple">
+<li><p><strong>transforms with branches</strong> — projecting derived targets to joint space</p></li>
+<li><p><strong>position limits</strong></p></li>
+<li><p><strong>velocity limits</strong> — also needed to compute the swept-path inflation, so the
+two uses should share the number rather than each fetching it</p></li>
+<li><p><strong>an anti-collision service, optionally</strong></p></li>
+</ul>
+<p>The service being optional matters for deployment: a beamline gets transforms,
+branch selection and limit checking from the same preprocessor whether or not
+anti-collision exists there yet. Without a service, selection falls back to
+limits plus continuity — stay on the branch you are on — which means branch
+selection is not solely a collision concern.</p>
+<p>Failure has two shapes, and the user’s next action differs:</p>
+<ul class="simple">
+<li><p><strong>Infeasible</strong> — the collision involves only choice-free devices. No search
+helps. Report immediately, and check it first because it is cheap.</p></li>
+<li><p><strong>Unsatisfiable</strong> — choices exist but no assignment works. Report after the
+search, naming the window and the binding constraint.</p></li>
+</ul>
+</section>
+<section id="certificate">
+<h3>Certificate<a class="headerlink" href="#certificate" title="Link to this heading">#</a></h3>
+<p>What the validator emits and the executor consumes — but not directly. The
+validator returns it to the <strong>queue</strong>, where it is held against the entry
+alongside the verdict, and the queue pushes it down to the executor with the
+task. The certificate is part of an entry’s validation state, so it is revoked
+by the same rule that revokes the tick.</p>
+<p>It carries <strong>branch selection only</strong>, per window.</p>
+<p>It is a <strong>recipe, not a result</strong>. It does not carry joint positions, because for
+a fly scan they do not exist yet — an hour at 20 kHz is ~72M points, chunk N+1
+is generated while N executes, and densification happens at runtime by
+construction. So the branch must reach runtime IK; it cannot be resolved away at
+insertion.</p>
+<p>It is invalidated by any state change in the collision scope. If invalid, get a
+new one.</p>
+<p><strong>The preprocessor reads it to avoid repeating the validator’s work.</strong> Given a
+certificate it takes the branch decision straight from it rather than searching
+again; without one it searches. That is what makes the certificate an
+optimisation on the unvalidated path rather than a prerequisite for it — which
+matters, because adaptive plans never have one.</p>
+<p>Nothing guards against a branch being applied at a position it was not solved
+for, because nothing needs to: the decision travels wrapped around the value it
+applies to rather than stashed beside it, so that desync is unrepresentable.</p>
+</section>
+<section id="anti-collision-service">
+<h3>Anti-collision service<a class="headerlink" href="#anti-collision-service" title="Link to this heading">#</a></h3>
+<p>External, and a hard runtime dependency of flyscan execution. It owns the
+geometry:</p>
+<ul class="simple">
+<li><p><strong>static environment</strong> as a point cloud, from scans of the hutch</p></li>
+<li><p><strong>movable bodies</strong> as CAD meshes, articulated by a joint chain from config</p></li>
+<li><p>a declaration of which axes are <strong>collidable</strong> — typically a handful per
+beamline</p></li>
+</ul>
+<p>Two tiers, split by geometry type rather than by language or process:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>tier</p></th>
+<th class="head"><p>runs on</p></th>
+<th class="head"><p>primitive</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>coarse</p></td>
+<td><p>every trajectory point</p></td>
+<td><p>conservative bounding volumes</p></td>
+</tr>
+<tr class="row-odd"><td><p>exact</p></td>
+<td><p>only pairs the coarse tier flags</p></td>
+<td><p>triangle meshes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The coarse tier must report <strong>which pair</strong> is implicated, not a boolean per
+point. Otherwise the exact tier cannot be restricted to flagged pairs and the
+tiering buys nothing — measured, that distinction is ~105 s versus a few seconds
+per batch.</p>
+<p>Which primitive the coarse tier uses is <strong>open</strong>, and is the binding constraint
+on the whole design. Hand-authored capsule models are ruled out on cost, so it
+must be derived automatically from the mesh.</p>
+<p>Everything known about the service as it exists — what the prototype does, what
+was measured against it, and what remains to settle with its author — is in
+<a class="reference internal" href="anti-collision-service.html"><span class="std std-doc">The anti-collision service</span></a>.</p>
+</section>
+</section>
+<section id="how-checking-is-hooked-in">
+<h2>How checking is hooked in<a class="headerlink" href="#how-checking-is-hooked-in" title="Link to this heading">#</a></h2>
+<p>Collision checking has to cover <strong>every</strong> move of a collidable axis, whether it
+comes from a scan, a <code class="docutils literal notranslate"><span class="pre">bps.mv</span></code>, or someone at a terminal. Kinematics and branch
+selection only apply to derived axes; checking applies to all of them. So a raw
+motor is the <em>degenerate</em> case rather than a special one — an axis whose
+projection is the identity and whose branch set has one member.</p>
+<section id="the-certified-wrapper">
+<h3>The <code class="docutils literal notranslate"><span class="pre">Certified</span></code> wrapper<a class="headerlink" href="#the-certified-wrapper" title="Link to this heading">#</a></h3>
+<p>Values passed to <code class="docutils literal notranslate"><span class="pre">set</span></code> and <code class="docutils literal notranslate"><span class="pre">prepare</span></code> are wrapped:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Certified</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">T</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise if the preconditions this certification assumed no longer hold.&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">check_valid()</span></code> is <strong>cheap and local</strong> — PV values compared against thresholds.
+It does not call the anti-collision service. The only service traffic on the
+runtime path is chunk checking.</p>
+<p>Wrapping the value rather than stashing the decision alongside it is what makes
+the branch and its target inseparable. They cannot desync, so the class of bug
+where a branch prepared for one window gets applied at a different position —
+moving somewhere plausible and wrong — is not representable.</p>
+<p><code class="docutils literal notranslate"><span class="pre">StandardMovable</span></code> and <code class="docutils literal notranslate"><span class="pre">StandardFlyable</span></code> gain support for it, so
+<code class="docutils literal notranslate"><span class="pre">Certified[HorizontalMirrorDerived]</span></code> carries a deferred coordinated move the
+same way <code class="docutils literal notranslate"><span class="pre">Certified[float]</span></code> carries a single axis.</p>
+</section>
+<section id="installed-on-re-preprocessors">
+<h3>Installed on <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code><a class="headerlink" href="#installed-on-re-preprocessors" title="Link to this heading">#</a></h3>
+<p>The checker is a <strong>class</strong>, instantiated with the beamline’s scope and exported
+from the beamline module the way devices already are, so there is one instance
+by construction rather than an instruction to hold a reference. Its instance is
+added to <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code> at startup. <code class="docutils literal notranslate"><span class="pre">RunEngine.__call__</span></code> composes it over every plan
+it runs, so <strong>a standard <code class="docutils literal notranslate"><span class="pre">bps.mv</span></code> plan works unmodified</strong> — the preprocessor
+sees the <code class="docutils literal notranslate"><span class="pre">set</span></code> messages, certifies them as a group, and passes the wrapped
+values down.</p>
+<p>This is deliberately not a per-plan parameter. A plan author cannot forget to
+opt in, which for a safety-adjacent property is the requirement. It is
+forget-proof rather than tamper-proof: the list is public and mutable, and the
+device-side raise on an uncertified value is what makes it robust rather than
+merely conventional.</p>
+<p>Grouping is why this lives at the message layer rather than on the device.
+<code class="docutils literal notranslate"><span class="pre">bps.mv(m1,</span> <span class="pre">x,</span> <span class="pre">m2,</span> <span class="pre">y)</span></code> is <em>one</em> motion; checking each <code class="docutils literal notranslate"><span class="pre">set</span></code> independently would
+check states the machine never occupies and reject legitimate moves.</p>
+</section>
+<section id="uncertified-values-are-rejected-not-self-certified">
+<h3>Uncertified values are rejected, not self-certified<a class="headerlink" href="#uncertified-values-are-rejected-not-self-certified" title="Link to this heading">#</a></h3>
+<p>A collidable axis given a bare value raises. There is no fallback to the device
+certifying itself, because that path is only sound when a single device moves
+at a time: two devices each certifying in isolation would each check against the
+other’s <em>current</em> position rather than its <em>target</em>, and two individually-safe
+moves can collide. Nothing inside a device can detect that condition.</p>
+<p>Non-collidable axes are unaffected — the ban is scoped by the collision-scope
+declaration, so existing plans that move things which cannot reach anything keep
+working.</p>
+<p>For interactive use the same object provides the move:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.beamlines.i16</span><span class="w"> </span><span class="kn">import</span> <span class="n">checker</span>
+<span class="k">await</span> <span class="n">checker</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">mirror</span><span class="p">,</span> <span class="n">HorizontalMirrorDerived</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">roll</span><span class="o">=</span><span class="mi">12</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>One object, one policy, no second implementation to drift. That the sanctioned
+route is a one-liner matters: if the blessed path is more awkward than a raw
+<code class="docutils literal notranslate"><span class="pre">caput</span></code>, the bypass wins and is worse than what was banned.</p>
+<p>It does bypass the RunEngine, which is right for interactive use but means it
+cannot see a scan in flight — live PVs say where things are now, not where a
+running scan is about to put them. Either the checker holds a reference to the
+RE and refuses while a plan is running, or that is a documented hazard.</p>
+</section>
+<section id="per-beamline-wiring">
+<h3>Per-beamline wiring<a class="headerlink" href="#per-beamline-wiring" title="Link to this heading">#</a></h3>
+<p>The checker needs beamline-specific knowledge — which axes are collidable, which
+service owns them — but no mechanism to inject it: it is wired at RunEngine
+construction and reached interactively by import, so it is never a plan
+parameter.</p>
+<p>What does need one is a generic <code class="docutils literal notranslate"><span class="pre">scanspec_scan</span></code>, which needs a beamline’s
+devices and triggering strategy while the rest of the plan stays generic.
+blueapi already solves that shape for devices — a plan parameter typed as a
+<code class="docutils literal notranslate"><span class="pre">Device</span></code> arrives over the API as a <em>name</em> and is resolved server-side against
+that beamline’s context, with the JSON schema enumerating valid names.</p>
+<p><strong>Open:</strong> blueapi’s <code class="docutils literal notranslate"><span class="pre">Device</span></code> is a union of bluesky protocols and
+<code class="docutils literal notranslate"><span class="pre">register_device</span></code> rejects anything failing <code class="docutils literal notranslate"><span class="pre">is_bluesky_compatible_device</span></code>, so a
+trigger strategy cannot be registered today. See <a class="reference internal" href="open-questions.html"><span class="std std-doc">Open questions</span></a>.</p>
+</section>
+<section id="where-it-lives">
+<h3>Where it lives<a class="headerlink" href="#where-it-lives" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Transform</span></code> belongs in <strong>its own package</strong>, because analysis needs it to convert
+recorded raw values to derived coordinates and should not have to install
+ophyd-async to do so.</p>
+<p>The checker plausibly belongs in <strong>ophyd-async</strong> — it is within scope there, and
+it needs <code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code> internals. It may be worth splitting out later,
+but starting it there avoids inventing a package before the shape is settled.</p>
+</section>
+</section>
+<section id="execution-contract">
+<h2>Execution contract<a class="headerlink" href="#execution-contract" title="Link to this heading">#</a></h2>
+<p>Every move of a collidable axis arrives already certified. The device checks the
+certificate is still valid, applies the branch it carries, moves, and discards
+it.</p>
+<pre  class="mermaid">
+        sequenceDiagram
+    autonumber
+    participant P as plan
+    participant C as checker&lt;br/&gt;(preprocessor)
+    participant D as device
+    participant AC as anti-collision
+
+    Note over P,AC: every move in a plan, certified as a group
+    P-&gt;&gt;C: Msg(&quot;set&quot;, mirror, HorizontalMirrorDerived(...))
+    C-&gt;&gt;C: project through Transform, search branches
+    C-&gt;&gt;AC: candidate joint positions
+    AC--&gt;&gt;C: verdict
+    C-&gt;&gt;D: set(Certified(value, branch))
+    D-&gt;&gt;D: check_valid() — cheap, PVs against thresholds
+    D-&gt;&gt;D: derived_to_raw(branch, value)
+    D-&gt;&gt;D: one deferred move, then discard the certificate
+
+    Note over P,AC: with a certificate, the search is skipped
+    P-&gt;&gt;C: Msg(&quot;set&quot;, mirror, value)
+    C-&gt;&gt;C: take the branch from the certificate
+    C-&gt;&gt;D: set(Certified(value, branch))
+
+    Note over P,AC: bare value on a collidable axis
+    P-&gt;&gt;D: set(3.0)
+    D--xP: raise — there is no self-certification
+    </pre><section id="coordinated-moves-are-one-value-not-several">
+<h3>Coordinated moves are one value, not several<a class="headerlink" href="#coordinated-moves-are-one-value-not-several" title="Link to this heading">#</a></h3>
+<p>A device that can move several axes together exposes <strong>one</strong> settable taking a
+composite value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">HorizontalMirrorDerived</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>so the whole mirror moves as a single deferred move. Which means:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">mirror</span><span class="o">.</span><span class="n">roll</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="c1"># WRONG</span>
+</pre></div>
+</div>
+<p>This is broken for a reason that has nothing to do with collisions: it issues
+two independent moves, the axes no longer start and stop together, and the path
+acquires corners. Every straight-line-in-joint-space assumption in this design
+depends on the composite move being used.</p>
+<p>The certified form is therefore <code class="docutils literal notranslate"><span class="pre">Certified[HorizontalMirrorDerived]</span></code>, not a
+<code class="docutils literal notranslate"><span class="pre">Certified[float]</span></code> per axis — which keeps the incentive pointing at the API that
+preserves coordination, rather than nudging people toward the one that breaks
+it.</p>
+</section>
+<section id="what-the-device-does-with-it">
+<h3>What the device does with it<a class="headerlink" href="#what-the-device-does-with-it" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code> extracts the branch from the certificate and applies it to
+the transform; <code class="docutils literal notranslate"><span class="pre">StandardFlyable</span></code> does the same for a trajectory. That is new
+plumbing in ophyd-async — the branch has to reach <code class="docutils literal notranslate"><span class="pre">derived_to_raw</span></code>, which today
+takes no such argument.</p>
+<p>The rest is nearly free: <code class="docutils literal notranslate"><span class="pre">SignalTransformer</span></code> already holds the transform class,
+the raw devices and the transform parameter sources. What is missing is public
+access to them, and to the derived axis names, so the checker can be told about
+a <code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code> and work out the rest itself.</p>
+</section>
+<section id="registration-takes-two-overlapping-sets">
+<h3>Registration takes two overlapping sets<a class="headerlink" href="#registration-takes-two-overlapping-sets" title="Link to this heading">#</a></h3>
+<p>The checker needs <strong>every factory with branches</strong>, so it can project; and the
+<strong>collidable scope</strong>, so it knows what to check. A mirror with a single-valued
+transform outside the scope is in neither. A raw collidable motor is only in the
+second. Keeping them distinct in the registration API is worth doing from the
+start, because assuming one list works right up until a beamline has both.</p>
+</section>
+<section id="windows-and-turnarounds">
+<h3>Windows and turnarounds<a class="headerlink" href="#windows-and-turnarounds" title="Link to this heading">#</a></h3>
+<p>scanspec2’s <code class="docutils literal notranslate"><span class="pre">_step_windows</span></code> yields one window per setpoint, so per-window branch
+is per-point branch for step scans with no special case.</p>
+<p><strong>Turnaround trajectories are in joint space and need checking too, and scanspec
+does not produce them.</strong> Easy to forget for exactly that reason. The same
+applies to the move to start.</p>
+</section>
+</section>
+<section id="what-this-rests-on">
+<h2>What this rests on<a class="headerlink" href="#what-this-rests-on" title="Link to this heading">#</a></h2>
+<p>Anti-collision here is <strong>soft machine protection, not a safety function</strong>.
+Catastrophic cases are guarded at the robot level and by door interlocks; this
+layer handles constraints too dynamic to guard there. That is what licenses two
+otherwise indefensible choices: making flyscan execution depend on a network
+service, and accepting a coarse model that is probabilistic rather than sound.
+If anyone reclassifies this layer, both have to be revisited.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Scan validation architecture</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="decisions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Decisions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem">The problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#components">Components</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#queue">Queue</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validator">Validator</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#executor">Executor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kinematics-transform">Kinematics — <code class="docutils literal notranslate"><span class="pre">Transform</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checker-selection-and-checking-are-one-component">Checker — selection and checking are one component</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#certificate">Certificate</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anti-collision-service">Anti-collision service</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-checking-is-hooked-in">How checking is hooked in</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-certified-wrapper">The <code class="docutils literal notranslate"><span class="pre">Certified</span></code> wrapper</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installed-on-re-preprocessors">Installed on <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#uncertified-values-are-rejected-not-self-certified">Uncertified values are rejected, not self-certified</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#per-beamline-wiring">Per-beamline wiring</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#where-it-lives">Where it lives</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#execution-contract">Execution contract</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coordinated-moves-are-one-value-not-several">Coordinated moves are one value, not several</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-device-does-with-it">What the device does with it</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#registration-takes-two-overlapping-sets">Registration takes two overlapping sets</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#windows-and-turnarounds">Windows and turnarounds</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-rests-on">What this rests on</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/architecture.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/explanations/architecture.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

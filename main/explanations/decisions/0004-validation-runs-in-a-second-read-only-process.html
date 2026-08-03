@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Decisions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>4. Validation runs in a second, read-only process &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
   
   
   
@@ -27,26 +27,26 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=476db245"></script>
-    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions';</script>
+    <script src="../../_static/documentation_options.js?v=476db245"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions/0004-validation-runs-in-a-second-read-only-process';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -55,19 +55,19 @@
             false;
         </script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
-    <link rel="icon" href="../_static/dls-logo.svg"/>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="3. Anti-collision is soft machine protection, not a safety function" href="decisions/0003-anti-collision-is-soft-machine-protection.html" />
-    <link rel="prev" title="The working architecture" href="architecture.html" />
+    <link rel="icon" href="../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="9. Checking is a plan preprocessor, and the certificate is a recipe" href="0009-checking-is-a-plan-preprocessor.html" />
+    <link rel="prev" title="8. Validation state is owned by the queue" href="0008-validation-state-is-owned-by-the-queue.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
   
     
-    <script src="../_static/searchtools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../searchindex.js"></script>
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
   
   </head>
   <body data-default-mode="">
@@ -87,7 +87,7 @@
   <dialog id="pst-search-dialog">
     
 <form class="bd-search d-flex align-items-center"
-      action="../search.html"
+      action="../../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -123,7 +123,7 @@
     
   
 
-<a class="navbar-brand logo" href="../index.html">
+<a class="navbar-brand logo" href="../../index.html">
   
   
   
@@ -134,8 +134,8 @@
       
     
     
-    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
-    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">bluesky-architecture</p>
@@ -153,35 +153,35 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+  <a class="nav-link nav-internal" href="../open-questions.html">
     Open questions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
     The anti-collision service
   </a>
 </li>
@@ -195,14 +195,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="pinned-references.html">
+  <a class="nav-link dropdown-item nav-internal" href="../pinned-references.html">
     Pinned references
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="session-notes.html">
+  <a class="nav-link dropdown-item nav-internal" href="../session-notes.html">
     Where the work stands
   </a>
 </li>
@@ -326,49 +326,49 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+  <a class="nav-link nav-internal" href="../open-questions.html">
     Open questions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
     The anti-collision service
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="pinned-references.html">
+  <a class="nav-link nav-internal" href="../pinned-references.html">
     Pinned references
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="session-notes.html">
+  <a class="nav-link nav-internal" href="../session-notes.html">
     Where the work stands
   </a>
 </li>
@@ -450,17 +450,17 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. Validation runs in a second, read-only process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
 </ul>
 </div>
 </nav></div>
@@ -497,11 +497,14 @@
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
-      <a href="../index.html" class="nav-link" aria-label="Home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Decisions</span></li>
+    
+    <li class="breadcrumb-item"><a href="../decisions.html" class="nav-link">Decisions</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">4. Validation runs in a second, read-only process</span></li>
   </ul>
 </nav>
 </div>
@@ -518,43 +521,49 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="decisions">
-<h1>Decisions<a class="headerlink" href="#decisions" title="Link to this heading">#</a></h1>
-<p>The load-bearing choices, in <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">Nygard format</a>:
-context, decision, consequences. The consequences section is the useful part —
-it is where the cost of each choice is written down.</p>
-<p>If you are reading them all, read in this order. ADR-0003 first, because it is
-the classification everything else is licensed by; ADR-0008 second, because it
-is the one that bears on queueing.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
-</div>
-<section id="a-note-on-the-numbering">
-<h2>A note on the numbering<a class="headerlink" href="#a-note-on-the-numbering" title="Link to this heading">#</a></h2>
-<p>These were renumbered once, in a single pass before this repo was first pushed.
-Two ADRs were superseded during the design and have been folded into the ones
-that superseded them, with <strong>what they decided recorded as a note there</strong> rather
-than deleted — the superseded reasoning is usually why the current decision has
-the shape it does.</p>
-<ul class="simple">
-<li><p>The certificate ADR is now part of ADR-0009.</p></li>
-<li><p>The machine-scoped-solver ADR is now part of ADR-0010.</p></li>
-</ul>
-<p><strong>This will not happen again.</strong> From the first push, an ADR keeps its number
-permanently, and a superseded one is marked superseded in place — never removed,
-never renumbered. The one-time exception was taken because nothing had been
-published against the old numbers.</p>
+  <section id="validation-runs-in-a-second-read-only-process">
+<h1>4. Validation runs in a second, read-only process<a class="headerlink" href="#validation-runs-in-a-second-read-only-process" title="Link to this heading">#</a></h1>
+<section id="status">
+<h2>Status<a class="headerlink" href="#status" title="Link to this heading">#</a></h2>
+<p>Accepted</p>
+</section>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h2>
+<p>blueapi’s task worker runs one task at a time, in the process that holds the
+devices. Validation has to work while a scan is running, so it cannot share that
+process.</p>
+<p>Validation also cannot work from a serialised description of the scan.
+<code class="docutils literal notranslate"><span class="pre">check_limits_async</span></code> iterates the real plan generator against real device
+objects; no serialised representation substitutes for that. So the validator
+needs devices.</p>
+</section>
+<section id="decision">
+<h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">#</a></h2>
+<p>Validation runs in a second blueapi worker process, seeing PVs through a
+<strong>read-only gateway</strong>. It creates devices, but only for introspection and
+reading.</p>
+<p>Crucially it <strong>iterates the plan and inspects the messages rather than executing
+them</strong>. <code class="docutils literal notranslate"><span class="pre">Msg(&quot;prepare&quot;,</span> <span class="pre">pmac,</span> <span class="pre">spec)</span></code> does not call <code class="docutils literal notranslate"><span class="pre">pmac.prepare(spec)</span></code>; the
+validator stashes the spec, and <code class="docutils literal notranslate"><span class="pre">Msg(&quot;kickoff&quot;,</span> <span class="pre">pmac)</span></code> then transforms the
+stashed values through the pmac’s transforms and sends them to the
+anti-collision service.</p>
+</section>
+<section id="consequences">
+<h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">#</a></h2>
+<p>The validator sees live PVs, so mid-scan it sees a machine in flight. It must
+therefore validate against the <strong>projected end state</strong> of the running task, not
+the instantaneous one.</p>
+<p><strong>It needs no solver.</strong> Because it interprets messages rather than executing
+them, it never calls a device’s write path, so the question of injecting a
+solver into validator-side devices does not arise. This also removes the loop
+that would otherwise exist between devices and the service the validator exists
+to serve.</p>
+<p><strong>If it meets a message whose effect it cannot predict, it raises</strong>, and that is
+the sole origin of the “not validatable” verdict.</p>
+<p>Channel-access footprint is not a concern.</p>
+<p>The validator is a <strong>blocking call</strong>, but the queueing service does not block
+waiting on the result — it holds the entry at ⏳ and carries on. So the queue
+needs that state, and a rule for whether an entry may run before it resolves.</p>
 </section>
 </section>
 
@@ -569,20 +578,20 @@ published against the old numbers.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="architecture.html"
+       href="0008-validation-state-is-owned-by-the-queue.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The working architecture</p>
+        <p class="prev-next-title">8. Validation state is owned by the queue</p>
       </div>
     </a>
     <a class="right-next"
-       href="decisions/0003-anti-collision-is-soft-machine-protection.html"
+       href="0009-checking-is-a-plan-preprocessor.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">3. Anti-collision is soft machine protection, not a safety function</p>
+        <p class="prev-next-title">9. Checking is a plan preprocessor, and the certificate is a recipe</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -605,7 +614,10 @@ published against the old numbers.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-the-numbering">A note on the numbering</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status">Status</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context">Context</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decision">Decision</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences">Consequences</a></li>
 </ul>
   </nav></div>
 
@@ -613,7 +625,7 @@ published against the old numbers.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions/0004-validation-runs-in-a-second-read-only-process.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -628,7 +640,7 @@ published against the old numbers.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/explanations/decisions.md.txt">
+    <a href="../../_sources/explanations/decisions/0004-validation-runs-in-a-second-read-only-process.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
@@ -647,8 +659,8 @@ published against the old numbers.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

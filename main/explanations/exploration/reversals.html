@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Decisions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>What we got wrong &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
   
   
   
@@ -27,26 +27,26 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=476db245"></script>
-    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions';</script>
+    <script src="../../_static/documentation_options.js?v=476db245"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/exploration/reversals';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -55,19 +55,19 @@
             false;
         </script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
-    <link rel="icon" href="../_static/dls-logo.svg"/>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="3. Anti-collision is soft machine protection, not a safety function" href="decisions/0003-anti-collision-is-soft-machine-protection.html" />
-    <link rel="prev" title="The working architecture" href="architecture.html" />
+    <link rel="icon" href="../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The anti-collision service" href="../anti-collision-service.html" />
+    <link rel="prev" title="Measurements" href="measurements.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
   
     
-    <script src="../_static/searchtools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../searchindex.js"></script>
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
   
   </head>
   <body data-default-mode="">
@@ -87,7 +87,7 @@
   <dialog id="pst-search-dialog">
     
 <form class="bd-search d-flex align-items-center"
-      action="../search.html"
+      action="../../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -123,7 +123,7 @@
     
   
 
-<a class="navbar-brand logo" href="../index.html">
+<a class="navbar-brand logo" href="../../index.html">
   
   
   
@@ -134,8 +134,8 @@
       
     
     
-    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
-    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">bluesky-architecture</p>
@@ -153,35 +153,35 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+  <a class="nav-link nav-internal" href="../open-questions.html">
     Open questions
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
     The anti-collision service
   </a>
 </li>
@@ -195,14 +195,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="pinned-references.html">
+  <a class="nav-link dropdown-item nav-internal" href="../pinned-references.html">
     Pinned references
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="session-notes.html">
+  <a class="nav-link dropdown-item nav-internal" href="../session-notes.html">
     Where the work stands
   </a>
 </li>
@@ -326,49 +326,49 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+  <a class="nav-link nav-internal" href="../open-questions.html">
     Open questions
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
     The anti-collision service
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="pinned-references.html">
+  <a class="nav-link nav-internal" href="../pinned-references.html">
     Pinned references
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="session-notes.html">
+  <a class="nav-link nav-internal" href="../session-notes.html">
     Where the work stands
   </a>
 </li>
@@ -450,17 +450,10 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measurements.html">Measurements</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">What we got wrong</a></li>
 </ul>
 </div>
 </nav></div>
@@ -497,11 +490,14 @@
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
-      <a href="../index.html" class="nav-link" aria-label="Home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Decisions</span></li>
+    
+    <li class="breadcrumb-item"><a href="../exploration.html" class="nav-link">Exploration</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">What we got wrong</span></li>
   </ul>
 </nav>
 </div>
@@ -518,43 +514,107 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="decisions">
-<h1>Decisions<a class="headerlink" href="#decisions" title="Link to this heading">#</a></h1>
-<p>The load-bearing choices, in <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">Nygard format</a>:
-context, decision, consequences. The consequences section is the useful part —
-it is where the cost of each choice is written down.</p>
-<p>If you are reading them all, read in this order. ADR-0003 first, because it is
-the classification everything else is licensed by; ADR-0008 second, because it
-is the one that bears on queueing.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
-</div>
-<section id="a-note-on-the-numbering">
-<h2>A note on the numbering<a class="headerlink" href="#a-note-on-the-numbering" title="Link to this heading">#</a></h2>
-<p>These were renumbered once, in a single pass before this repo was first pushed.
-Two ADRs were superseded during the design and have been folded into the ones
-that superseded them, with <strong>what they decided recorded as a note there</strong> rather
-than deleted — the superseded reasoning is usually why the current decision has
-the shape it does.</p>
-<ul class="simple">
-<li><p>The certificate ADR is now part of ADR-0009.</p></li>
-<li><p>The machine-scoped-solver ADR is now part of ADR-0010.</p></li>
-</ul>
-<p><strong>This will not happen again.</strong> From the first push, an ADR keeps its number
-permanently, and a superseded one is marked superseded in place — never removed,
-never renumbered. The one-time exception was taken because nothing had been
-published against the old numbers.</p>
+  <section id="what-we-got-wrong">
+<h1>What we got wrong<a class="headerlink" href="#what-we-got-wrong" title="Link to this heading">#</a></h1>
+<p>Fourteen conclusions that were argued confidently and then reversed. Recorded
+because the pattern is consistent and anyone extending this work should assume
+they will hit it too.</p>
+<p><strong>The pattern:</strong> a number or an API shape assumed rather than checked, then used
+as a premise. In every case the reversal came from either a fact from someone
+who knew the system, or from running something. None came from further
+reasoning.</p>
+<p>That is the whole argument for <code class="docutils literal notranslate"><span class="pre">benchmarks/</span></code> existing, and for keeping this page
+rather than quietly editing the conclusions.</p>
+<section id="from-facts">
+<h2>From facts<a class="headerlink" href="#from-facts" title="Link to this heading">#</a></h2>
+<p>These came from Tom, correcting the design as it was being written.</p>
+<p><strong>1. “For a flyscan the chunk deadline is milliseconds.”</strong>
+Chunking is at most 1 Hz, so ~500 ms. This was the load-bearing premise for
+“shared library, not a service”, and that conclusion collapsed with it.</p>
+<p><strong>2. “<code class="docutils literal notranslate"><span class="pre">derived_to_raw</span></code> is never called.”</strong>
+It is — from <code class="docutils literal notranslate"><span class="pre">sim/_mirror_vertical.py:71</span></code> and <code class="docutils literal notranslate"><span class="pre">_mirror_horizontal.py:39</span></code>, inside
+user-supplied <code class="docutils literal notranslate"><span class="pre">set_derived</span></code>. Only the <em>backend</em> does not call it.</p>
+<p><strong>3. “Analysis needs sync because async needs an event loop.”</strong>
+Analysis needs <code class="docutils literal notranslate"><span class="pre">raw_to_derived</span></code>, which was already sync for monitor-path
+reasons. That says nothing about the inverse. The sync-inverse decision rests on
+purity, not on this.</p>
+<p><strong>4. “The certificate carries all positions.”</strong>
+True for step scans, false for fly. Overgeneralised from one case.</p>
+<p><strong>5. “The branch never needs to reach the <code class="docutils literal notranslate"><span class="pre">Transform</span></code>.”</strong>
+Same error — a step-scan argument presented as general.</p>
+<p><strong>6. “4.2 ms per inverse means you need a scaled external service.”</strong>
+The 4.2 ms was diffcalc’s <em>general</em> solve, enumerating 8 solutions with per-call
+object overhead. The branch-fixed vectorised inverse is 0.101 µs/point, 41,000×
+faster. The entire external-service argument rested on measuring the wrong
+thing.</p>
+<p><strong>7. “The external service may not be needed.”</strong>
+It exists and is a hard runtime dependency of flyscan execution. Everything that
+was said would disappear — fail-closed-on-timeout, backpressure, the latency
+budget, the availability dependency — is back.</p>
+<p><strong>8. “Queue and validation are nearly orthogonal.”</strong>
+Verdicts live on queue entries and are revoked when control leaves the queue.
+Validation state <em>is</em> queue state. This is the strongest available argument for
+superseding blueapi ADR-0003, and it promotes the queue-service reconciliation
+from last on the list to an early decision.</p>
+</section>
+<section id="from-measurement">
+<h2>From measurement<a class="headerlink" href="#from-measurement" title="Link to this heading">#</a></h2>
+<p>These came from running something against real beamline geometry.</p>
+<p><strong>9. “GPU compute is why the collision service must be external.”</strong>
+Its collision maths is three-mesh-bvh in a Web Worker — CPU — and its Helm chart
+requests no GPU. The genuine GPU case is ray-traced narrow phase on RT cores,
+which is a different argument. The service should still be treated as external,
+but for organisational and geometric reasons, not arithmetic.</p>
+<p><strong>10. “You can’t make it headless.”</strong>
+It runs headless on real i16 geometry with no WebGL context and no DOM. The
+apparent dependency was on <code class="docutils literal notranslate"><span class="pre">render()</span></code>’s side effect of refreshing world
+matrices, which is one line of pure CPU maths.</p>
+<p><strong>11. “Padding for maximum velocity would over-reject; typical is the pragmatic
+trade.”</strong>
+The trade runs the other way. At 10 Hz the <em>sound</em> padding reaches 263 mm
+against the ~50 mm applied — under-padded by ~5×, not over-padded.</p>
+<p><strong>12. “The fine tier does not fit in any language”</strong> (~105 s per batch).
+That measured triangle checking on every pair at every pose — the fine tier as
+the <em>primary</em> path, which nobody proposed. In the design the coarse tier names
+the pair and the fine tier runs only on that, so cost is flag-rate driven. The
+conclusion was circular: it assumed the thing it set out to disprove.</p>
+<p><strong>13. “coal is 9× faster than the JavaScript.”</strong>
+It is ~6×. The rest was three-mesh-bvh’s default <code class="docutils literal notranslate"><span class="pre">CENTER</span></code> split strategy; <code class="docutils literal notranslate"><span class="pre">SAH</span></code>
+is a one-line change worth ~1.5×. Part of what was reported as a property of the
+language was a property of my defaults.</p>
+<p><strong>14. “Continuous collision detection removes the padding compromise.”</strong>
+CCD is worth 2–3×, not the order of magnitude assumed. The compromise does go
+away — but because the sound sample rates are low (50–400 Hz) and the executor
+at 5 kHz already exceeds them by 12–100×, not because of CCD.</p>
+</section>
+<section id="near-misses">
+<h2>Near misses<a class="headerlink" href="#near-misses" title="Link to this heading">#</a></h2>
+<p>Caught by a check rather than by review. Both would have been plausible enough
+to ship.</p>
+<p><strong>The natural arc bound is not conservative.</strong> Bounding a swept sphere’s arc by
+its chord plus the single-arc sagitta, <code class="docutils literal notranslate"><span class="pre">Σⱼ</span> <span class="pre">dⱼ(1</span> <span class="pre">−</span> <span class="pre">cos(Δθⱼ/2))</span></code>, is wrong for a
+kinematic chain: rotating an upstream joint also moves the downstream axes, so
+individual arc deviations do not compose additively. Violated by 3.9 mm on i16.
+The path-length form <code class="docutils literal notranslate"><span class="pre">L/2</span></code> is rigorous and holds — a point on a path of length
+<code class="docutils literal notranslate"><span class="pre">L</span></code> from <code class="docutils literal notranslate"><span class="pre">p₀</span></code> to <code class="docutils literal notranslate"><span class="pre">p₁</span></code> has <code class="docutils literal notranslate"><span class="pre">|q−p₀|</span> <span class="pre">+</span> <span class="pre">|q−p₁|</span> <span class="pre">≤</span> <span class="pre">L</span></code>, so its distance to the chord is
+at most <code class="docutils literal notranslate"><span class="pre">L/2</span></code>.</p>
+<p><strong>A cross-language benchmark measured its own decimation.</strong> Comparing JS and C++
+on identically decimated meshes said JavaScript was faster, contradicting the
+real-geometry result. Taking every k-th face destroys spatial coherence, and FCL
+(oriented boxes) and three-mesh-bvh (axis-aligned) degrade differently under it.
+The scripts are kept in <code class="docutils literal notranslate"><span class="pre">benchmarks/</span></code>, labelled as discarded, so nobody repeats
+the experiment.</p>
+</section>
+<section id="two-smaller-ones-about-verification-itself">
+<h2>Two smaller ones about verification itself<a class="headerlink" href="#two-smaller-ones-about-verification-itself" title="Link to this heading">#</a></h2>
+<p><strong>A validation assertion that was wrong, not the code.</strong> The first version of the
+distance-routine check asserted two-sided agreement with brute force and failed.
+The analytic answer is a true minimum; brute force samples a subset and can only
+overestimate. The correct check is one-sided — the analytic result must never
+<em>exceed</em> a sampled minimum.</p>
+<p><strong>A benchmark that measured the allocator.</strong> The first temporal-BVH descent
+pushed <code class="docutils literal notranslate"><span class="pre">[level,</span> <span class="pre">index]</span></code> arrays onto a stack and showed the tree 3× <em>slower</em> than
+the flat scan it was meant to beat. With a flat <code class="docutils literal notranslate"><span class="pre">Int32Array</span></code> stack it is faster.</p>
 </section>
 </section>
 
@@ -569,20 +629,20 @@ published against the old numbers.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="architecture.html"
+       href="measurements.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The working architecture</p>
+        <p class="prev-next-title">Measurements</p>
       </div>
     </a>
     <a class="right-next"
-       href="decisions/0003-anti-collision-is-soft-machine-protection.html"
+       href="../anti-collision-service.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">3. Anti-collision is soft machine protection, not a safety function</p>
+        <p class="prev-next-title">The anti-collision service</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -605,7 +665,10 @@ published against the old numbers.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-the-numbering">A note on the numbering</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-facts">From facts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-measurement">From measurement</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#near-misses">Near misses</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-smaller-ones-about-verification-itself">Two smaller ones about verification itself</a></li>
 </ul>
   </nav></div>
 
@@ -613,7 +676,7 @@ published against the old numbers.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/exploration/reversals.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -628,7 +691,7 @@ published against the old numbers.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/explanations/decisions.md.txt">
+    <a href="../../_sources/explanations/exploration/reversals.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
@@ -647,8 +710,8 @@ published against the old numbers.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

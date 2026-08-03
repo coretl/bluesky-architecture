@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Decisions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>Where the work stands &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/session-notes';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -58,8 +58,7 @@
     <link rel="icon" href="../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="3. Anti-collision is soft machine protection, not a safety function" href="decisions/0003-anti-collision-is-soft-machine-protection.html" />
-    <link rel="prev" title="The working architecture" href="architecture.html" />
+    <link rel="prev" title="Pinned references" href="pinned-references.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -159,8 +158,8 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
     Decisions
   </a>
 </li>
@@ -201,8 +200,8 @@
 </li>
 
 
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="session-notes.html">
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
     Where the work stands
   </a>
 </li>
@@ -332,8 +331,8 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
     Decisions
   </a>
 </li>
@@ -367,8 +366,8 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="session-notes.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Where the work stands
   </a>
 </li>
@@ -450,19 +449,7 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
-</div>
+  <div class="bd-toc-item navbar-nav"></div>
 </nav></div>
     </div>
   
@@ -501,7 +488,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Decisions</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Where the work stands</span></li>
   </ul>
 </nav>
 </div>
@@ -518,43 +505,75 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="decisions">
-<h1>Decisions<a class="headerlink" href="#decisions" title="Link to this heading">#</a></h1>
-<p>The load-bearing choices, in <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">Nygard format</a>:
-context, decision, consequences. The consequences section is the useful part —
-it is where the cost of each choice is written down.</p>
-<p>If you are reading them all, read in this order. ADR-0003 first, because it is
-the classification everything else is licensed by; ADR-0008 second, because it
-is the one that bears on queueing.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
-</div>
-<section id="a-note-on-the-numbering">
-<h2>A note on the numbering<a class="headerlink" href="#a-note-on-the-numbering" title="Link to this heading">#</a></h2>
-<p>These were renumbered once, in a single pass before this repo was first pushed.
-Two ADRs were superseded during the design and have been folded into the ones
-that superseded them, with <strong>what they decided recorded as a note there</strong> rather
-than deleted — the superseded reasoning is usually why the current decision has
-the shape it does.</p>
-<ul class="simple">
-<li><p>The certificate ADR is now part of ADR-0009.</p></li>
-<li><p>The machine-scoped-solver ADR is now part of ADR-0010.</p></li>
-</ul>
-<p><strong>This will not happen again.</strong> From the first push, an ADR keeps its number
-permanently, and a superseded one is marked superseded in place — never removed,
-never renumbered. The one-time exception was taken because nothing had been
-published against the old numbers.</p>
+  <section id="where-the-work-stands">
+<h1>Where the work stands<a class="headerlink" href="#where-the-work-stands" title="Link to this heading">#</a></h1>
+<p>What state this design is in, what is unfinished, and what is waiting on other
+people. Everything technical is in the other documents; this is the part that
+lives between them, and it is the page most likely to be out of date.</p>
+<section id="how-far-it-has-got">
+<h2>How far it has got<a class="headerlink" href="#how-far-it-has-got" title="Link to this heading">#</a></h2>
+<p>The design conclusions are in <a class="reference internal" href="architecture.html"><span class="std std-doc">The working architecture</span></a> and the ADRs. What was
+measured is in <a class="reference internal" href="exploration/measurements.html"><span class="std std-doc">Measurements</span></a>, and the fourteen conclusions
+reversed along the way are in <a class="reference internal" href="exploration/reversals.html"><span class="std std-doc">What we got wrong</span></a>.</p>
+<p>Broadly: the shape of validation is settled, the mechanism by which checking
+hooks into bluesky is settled, and the geometry underneath it is not. The three
+questions in <a class="reference internal" href="open-questions.html"><span class="std std-doc">Open questions</span></a> that would actually move the design are all
+in that last category or adjacent to it.</p>
+</section>
+<section id="what-is-not-finished">
+<h2>What is not finished<a class="headerlink" href="#what-is-not-finished" title="Link to this heading">#</a></h2>
+<p><strong>The architecture document has been reviewed unevenly.</strong> The sections up to
+<em>Execution contract</em> have had more scrutiny than the ones after it. The
+checker/solver consolidation and the <code class="docutils literal notranslate"><span class="pre">Certified</span></code> wrapper were worked out late
+and have had the least.</p>
+<p><strong>Two things from the original plan were never started.</strong> Sequence-diagram
+traces of blueapi and bluesky-queueserver in matching notation, with a
+capability comparison; and the reconciliation with
+<code class="docutils literal notranslate"><span class="pre">DiamondLightSource/daq-queuing-service</span></code>. The second has been promoted in
+importance since it was first listed, because validation state turning out to be
+queue state makes <em>where the queue lives</em> an early architectural decision rather
+than a late one.</p>
+<p><strong>The round-trip property test has not been ported into ophyd-async.</strong> It found
+two real bugs in a few hundred lines of carefully written code, and it is cheap.</p>
+</section>
+<section id="the-three-things-that-would-move-the-design">
+<h2>The three things that would move the design<a class="headerlink" href="#the-three-things-that-would-move-the-design" title="Link to this heading">#</a></h2>
+<p>Unchanged from <a class="reference internal" href="open-questions.html"><span class="std std-doc">Open questions</span></a>, repeated because they are the point.</p>
+<ol class="arabic simple">
+<li><p><strong>Can an automatically-derived coarse model be tight enough?</strong> Fitted spheres
+leave 63–173 mm of error against 3.3 mm of motion padding. Half a day: one
+detector arm, a medial-axis sphere tree and <code class="docutils literal notranslate"><span class="pre">coal</span></code>’s OBB/RSS BVH nodes, same
+error metric on both.</p></li>
+<li><p><strong>What is the exemption set?</strong> The reference model reports 8–12 collisions
+per pose at its own nominal-valid pose, so no false-positive number measured
+on it means anything. A conversation, not a computation.</p></li>
+<li><p><strong>What are the real joint velocities?</strong> Every padding and rate figure scales
+linearly with it, and the two regimes tested differ by 8×.</p></li>
+</ol>
+</section>
+<section id="waiting-on-other-people">
+<h2>Waiting on other people<a class="headerlink" href="#waiting-on-other-people" title="Link to this heading">#</a></h2>
+<p><strong>Gareth Nisbet (anti-collision service)</strong> — everything known about the service,
+what has been asked, what was answered, and what is still open is gathered in
+<a class="reference internal" href="anti-collision-service.html"><span class="std std-doc">The anti-collision service</span></a>, which ends with a suggested shape for the next
+conversation. Most of the findings in it have not yet been raised with him, and
+the page marks which.</p>
+<p><strong>bluesky</strong> — <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code> composition order in the code disagrees with
+the docstring at <code class="docutils literal notranslate"><span class="pre">run_engine.py:235</span></code>. A checker must be outermost, so this is
+not academic. Worth an issue either way.</p>
+<p><strong>blueapi</strong> — <code class="docutils literal notranslate"><span class="pre">register_device</span></code> gates on <code class="docutils literal notranslate"><span class="pre">is_bluesky_compatible_device</span></code>, so a
+non-device collaborator (a trigger strategy) cannot be registered. Whether
+extending that is small or large is an hour’s reading and has not been done.</p>
+</section>
+<section id="practical-notes-for-anyone-picking-this-up">
+<h2>Practical notes for anyone picking this up<a class="headerlink" href="#practical-notes-for-anyone-picking-this-up" title="Link to this heading">#</a></h2>
+<p>The benchmarks need real geometry that is not vendored — see
+<code class="docutils literal notranslate"><span class="pre">benchmarks/README.md</span></code>, which also lists the methodological traps specific to
+this domain. Several cost a full measurement each to discover.</p>
+<p>Diagrams are mermaid, and sphinx does not validate them: a broken or badly
+laid-out diagram builds clean and fails only in a browser. Use
+<code class="docutils literal notranslate"><span class="pre">tools/render_diagram.sh</span></code> rather than iterating blind. This was learned the
+expensive way.</p>
 </section>
 </section>
 
@@ -569,22 +588,13 @@ published against the old numbers.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="architecture.html"
+       href="pinned-references.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The working architecture</p>
+        <p class="prev-next-title">Pinned references</p>
       </div>
-    </a>
-    <a class="right-next"
-       href="decisions/0003-anti-collision-is-soft-machine-protection.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">3. Anti-collision is soft machine protection, not a safety function</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -605,7 +615,11 @@ published against the old numbers.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-the-numbering">A note on the numbering</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-far-it-has-got">How far it has got</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-not-finished">What is not finished</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-things-that-would-move-the-design">The three things that would move the design</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#waiting-on-other-people">Waiting on other people</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-notes-for-anyone-picking-this-up">Practical notes for anyone picking this up</a></li>
 </ul>
   </nav></div>
 
@@ -613,7 +627,7 @@ published against the old numbers.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/session-notes.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -628,7 +642,7 @@ published against the old numbers.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/explanations/decisions.md.txt">
+    <a href="../_sources/explanations/session-notes.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

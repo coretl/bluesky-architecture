@@ -1,0 +1,1142 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Collision libraries: survey and re-architecture &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../../_static/documentation_options.js?v=476db245"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/exploration/collision-libraries';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Measurements" href="measurements.html" />
+    <link rel="prev" title="Exploration" href="../exploration.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">bluesky-architecture</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../architecture.html">
+    The working architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../decisions.html">
+    Decisions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../open-questions.html">
+    Open questions
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
+    Exploration
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
+    The anti-collision service
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../pinned-references.html">
+    Pinned references
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../session-notes.html">
+    Where the work stands
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../architecture.html">
+    The working architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../decisions.html">
+    Decisions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../open-questions.html">
+    Open questions
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
+    Exploration
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
+    The anti-collision service
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../pinned-references.html">
+    Pinned references
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../session-notes.html">
+    Where the work stands
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="measurements.html">Measurements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reversals.html">What we got wrong</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../exploration.html" class="nav-link">Exploration</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Collision libraries: survey and re-architecture</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="collision-libraries-survey-and-re-architecture">
+<h1>Collision libraries: survey and re-architecture<a class="headerlink" href="#collision-libraries-survey-and-re-architecture" title="Link to this heading">#</a></h1>
+<p>Research into what to build the anti-collision service out of, prompted by
+three questions: is there a JavaScript capsule library we should use, should
+the triangle-level check be a Python library, and what does the rest of the
+industry do.</p>
+<p><strong>The measurements themselves live in <a class="reference internal" href="measurements.html"><span class="std std-doc">Measurements</span></a></strong> — every table below
+is quoted from there rather than repeated, so there is one place to correct if a
+number changes. Conclusions that were later overturned are catalogued in
+<a class="reference internal" href="reversals.html"><span class="std std-doc">What we got wrong</span></a>, and everything specific to the DLS anti-collision service is
+in <a class="reference internal" href="../anti-collision-service.html"><span class="std std-doc">The anti-collision service</span></a>. What this page keeps is the survey of what
+exists <em>outside</em> DLS, and the re-architecture that follows from it.</p>
+<p>All measurements are on the <strong>real i16 geometry</strong> from <code class="docutils literal notranslate"><span class="pre">garethnisbet/Robot</span></code>
+(<code class="docutils literal notranslate"><span class="pre">i16_scene.glb</span></code>, 18 meshes, 233,034 triangles), in a container, single machine.
+Directional, not final — the caveats at the end are load-bearing.</p>
+<section id="conclusions-first">
+<h2>Conclusions first<a class="headerlink" href="#conclusions-first" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Split the tiers by geometry type, not by language or process.</strong> Spheres
+and capsules for every point of a trajectory; triangle meshes only for the
+points that tier flags. This is what every fast implementation does. Now
+ADR-0006.</p></li>
+<li><p><strong>The coarse tier fits the batch budget in plain numpy</strong> — 1.1–1.6 s for a
+15,000-point batch, single core, with a sound hierarchical broad phase. No
+GPU required to meet the deadline for the tier that runs on every point.</p></li>
+<li><p><strong>The fine tier is flag-rate driven, not pair-count driven.</strong> An earlier
+version of this document said it “does not fit in any language” on the basis
+of ~105 s per 15,000-point batch. That measured triangle checking on <em>every
+pair at every pose</em>, which is not the design and which nobody proposed. The
+cost is (flagged points) × (pairs per flag), and the binding unknown is the
+coarse tier’s false-positive rate, not its speed.</p></li>
+<li><p><strong>Use <code class="docutils literal notranslate"><span class="pre">coal</span></code>, but for its bounding volumes rather than its speed.</strong> It is
+~6× faster than tuned JavaScript on the dominant case — itself a correction;
+the first version of this document said 9× and was partly measuring
+three-mesh-bvh’s default split strategy. The stronger argument is that
+<code class="docutils literal notranslate"><span class="pre">coal</span></code>’s <code class="docutils literal notranslate"><span class="pre">OBBRSS</span></code> nodes are <em>oriented</em> boxes and rectangle-swept-spheres,
+which rotate exactly, where three-mesh-bvh’s axis-aligned nodes inflate. That
+attacks the binding term rather than the fast one.</p></li>
+<li><p><strong>Nobody should be authoring a coarse model by hand.</strong> Mech engineers export
+meshes and every CAD revision would need re-authoring, so the coarse model
+must be derived automatically. That rules out hand-built capsules and makes
+the mesh’s own BVH nodes attractive: conservative by construction, no second
+artefact to version, and incapable of drifting out of sync. Now ADR-0007.</p></li>
+<li><p><strong>The binding constraint is coarse-model fit quality, not speed.</strong> Fitted
+spheres leave 63–173 mm of error on i16 meshes against 3.3 mm of motion
+padding at 200 Hz. Until something automatic gets that into single digits,
+tuning sample rates and checking methods is optimising the wrong term. Now
+Q1 in <a class="reference internal" href="../open-questions.html"><span class="std std-doc">Open questions</span></a>.</p></li>
+<li><p><strong>The velocity padding is unnecessary, but CCD is not why.</strong> Measured, CCD is
+worth 2–3×, not the order of magnitude assumed. The real findings are that
+the executor at 5 kHz is already sound by 12–100×, and that the validator at
+10 Hz misses up to 32% of collisions. Raising the validator’s rate fixes it
+without CCD.</p></li>
+</ol>
+</section>
+<section id="what-the-measurements-established">
+<h2>What the measurements established<a class="headerlink" href="#what-the-measurements-established" title="Link to this heading">#</a></h2>
+<p>The tables are in <a class="reference internal" href="measurements.html"><span class="std std-doc">Measurements</span></a>. What they <em>mean</em>, which is this page’s
+job:</p>
+<p><strong>Proving two meshes don’t touch is the expensive case.</strong> A real collision exits
+at the first intersecting triangle; a near miss forces exhaustive descent of
+both trees. A well-optimised scan consists almost entirely of near misses, so
+the worst case is the normal case. Exact distance is 10× worse again, which
+rules out “just compute clearance per point” as an alternative to a margin.</p>
+<p><strong>The JS column was originally measured with three-mesh-bvh’s default <code class="docutils literal notranslate"><span class="pre">CENTER</span></code>
+split strategy.</strong> Switching to <code class="docutils literal notranslate"><span class="pre">SAH</span></code> is a one-line change worth ~1.5× on the
+dominant case, and it moves the language gap from 9.2× to 6.2×. The first
+number in this document was partly measuring my own defaults. Both sides return
+the same verdict on every one of the 153 pairs, and both are warmed up before
+timing.</p>
+<p><strong>The point-cloud environment check is the cheapest thing here</strong>, which is not
+what anyone expected. Cost is insensitive to cloud size — 20k and 200k points
+measure the same — because a KD-tree query is logarithmic. 194 spheres × 15,000
+poses is 2.9M queries in 0.16 s across 24 threads.</p>
+<p><strong>The broad phase is sound, in a specific sense.</strong> Each body gets a bounding
+sphere that provably encloses all its leaf spheres, and a body pair is skipped
+only when those bounding spheres are separated. No leaf pair is skipped for any
+other reason. An earlier sketch skipped intra-group pairs, which was not sound;
+this does not.</p>
+<p><strong>Sphere count barely matters; sphere placement does.</strong> K=4 and K=16 per mesh
+flag 55.2 and 52.1 pairs per pose. Tightness comes from where the spheres are,
+not how many, and a medial-axis sphere tree would beat the Lloyd-relaxed
+clustering used here. The fine tier confirms the same collision count at both K,
+which is the check that the coarse tier changes only the amount of work, not the
+answer.</p>
+<p><strong>Descending the BVH deeper is free, and saturates.</strong> Cost is flat because the
+descent prunes — extra nodes are visited only where boxes already overlap — so
+depth 3–4 halves the false positives for nothing. That it then stops improving
+says the limit is the <em>shape</em> of the bounding volume rather than the count:
+three-mesh-bvh nodes are axis-aligned in the mesh’s local frame, so a rotated
+arm’s world AABB is loose however finely the tree is subdivided. That is exactly
+what <code class="docutils literal notranslate"><span class="pre">coal</span></code>’s <code class="docutils literal notranslate"><span class="pre">OBBRSS</span></code> nodes fix. Measuring an OBB-node descent is the strongest
+remaining argument for coal over the JavaScript stack, and is Q4.</p>
+<p><strong>Depth alone does not make exact checking viable at 200 Hz.</strong> Sixteen near-miss
+pairs per pose at coal’s 250 µs is 4 ms/pose, and 720,000 intervals in an
+hour-long scan is roughly an hour of compute. The coarse tier has to flag far
+less than that.</p>
+<p><strong>The false-positive rate is what decides the fine tier, and this model cannot
+measure it.</strong> The articulated i16 reports 8–12 exact triangle collisions per
+pose even at the <code class="docutils literal notranslate"><span class="pre">demoPose</span></code> its config ships as valid — almost certainly
+permanently-touching parts, mounting faces, the base against the first rotating
+stage, which the config’s link-level adjacency rules do not cover. With the
+machine “in collision” at rest, any false-positive figure is meaningless, so the
+85% measured is not reported as a finding. This is Q2, and it is a conversation
+with whoever owns the CAD, not a computation.</p>
+<p>It may not need answering. Q7 calls for a hard cap on fallback work, which
+converts an unmeasured cost into a bounded one: if the coarse tier flags more
+than N points in a batch, treat it as a collision and stop rather than trying to
+clear them all. <strong>The design should not depend on the false-positive rate being
+small — it should stay correct when it is not.</strong></p>
+</section>
+<section id="what-the-industry-does">
+<h2>What the industry does<a class="headerlink" href="#what-the-industry-does" title="Link to this heading">#</a></h2>
+<p><strong>NVIDIA cuRobo</strong> approximates the robot as a set of spheres attached to links
+and queries them against the world as meshes, cuboids, nvblox maps or ESDF
+voxel grids. Collision checkers take spheres shaped <code class="docutils literal notranslate"><span class="pre">[batch,</span> <span class="pre">horizon,</span> <span class="pre">n,</span> <span class="pre">4]</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">horizon</span></code> is the trajectory of a sphere — the batch API we have been
+sketching, already designed. It ships mesh-to-sphere approximation tooling and
+reports ~30 ms end-to-end on an RTX 4090, ~60× faster than CPU planners.
+The relevant point is not the speed: <strong>the fastest GPU collision checker in
+robotics represents the robot as spheres, not triangles.</strong></p>
+<p><strong>Collision-Affording Point Trees</strong> (Kavraki Lab, RSS 2024) is a SIMD-amenable
+structure for sphere-vs-point-cloud queries reporting &lt;10 ns per query on
+scenes of thousands of points, plus a space-filling-curve filter that decimates
+clouds while preserving structure. Our static environment is a point cloud, so
+this is directly applicable and roughly 100× better than the scipy KD-tree
+measured above. A Rust implementation exists.</p>
+<p><strong>MoveIt</strong> began on FCL and added Bullet specifically because FCL lacked
+continuous collision detection. <strong>Tesseract</strong> (ROS-Industrial) uses Bullet for
+both discrete and continuous checking of convex-convex and convex-concave
+shapes. <strong>Drake</strong> uses FCL. <strong>Pinocchio</strong> and the Humanoid Path Planner use
+<code class="docutils literal notranslate"><span class="pre">coal</span></code>, an FCL fork with dedicated GJK/EPA implementations, support for safety
+margins, and a Nesterov-accelerated variant reporting up to 2× over FCL.</p>
+<p>The pattern across all of them: primitives (spheres, capsules, convex hulls)
+for anything on a hot path, and meshes reserved for final verification. They
+also favour continuous over discrete checking — but note that those libraries
+are built for planners searching sparse configuration space, where samples are
+far apart. We are handed a dense trajectory at 5 kHz, which is a different
+regime, and it changes the answer.</p>
+</section>
+<section id="answering-the-three-questions">
+<h2>Answering the three questions<a class="headerlink" href="#answering-the-three-questions" title="Link to this heading">#</a></h2>
+<section id="is-there-a-js-library-we-should-use-for-capsules">
+<h3>Is there a JS library we should use for capsules?<a class="headerlink" href="#is-there-a-js-library-we-should-use-for-capsules" title="Link to this heading">#</a></h3>
+<p>Rapier (Rust compiled to WASM, with maintained JS bindings) has capsule
+colliders and shape casting, and is the strongest option if capsules must live
+in JavaScript. Jolt and Ammo.js (Bullet) are alternatives.</p>
+<p><strong>But the recommendation is not to do this.</strong> The coarse tier is the one that
+runs on every point of every trajectory, in a service the executor depends on
+to keep motors moving. Putting it in a browser runtime adds a WASM boundary, a
+JS event loop and a deployment story, to reach a tier that plain numpy already
+runs inside the budget. The measurements do not justify it.</p>
+</section>
+<section id="should-the-triangles-be-a-python-library">
+<h3>Should the triangles be a Python library?<a class="headerlink" href="#should-the-triangles-be-a-python-library" title="Link to this heading">#</a></h3>
+<p>Yes, but by less than first reported. <code class="docutils literal notranslate"><span class="pre">coal</span></code> (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">coal</span></code>, 3.0.3 on
+PyPI) is ~6× faster than <em>tuned</em> three-mesh-bvh on near misses and ~14× on
+intersections, and it is the same library Pinocchio uses. <code class="docutils literal notranslate"><span class="pre">python-fcl</span></code> is the
+older binding and measures the same within noise.</p>
+<p>Six times is worth having but it is not the difference between viable and not,
+and it should be weighed against the convention risk of maintaining a second
+implementation. See the note on geometry agreement below.</p>
+<p>Two features make it a better fit than raw speed suggests:</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">security_margin</span></code> is a request-time parameter, not baked into geometry.</strong>
+This answers the padding question directly — insertion-time validation and
+runtime checking use <em>one</em> geometry model with two margins, rather than two
+models that can drift apart. It also removes the need for the strawman’s
+<code class="docutils literal notranslate"><span class="pre">assert_conservative</span></code> in its current form: conservatism becomes a property of a
+parameter, not of a separately-maintained model.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">enable_distance_lower_bound</span></code> and <code class="docutils literal notranslate"><span class="pre">break_distance</span></code></strong> give a clearance bound
+with early exit, much cheaper than the 2.6 ms exact distance query while still
+answering “how close did it get”.</p>
+<p>One caveat against it: <strong><code class="docutils literal notranslate"><span class="pre">coal</span></code> has dropped continuous collision detection.</strong>
+<code class="docutils literal notranslate"><span class="pre">python-fcl</span></code> still exposes <code class="docutils literal notranslate"><span class="pre">continuousCollide</span></code>, <code class="docutils literal notranslate"><span class="pre">CCDMotionType</span></code> and
+<code class="docutils literal notranslate"><span class="pre">CCDSolverType</span></code>; <code class="docutils literal notranslate"><span class="pre">coal</span></code> exposes none of them. That does not matter much for the
+coarse tier, where swept checking is a segment-segment distance we can write in
+six lines of numpy, but it would matter if the fine tier ever needed swept mesh
+checks.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">curobo</span></code> on PyPI (version 0.2, “A simple python package”) is <strong>not</strong>
+NVIDIA’s cuRobo, which installs from source. Worth knowing before someone pip
+installs it.</p>
+</section>
+<section id="do-the-two-worlds-actually-agree">
+<h3>Do the two worlds actually agree?<a class="headerlink" href="#do-the-two-worlds-actually-agree" title="Link to this heading">#</a></h3>
+<p>The reason for considering headless JavaScript in the first place was
+convention drift — euler angle order, units, axis handedness — between the
+three.js scene and anything reimplementing it in Python. If the two disagree
+about where a body is, a faster checker is worse than useless.</p>
+<p>Measured directly: load <code class="docutils literal notranslate"><span class="pre">i16_scene.glb</span></code> in three.js and in trimesh, compute each
+mesh’s world AABB, and compare. <strong>They agree to 1.55e-15 m across all 18
+meshes</strong> — floating point noise.</p>
+<p>That is expected once you look at why: glTF stores node transforms as matrices
+or explicit TRS with rotation as a quaternion, so there is no euler convention
+to get wrong. Both loaders reproduce the same scene graph.</p>
+<p>Two practical wrinkles, neither affecting placement:</p>
+<ul class="simple">
+<li><p><strong>Node naming differs.</strong> three.js sanitises (<code class="docutils literal notranslate"><span class="pre">detector</span> <span class="pre">carriage</span></code> becomes
+<code class="docutils literal notranslate"><span class="pre">detector_carriage</span></code>) and exposes mesh names; trimesh uses node names with
+hash suffixes (<code class="docutils literal notranslate"><span class="pre">base_10b53f</span></code>). The name sets do not intersect for 11 of 18
+meshes. Any cross-implementation check must match on geometry, not on names —
+matching by name silently pairs the wrong bodies, which is how this comparison
+first appeared to show a 1.77 m disagreement.</p></li>
+<li><p>The convention risk is real but it lives in the <strong>hand-written WebSocket API</strong>
+(degrees, millimetres, Z-up, orientation relative to a home of <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">90,</span> <span class="pre">0]</span></code>)
+and in the joint definitions in <code class="docutils literal notranslate"><span class="pre">*_config.json</span></code>, not in the GLB.</p></li>
+</ul>
+<p>So consuming the GLB directly carries no convention risk, and that argument for
+headless JavaScript does not survive contact with the measurement. The argument
+that does survive is having one implementation rather than two — which is about
+maintenance, not correctness.</p>
+</section>
+<section id="a-discarded-experiment">
+<h3>A discarded experiment<a class="headerlink" href="#a-discarded-experiment" title="Link to this heading">#</a></h3>
+<p>To separate “JavaScript is slower” from “three-mesh-bvh’s <code class="docutils literal notranslate"><span class="pre">intersectsGeometry</span></code>
+is a weaker algorithm” — it restarts a traversal from the root of B’s tree at
+every leaf of A, rather than descending both trees together — I decimated the
+meshes to 500/2000/8000/20000 triangles and timed both sides on byte-identical
+geometry. That experiment said JavaScript was <em>faster</em> than FCL above 1000
+triangles, contradicting the full-scene result.</p>
+<p>It is discarded. Taking every k-th face scatters triangles across the original
+surface and destroys spatial coherence, and the two libraries degrade
+differently under that: FCL fits oriented boxes, three-mesh-bvh axis-aligned
+ones. The measurement was of the decimation, not of the libraries. The
+real-geometry numbers are the ones to use.</p>
+<p>The algorithmic question is therefore still open. It matters, because if the
+gap is <code class="docutils literal notranslate"><span class="pre">intersectsGeometry</span></code> rather than the language, it is fixable in place.</p>
+</section>
+</section>
+<section id="the-padding-is-unnecessary-but-not-because-of-ccd">
+<h2>The padding is unnecessary, but not because of CCD<a class="headerlink" href="#the-padding-is-unnecessary-but-not-because-of-ccd" title="Link to this heading">#</a></h2>
+<p>The design this replaced padded the coarse model for <em>typical</em> joint velocity
+over 0.1 s, knowingly accepting that a fast segment could slip between samples
+and be caught later by the fine check — a deliberate trade of soundness for
+usability, defensible only under the ADR-0003 classification.</p>
+<p>I expected continuous collision detection to remove the trade, and predicted it
+would let the validator stay at 10 Hz. <strong>Measured, that prediction is wrong in
+its reasoning and right in its conclusion.</strong></p>
+<p>A sphere swept along a straight line is exactly a capsule, so swept checking is
+segment-segment distance and needs no library; under linear interpolation the
+relative displacement is also linear, so the exact test is point-to-segment on
+the relative motion. Rates and costs are tabulated in
+<a class="reference internal" href="measurements.html"><span class="std std-doc">Measurements</span></a>. On rate × per-point cost, <strong>CCD wins by
+2× at diffractometer speeds and 3× at robot speeds</strong> — real, but nothing like
+the order of magnitude assumed. It does not on its own justify rebuilding the
+coarse tier around swept volumes.</p>
+<p>The genuinely useful findings are the other two:</p>
+<p><strong>The executor is already sound and the padding there is redundant.</strong> Discrete
+checking needs 50 Hz at diffractometer speeds and 400 Hz at robot speeds. The
+executor samples at 5 kHz — 12× to 100× more than soundness requires. Whatever
+the padding is protecting against at 5 kHz, it is not the sampling gap.</p>
+<p><strong>The validator at 10 Hz is where the problem actually is.</strong> Discrete checking
+at 10 Hz missed 9 of 850 real collisions at diffractometer speeds and 538 of
+1689 — 32% — at robot speeds. That is what the velocity padding is compensating
+for, and it is compensating for a lot.</p>
+<p>The fix does not require CCD. Sampling the validator at 50–400 Hz instead of
+10 Hz is sound by measurement, and validation is offline and non-blocking, so
+5–40× more points is affordable. Either way the velocity-guess padding
+disappears and a tick can mean “will run” rather than “probably” — which was the
+predicted conclusion, reached by a different route.</p>
+<section id="sound-padding-and-the-bound-that-is-actually-rigorous">
+<h3>Sound padding, and the bound that is actually rigorous<a class="headerlink" href="#sound-padding-and-the-bound-that-is-actually-rigorous" title="Link to this heading">#</a></h3>
+<p>A sphere on a rotating link sweeps an arc, so the exact swept volume is a torus
+segment. Bounding the arc by its chord plus a radius inflation turns it back
+into a capsule and the test into segment-segment distance. Rates and inflations
+are in <a class="reference internal" href="measurements.html"><span class="std std-doc">Measurements</span></a>.</p>
+<p><strong>The obvious inflation is wrong.</strong> The single-arc sagitta,
+<code class="docutils literal notranslate"><span class="pre">Σⱼ</span> <span class="pre">dⱼ(1</span> <span class="pre">−</span> <span class="pre">cos(Δθⱼ/2))</span></code> over ancestor joints, is <em>not</em> conservative for a chain:
+rotating an upstream joint also moves the downstream axes, so individual arc
+deviations do not compose additively. Measured, it is violated by up to 3.9 mm
+on i16. The check caught this before it was written down.</p>
+<p>What is rigorous is the path-length bound. A point <code class="docutils literal notranslate"><span class="pre">q</span></code> on a path of length <code class="docutils literal notranslate"><span class="pre">L</span></code>
+from <code class="docutils literal notranslate"><span class="pre">p₀</span></code> to <code class="docutils literal notranslate"><span class="pre">p₁</span></code> satisfies <code class="docutils literal notranslate"><span class="pre">|q−p₀|</span> <span class="pre">+</span> <span class="pre">|q−p₁|</span> <span class="pre">≤</span> <span class="pre">L</span></code>, so its distance to the chord
+is at most <code class="docutils literal notranslate"><span class="pre">L/2</span></code>. With <code class="docutils literal notranslate"><span class="pre">L</span> <span class="pre">=</span> <span class="pre">Σⱼ</span> <span class="pre">dⱼ|Δθⱼ|</span></code> that gives an inflation which held at
+every rate tested, worst-case overshoot −0.0074 mm.</p>
+<p>Two things follow.</p>
+<p><strong>The current scheme is under-padded, not over-padded.</strong> At 10 Hz the sound
+inflation reaches 263 mm. Padding ~50 mm for typical velocity is roughly 5×
+short in the worst case, which is the concrete content of “the tick means it
+will probably run”.</p>
+<p><strong>Sample rate is the lever, not the checking method.</strong> Inflation scales as
+1/rate and cost as rate, so the product is fixed and the only choice is where on
+that line to sit. 200 Hz gives 3.3 mm mean inflation for 32 s per 1-hour scan —
+sound, tight enough not to reject real scans, and trivially affordable because
+validation is offline. Feasibility in JavaScript is not in question: 32–45 µs
+per interval in plain three.js with no BVH involved.</p>
+</section>
+<section id="the-arc-correction-when-the-chord-is-used-anyway">
+<h3>The arc correction, when the chord is used anyway<a class="headerlink" href="#the-arc-correction-when-the-chord-is-used-anyway" title="Link to this heading">#</a></h3>
+<p>Both CCD variants assume the sphere travels in a straight line between samples.
+Unlike a velocity guess, the error is <strong>computable</strong>, and it shrinks
+quadratically with rate:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>sample rate</p></th>
+<th class="head"><p>ω = 1 rad/s</p></th>
+<th class="head"><p>ω = 8 rad/s</p></th>
+<th class="head"><p>the velocity padding it replaces</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>10 Hz</p></td>
+<td><p>625 µm</p></td>
+<td><p>39469 µm</p></td>
+<td><p>50 mm</p></td>
+</tr>
+<tr class="row-odd"><td><p>200 Hz</p></td>
+<td><p>1.6 µm</p></td>
+<td><p>100 µm</p></td>
+<td><p>50 mm</p></td>
+</tr>
+<tr class="row-even"><td><p>5000 Hz</p></td>
+<td><p>0.0 µm</p></td>
+<td><p>0.2 µm</p></td>
+<td><p>50 mm</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>At any rate above ~200 Hz the exact arc correction is micrometres against a
+50 mm guess. The padding term should be this expression, evaluated per segment
+from the actual commanded velocity, not a constant. At ω = 8 rad/s and 10 Hz the
+sagitta is 39 mm, which dwarfs the geometry — which is why swept checking still
+missed 26 intervals in that regime.</p>
+</section>
+<section id="the-number-this-all-hinges-on">
+<h3>The number this all hinges on<a class="headerlink" href="#the-number-this-all-hinges-on" title="Link to this heading">#</a></h3>
+<p>The answer swings by 8× between the two velocity regimes, and <strong>nobody has told
+us what DLS diffractometer axes actually do</strong>. Maximum and typical angular
+velocity per axis, per beamline: an afternoon for whoever owns the motion
+controllers, and it decides the validator’s sample rate. This is Q3.</p>
+</section>
+</section>
+<section id="ray-casting-as-the-fine-pass">
+<h2>Ray casting as the fine pass<a class="headerlink" href="#ray-casting-as-the-fine-pass" title="Link to this heading">#</a></h2>
+<p>Gareth describes the intended design as capsules first, ray casting second.
+Capsules first is right and agrees with everything above. Ray casting second
+needs care, because its error direction is the opposite of the one the two-tier
+scheme assumes.</p>
+<p>Note first what is committed today: the collision path calls
+<code class="docutils literal notranslate"><span class="pre">intersectsGeometry</span></code> (triangle-triangle BVH) and <code class="docutils literal notranslate"><span class="pre">closestPointToPoint</span></code> (point
+cloud). The string “capsule” does not appear in any JavaScript file — capsules
+exist only in <code class="docutils literal notranslate"><span class="pre">planner.py</span></code>. The only raycasting is VR controller pointing and
+click-to-select. So this is a description of intent, not of the current code.</p>
+<p><strong>Ray casting samples.</strong> It finds what a ray happens to hit, and a feature
+between two rays is invisible to it. Measured on the i16 geometry
+(<code class="docutils literal notranslate"><span class="pre">benchmarks/bench_raycast.mjs</span></code>, 8.3 µs/ray against the largest mesh, objects
+reused and the BVH called directly):</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>rays/pose</p></th>
+<th class="head"><p>time/pose</p></th>
+<th class="head"><p>angular spacing</p></th>
+<th class="head"><p>feature it can miss at 1 m</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>256</p></td>
+<td><p>2.1 ms</p></td>
+<td><p>7.17°</p></td>
+<td><p>252 mm</p></td>
+</tr>
+<tr class="row-odd"><td><p>1024</p></td>
+<td><p>8.5 ms</p></td>
+<td><p>3.58°</p></td>
+<td><p>125 mm</p></td>
+</tr>
+<tr class="row-even"><td><p>4096</p></td>
+<td><p>34 ms</p></td>
+<td><p>1.79°</p></td>
+<td><p>63 mm</p></td>
+</tr>
+<tr class="row-odd"><td><p>16384</p></td>
+<td><p>137 ms</p></td>
+<td><p>0.90°</p></td>
+<td><p>31 mm</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>At any affordable ray density the missable feature is larger than the
+clearances this system exists to enforce.</strong> “The detector must stay 20 mm from
+the sample” is one of the motivating constraints in ADR-0003; 16,384 rays per
+pose costs 137 ms and can still miss 31 mm.</p>
+<p>This matters because of what the fine tier is <em>for</em>. The coarse tier
+over-approximates and flags; the fine tier clears the ones flagged only because
+of padding. The fine tier therefore gets the last word, and a technique with
+false negatives will confidently clear real collisions. Triangle-triangle
+intersection is exact, so “fine says clear” is trustworthy. Ray casting is a
+sampling estimate, so it is not — unless the ray spacing is bounded against the
+smallest feature in the model, which is a geometry-dependent argument that has
+to be made explicitly rather than assumed.</p>
+<p>There is a sound use for rays here: casting <em>along the direction of motion</em> to
+find time-of-impact is a legitimate CCD formulation, and is what the literature
+below does. That is a different thing from spraying rays at a mesh to test
+overlap.</p>
+<section id="the-first-coherent-gpu-argument">
+<h3>The first coherent GPU argument<a class="headerlink" href="#the-first-coherent-gpu-argument" title="Link to this heading">#</a></h3>
+<p>If the fine pass is ray casting, then RTX ray-tracing cores are purpose-built
+silicon for exactly that operation — and this is the first GPU justification
+for this project that holds together. <a class="reference external" href="https://arxiv.org/abs/2409.09918">Hardware-Accelerated Ray Tracing for
+Discrete and Continuous Collision Detection on GPUs</a>
+(ICRA 2025) reports up to 3× over state-of-the-art GPU sphere-based methods for
+batched discrete-pose queries, and up to 9× for continuous, at 24k robot
+triangles against 190k obstacle triangles — almost exactly i16’s scale.</p>
+<p>Two things worth noting from it. Its continuous variant uses a <strong>sphere</strong> robot
+representation against obstacle meshes, so spheres-on-the-hot-path survives even
+in the ray-traced design. And its discrete variant is <em>exact</em> mesh-to-mesh, not
+a sampled overlap test, which is the distinction drawn above.</p>
+<p>If Gareth is heading here, the GPU instinct is right — it was just explained by
+scene assembly earlier, which is not where the parallelism is.</p>
+</section>
+</section>
+<section id="proposed-re-architecture">
+<h2>Proposed re-architecture<a class="headerlink" href="#proposed-re-architecture" title="Link to this heading">#</a></h2>
+<p>Gareth’s project grew anti-collision out of a visualiser, and the two roles
+should be separated rather than merged:</p>
+<p><strong>Keep as the viewer and model-authoring tool.</strong> The three.js application is
+genuinely good at what it was built for, and the <code class="docutils literal notranslate"><span class="pre">*_config.json</span></code> + <code class="docutils literal notranslate"><span class="pre">*_scene.glb</span></code>
+pair is a portable scene description that a checker and a viewer can both
+consume. That format is the interface between the two halves, and it already
+exists.</p>
+<p><strong>Build the checking engine headless, in Python over <code class="docutils literal notranslate"><span class="pre">coal</span></code>.</strong> Same configs,
+same GLB. Three tiers by geometry type:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>tier</p></th>
+<th class="head"><p>geometry</p></th>
+<th class="head"><p>when</p></th>
+<th class="head"><p>measured</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>self-collision</p></td>
+<td><p>spheres/capsules per link</p></td>
+<td><p>every point</p></td>
+<td><p>1.1–1.6 s / 15k</p></td>
+</tr>
+<tr class="row-odd"><td><p>environment</p></td>
+<td><p>spheres vs point cloud (KD-tree, later CAPT)</p></td>
+<td><p>every point</p></td>
+<td><p>0.16 s / 15k</p></td>
+</tr>
+<tr class="row-even"><td><p>verification</p></td>
+<td><p>triangle meshes, <code class="docutils literal notranslate"><span class="pre">coal</span></code></p></td>
+<td><p>flagged points only</p></td>
+<td><p>250 µs/pair</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Keep the capsule model from <code class="docutils literal notranslate"><span class="pre">planner.py</span></code>, drop the RRT planner around it.</strong>
+The geometry model is the right one and is the only component in the prototype
+that can keep up with a batch. The planner solves a problem we do not have.</p>
+<p><strong>Revisit GPU only if the coarse tier stops fitting.</strong> On these numbers it fits
+with room to spare, single core. The GPU case would be a real one if the fine
+tier had to run per-point — but the architecture exists precisely so that it
+doesn’t.</p>
+</section>
+<section id="caveats">
+<h2>Caveats<a class="headerlink" href="#caveats" title="Link to this heading">#</a></h2>
+<p>The sphere decomposition is crude — voxel centres with a radius covering the
+voxel diagonal, capped at 12 per body — not a medial-axis sphere tree. Sphere
+<em>count</em> drives query cost, so the timings are representative, but a production
+decomposition would be tighter for the same count.</p>
+<p>Poses are synthetic offsets, not real forward kinematics, and I could not
+reproduce the prototype’s kinematic-adjacency exemptions or resolve all config
+joint names to GLB nodes (i16 3/10, i19 0/4). Whole-scene throughput numbers
+therefore over-count collisions; the per-pair regime costs do not depend on
+that, which is why they are the ones quoted.</p>
+<p>Container timings, single machine, no GPU available to test cuRobo or CAPT
+claims directly. The standing warning applies: re-measure on real geometry
+before sizing anything.</p>
+</section>
+<section id="sources">
+<h2>Sources<a class="headerlink" href="#sources" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/coal-library/coal">coal — an extension of the Flexible Collision Library</a></p></li>
+<li><p><a class="reference external" href="https://curobo.org/">cuRobo: CUDA Accelerated Robot Library</a></p></li>
+<li><p><a class="reference external" href="https://curobo.org/get_started/2c_world_collision.html">cuRobo collision world representation</a></p></li>
+<li><p><a class="reference external" href="https://curobo.org/reports/curobo_report.pdf">cuRobo: Parallelized Collision-Free Minimum-Jerk Robot Motion Generation</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/2406.02807">Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors for Fast Collision Checking</a></p></li>
+<li><p><a class="reference external" href="https://github.com/KavrakiLab/captree-rs">captree-rs — Rust implementation of the CAPT</a></p></li>
+<li><p><a class="reference external" href="https://moveit.ai/bullet/collision%20detection/moveit/2020/11/18/bullet-collision.html">Integrating Bullet for Collision Detection — MoveIt</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tesseract-robotics/tesseract">Tesseract — Motion Planning Environment</a></p></li>
+<li><p><a class="reference external" href="https://joss.theoj.org/papers/10.21105/joss.07473">robot_collision_checking: A Lightweight ROS 2 Interface to FCL</a></p></li>
+<li><p><a class="reference external" href="https://graphics.ewha.ac.kr/projects/details/C2A/C2A.pdf">C2A: Controlled conservative advancement for continuous collision detection</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2507.14061">MorphIt: Flexible Spherical Approximation of Robot Morphology</a></p></li>
+<li><p><a class="reference external" href="https://rapier.rs/javascript3d/classes/Collider.html">Rapier physics engine — Collider API</a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../exploration.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Exploration</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="measurements.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Measurements</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusions-first">Conclusions first</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-measurements-established">What the measurements established</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-industry-does">What the industry does</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#answering-the-three-questions">Answering the three questions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#is-there-a-js-library-we-should-use-for-capsules">Is there a JS library we should use for capsules?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#should-the-triangles-be-a-python-library">Should the triangles be a Python library?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#do-the-two-worlds-actually-agree">Do the two worlds actually agree?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-discarded-experiment">A discarded experiment</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-padding-is-unnecessary-but-not-because-of-ccd">The padding is unnecessary, but not because of CCD</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sound-padding-and-the-bound-that-is-actually-rigorous">Sound padding, and the bound that is actually rigorous</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arc-correction-when-the-chord-is-used-anyway">The arc correction, when the chord is used anyway</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-number-this-all-hinges-on">The number this all hinges on</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ray-casting-as-the-fine-pass">Ray casting as the fine pass</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-first-coherent-gpu-argument">The first coherent GPU argument</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proposed-re-architecture">Proposed re-architecture</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caveats">Caveats</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sources">Sources</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/exploration/collision-libraries.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/explanations/exploration/collision-libraries.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

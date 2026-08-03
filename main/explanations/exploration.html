@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Decisions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>Exploration &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/exploration';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="3. Anti-collision is soft machine protection, not a safety function" href="decisions/0003-anti-collision-is-soft-machine-protection.html" />
-    <link rel="prev" title="The working architecture" href="architecture.html" />
+    <link rel="next" title="Collision libraries: survey and re-architecture" href="exploration/collision-libraries.html" />
+    <link rel="prev" title="Open questions" href="open-questions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -159,8 +159,8 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
     Decisions
   </a>
 </li>
@@ -173,8 +173,8 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Exploration
   </a>
 </li>
@@ -332,8 +332,8 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
     Decisions
   </a>
 </li>
@@ -346,8 +346,8 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Exploration
   </a>
 </li>
@@ -451,16 +451,9 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/measurements.html">Measurements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/reversals.html">What we got wrong</a></li>
 </ul>
 </div>
 </nav></div>
@@ -501,7 +494,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Decisions</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Exploration</span></li>
   </ul>
 </nav>
 </div>
@@ -518,44 +511,21 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="decisions">
-<h1>Decisions<a class="headerlink" href="#decisions" title="Link to this heading">#</a></h1>
-<p>The load-bearing choices, in <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">Nygard format</a>:
-context, decision, consequences. The consequences section is the useful part —
-it is where the cost of each choice is written down.</p>
-<p>If you are reading them all, read in this order. ADR-0003 first, because it is
-the classification everything else is licensed by; ADR-0008 second, because it
-is the one that bears on queueing.</p>
+  <section id="exploration">
+<h1>Exploration<a class="headerlink" href="#exploration" title="Link to this heading">#</a></h1>
+<p>What was tried, what was measured, and what turned out to be wrong.</p>
+<p>Kept separate from <a class="reference internal" href="architecture.html"><span class="std std-doc">The working architecture</span></a> deliberately. The architecture document
+says what the design <em>is</em>; these say how it got there, which matters because a
+surprising amount of it was arrived at by being wrong first. Where a conclusion
+was reversed, the reasoning that led to it is usually still worth reading — that
+is why none of this is edited away.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/measurements.html">Measurements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/reversals.html">What we got wrong</a></li>
 </ul>
 </div>
-<section id="a-note-on-the-numbering">
-<h2>A note on the numbering<a class="headerlink" href="#a-note-on-the-numbering" title="Link to this heading">#</a></h2>
-<p>These were renumbered once, in a single pass before this repo was first pushed.
-Two ADRs were superseded during the design and have been folded into the ones
-that superseded them, with <strong>what they decided recorded as a note there</strong> rather
-than deleted — the superseded reasoning is usually why the current decision has
-the shape it does.</p>
-<ul class="simple">
-<li><p>The certificate ADR is now part of ADR-0009.</p></li>
-<li><p>The machine-scoped-solver ADR is now part of ADR-0010.</p></li>
-</ul>
-<p><strong>This will not happen again.</strong> From the first push, an ADR keeps its number
-permanently, and a superseded one is marked superseded in place — never removed,
-never renumbered. The one-time exception was taken because nothing had been
-published against the old numbers.</p>
-</section>
 </section>
 
 
@@ -569,20 +539,20 @@ published against the old numbers.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="architecture.html"
+       href="open-questions.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The working architecture</p>
+        <p class="prev-next-title">Open questions</p>
       </div>
     </a>
     <a class="right-next"
-       href="decisions/0003-anti-collision-is-soft-machine-protection.html"
+       href="exploration/collision-libraries.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">3. Anti-collision is soft machine protection, not a safety function</p>
+        <p class="prev-next-title">Collision libraries: survey and re-architecture</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -598,22 +568,10 @@ published against the old numbers.</p>
 
 
   <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-the-numbering">A note on the numbering</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/exploration.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -628,7 +586,7 @@ published against the old numbers.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/explanations/decisions.md.txt">
+    <a href="../_sources/explanations/exploration.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

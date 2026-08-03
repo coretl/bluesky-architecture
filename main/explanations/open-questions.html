@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Decisions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>Open questions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/open-questions';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="3. Anti-collision is soft machine protection, not a safety function" href="decisions/0003-anti-collision-is-soft-machine-protection.html" />
-    <link rel="prev" title="The working architecture" href="architecture.html" />
+    <link rel="next" title="Exploration" href="exploration.html" />
+    <link rel="prev" title="2. Adopt python-copier-template for project structure" href="decisions/0002-switched-to-python-copier-template.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -159,15 +159,15 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
     Decisions
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Open questions
   </a>
 </li>
@@ -332,15 +332,15 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="decisions.html">
     Decisions
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Open questions
   </a>
 </li>
@@ -450,19 +450,7 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
-</div>
+  <div class="bd-toc-item navbar-nav"></div>
 </nav></div>
     </div>
   
@@ -501,7 +489,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Decisions</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Open questions</span></li>
   </ul>
 </nav>
 </div>
@@ -518,43 +506,151 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="decisions">
-<h1>Decisions<a class="headerlink" href="#decisions" title="Link to this heading">#</a></h1>
-<p>The load-bearing choices, in <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">Nygard format</a>:
-context, decision, consequences. The consequences section is the useful part —
-it is where the cost of each choice is written down.</p>
-<p>If you are reading them all, read in this order. ADR-0003 first, because it is
-the classification everything else is licensed by; ADR-0008 second, because it
-is the one that bears on queueing.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
-</div>
-<section id="a-note-on-the-numbering">
-<h2>A note on the numbering<a class="headerlink" href="#a-note-on-the-numbering" title="Link to this heading">#</a></h2>
-<p>These were renumbered once, in a single pass before this repo was first pushed.
-Two ADRs were superseded during the design and have been folded into the ones
-that superseded them, with <strong>what they decided recorded as a note there</strong> rather
-than deleted — the superseded reasoning is usually why the current decision has
-the shape it does.</p>
-<ul class="simple">
-<li><p>The certificate ADR is now part of ADR-0009.</p></li>
-<li><p>The machine-scoped-solver ADR is now part of ADR-0010.</p></li>
-</ul>
-<p><strong>This will not happen again.</strong> From the first push, an ADR keeps its number
-permanently, and a superseded one is marked superseded in place — never removed,
-never renumbered. The one-time exception was taken because nothing had been
-published against the old numbers.</p>
+  <section id="open-questions">
+<h1>Open questions<a class="headerlink" href="#open-questions" title="Link to this heading">#</a></h1>
+<p>Ranked by how much they would move the design. Answered ones are kept at the
+bottom because knowing a question is closed is worth as much as knowing it is
+open.</p>
+<section id="blocking">
+<h2>Blocking<a class="headerlink" href="#blocking" title="Link to this heading">#</a></h2>
+<p><strong>Q1. How tight can an automatically-derived coarse model be?</strong>
+The binding constraint on the whole design. Fitted spheres leave 63–173 mm of
+error on i16 meshes, against 3.3 mm of motion padding at 200 Hz — so the coarse
+model, not the sample rate or the checking method, is what decides whether
+validation rejects legitimate scans. Hand-authored capsules are ruled out on
+cost: mech engineers export meshes and every CAD revision would need
+re-authoring. Candidates are medial-axis sphere trees and the mesh’s own BVH
+nodes at depth 3–4. <em>Half a day: one detector arm, both approaches, same error
+metric.</em></p>
+<p><strong>Q2. What is the exemption set?</strong>
+The articulated i16 reports 8–12 exact triangle collisions per pose <em>at the
+demoPose its own config ships as valid</em> — permanently touching parts, mounting
+faces, base against first stage, which the config’s link-level adjacency rules
+do not cover. Until this is right, no false-positive rate measured on that model
+means anything, and both the two-tier and temporal-tree results are held back by
+it. <em>A conversation with whoever owns the CAD and the config, not a
+computation.</em></p>
+<p><strong>Q3. What are the actual joint angular velocities?</strong>
+Every padding and sample-rate figure scales linearly with it, and the two
+regimes tested (1.6 vs 8 rad/s) swing the required validator rate by 8×. <em>An
+afternoon with whoever owns the motion controllers.</em></p>
+</section>
+<section id="architectural">
+<h2>Architectural<a class="headerlink" href="#architectural" title="Link to this heading">#</a></h2>
+<p><strong>Q4. Oriented vs axis-aligned coarse volumes.</strong> BVH-depth rejection saturates
+at 80–82% by depth 3–4, which says the limit is the volume’s <em>shape</em>, not the
+count — <code class="docutils literal notranslate"><span class="pre">three-mesh-bvh</span></code> nodes are axis-aligned in the mesh’s local frame, so a
+rotated arm’s world box inflates however finely you subdivide. <code class="docutils literal notranslate"><span class="pre">coal</span></code>’s <code class="docutils literal notranslate"><span class="pre">OBBRSS</span></code>
+nodes are oriented boxes and rectangle-swept-spheres, which rotate exactly.
+Measuring an OBB descent is the strongest remaining argument for <code class="docutils literal notranslate"><span class="pre">coal</span></code> over the
+JavaScript stack.</p>
+<p><strong>Q5. The batch API contract.</strong> Input shape and units, per-point verdicts rather
+than a boolean, request-time padding, whether coarse-then-fine happens in one
+call, statefulness, transport and concurrency. Being added by the service
+author; cheapest to influence now.</p>
+<p><strong>Q6. Where does a replacement certificate come from mid-scan?</strong> If the executor
+mints its own, the validator/executor split blurs and the executor is now
+solving. If it calls the validator, mid-scan execution depends on a process
+that is meant to be non-blocking. Currently unstated either way.</p>
+<p><strong>Q7. Fallback budget cap.</strong> Needs a hard cap on exact-tier work per batch, plus
+defined behaviour on exceeding it. The behaviour is settled in kind — <strong>treat as
+collision</strong>, which at insertion time means ✗ and at runtime means the stop in
+ADR-0006 — so what is open is the number. This may be the <em>answer</em> to Q1 rather
+than a detail: a cap converts an unmeasurable false-positive rate into a bounded
+cost, so the design does not need the rate to be small, only to stay correct
+when it is not.</p>
+<p><strong>Q8. Latency budget decomposition.</strong> Batches are a few seconds of motion at
+5 kHz checked ahead of execution, so the budget is roughly one batch period —
+an order of magnitude more headroom than the 500 ms premise this was originally
+sized against (see reversal 1). Still needs numbers against RTT, queueing,
+compute and margin.</p>
+<p><strong>Q9. When may the queue start an entry that is not ✓?</strong> Two cases, and they
+are not the same question. An entry at <strong>⏳</strong> is merely not validated <em>yet</em>, so
+the rule could be “wait” — but validation is asynchronous, and a queue that
+stalls on it has serialised itself behind the validator. An entry at <strong>?</strong> can
+<em>never</em> be validated, and must still run, so “wait” is not available at all.
+Neither rule is written down. ADR-0008 raises the ⏳ half and leaves it open.</p>
+</section>
+<section id="component-level">
+<h2>Component-level<a class="headerlink" href="#component-level" title="Link to this heading">#</a></h2>
+<p><strong>Q10. How do generic plans get beamline-specific collaborators?</strong> A generic
+<code class="docutils literal notranslate"><span class="pre">scanspec_scan</span></code> needs a beamline’s devices and triggering strategy while the
+rest of the plan stays generic. blueapi already solves that shape for devices —
+a <code class="docutils literal notranslate"><span class="pre">Device</span></code>-typed plan parameter arrives as a name and is resolved server-side,
+with the JSON schema enumerating valid names. Extending that to non-device
+collaborators would solve it and give the validator substitution for free. The
+blocker is concrete: <code class="docutils literal notranslate"><span class="pre">Device</span></code> is a union of bluesky protocols and
+<code class="docutils literal notranslate"><span class="pre">register_device</span></code> rejects anything failing <code class="docutils literal notranslate"><span class="pre">is_bluesky_compatible_device</span></code>.
+Whether that is a small extension or a rewrite is an hour’s reading.</p>
+<p>The checker is <em>not</em> in this question, which is a narrowing since ADR-0009: it
+is wired at RunEngine construction and reached interactively by import, so it
+never travels as a plan parameter.</p>
+<p>Related and unmeasured: whether <code class="docutils literal notranslate"><span class="pre">_convert_type</span></code> can be taught to resolve
+<code class="docutils literal notranslate"><span class="pre">Spec[Movable]</span></code> by mapping axis names through the same machinery. If it can,
+<code class="docutils literal notranslate"><span class="pre">scanspec_scan</span></code> needs no device registry at all and only the trigger strategy
+remains beamline-specific.</p>
+<p><strong>Q11. Constraint set as a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> field.</strong> The strawman hardcodes bisecting
+mode. Production needs the constraint set carried as a field with dispatch to
+the right closed form. This <em>is</em> legitimately <code class="docutils literal notranslate"><span class="pre">Transform</span></code> state — it changes the
+mapping — whereas branch is not, since it selects among solutions of a fixed
+mapping. They look alike and are not.</p>
+<p><strong>Q12. Branch count is mode-dependent.</strong> diffcalc returns 8 solutions for
+<code class="docutils literal notranslate"><span class="pre">{qaz:90,</span> <span class="pre">a_eq_b:True,</span> <span class="pre">mu:0}</span></code>; bisecting mode has 4. Machine-scoped combination
+growth depends on this: two devices at 8 branches is 64 per window, three is
+512.</p>
+<p><strong>Q13. Does deferred move on the PMAC give coordinated <em>finish</em>, not just
+synchronised start?</strong> The straight-line-in-joint-space model requires axes to
+start and stop together. If each runs at its own velocity, fast axes arrive
+early and the path has corners in exactly the region being checked. Too obvious
+to mention, and therefore survives review unexamined.</p>
+<p><strong>Q14. Where <code class="docutils literal notranslate"><span class="pre">Transform</span></code> lives</strong> — <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code> today, which means an
+analysis pipeline must install ophyd-async to convert angles to hkl. Argues for
+extraction into a dependency-light package both depend on. Decide before
+transforms proliferate across dodal.</p>
+<p><strong>Q15. Mapping collidable axis names to dodal devices and PVs.</strong> The service
+names them (<code class="docutils literal notranslate"><span class="pre">Gamma</span></code>, <code class="docutils literal notranslate"><span class="pre">Merlin</span></code>, <code class="docutils literal notranslate"><span class="pre">Crystal</span></code>, …) and they are recognisable, but
+nothing ties them to devices. Small config artefact, needs an owner.</p>
+<p><strong>Q16. <code class="docutils literal notranslate"><span class="pre">prepare</span></code>-per-point overhead in step scans.</strong> One extra Msg per point.
+Free in wall-clock terms, but it means the diffractometer participates in every
+step, which affects whether a plain <code class="docutils literal notranslate"><span class="pre">scan()</span></code> works unmodified.</p>
+<p><strong>Q17. Does <code class="docutils literal notranslate"><span class="pre">bps.mv(hkl,</span> <span class="pre">...)</span></code> stay?</strong> Confirmed required and must be checked.
+It moves to opaque joint values under the hood; consider whether a plan stub
+carrying both intent and precomputed values is wanted for readability.</p>
+</section>
+<section id="answered">
+<h2>Answered<a class="headerlink" href="#answered" title="Link to this heading">#</a></h2>
+<p><strong>Is the branch-fixed inverse closed-form?</strong> Yes — three independent lines of
+evidence, including a flat 0.1 µs/point from 10k to 100k. Demonstrated for
+bisecting mode on a six-circle; other constraint modes are analytic in diffcalc
+too but each needs its own closed form written and tested.</p>
+<p><strong>Is the vectorised inverse fast enough to stay in-process?</strong> Yes, by a wide
+margin — 1.0 ms per 10,000-point chunk, 41,000× the scalar path. Kinematics is
+not a constraint anywhere.</p>
+<p><strong>How many bodies are in a real beamline collision model?</strong> Small — i16 has 18
+meshes and 10 movable joints, i19 has 9 links and 4. It was the wrong question;
+fit quality (Q1) is what binds.</p>
+<p><strong>Is there a sound broad phase?</strong> Two, both measured. A hierarchical sphere
+broad phase took a 15,000-point batch from 9.3 s to ~1.3 s; a depth-limited
+descent of the mesh’s own BVH needs no second model at all and costs the same at
+any depth.</p>
+<p><strong>Who declares the collision scope?</strong> The anti-collision service, as a set of
+“collidable” axes. Only the mapping to dodal devices remains (Q15).</p>
+<p><strong>Chunk lookahead vs deceleration.</strong> Checking runs ahead of motion, so lookahead
+equals batch duration — seconds. Remaining: pin the pipeline depth and confirm
+<code class="docutils literal notranslate"><span class="pre">check</span> <span class="pre">latency</span> <span class="pre">+</span> <span class="pre">stop</span> <span class="pre">time</span> <span class="pre">≤</span> <span class="pre">batch</span> <span class="pre">duration</span></code>.</p>
+<p><strong>Can the collision service run headless?</strong> Yes — proven on real geometry with
+no WebGL context and no DOM. The apparent dependency was on <code class="docutils literal notranslate"><span class="pre">render()</span></code>’s side
+effect of refreshing world matrices, which is one line of pure CPU maths.</p>
+<p><strong>Where does checking hook in, for raw as well as derived axes?</strong> A plan
+preprocessor on <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code>, passing its decision down by wrapping the
+value in <code class="docutils literal notranslate"><span class="pre">Certified[T]</span></code>. Raw motors are the degenerate case rather than a
+special one. See ADR-0009. What remains open is the per-beamline wiring for
+generic plans, which is Q10.</p>
+<p><strong>Is there a hook for preprocessors on the RunEngine?</strong> Yes —
+<code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code>, applied in <code class="docutils literal notranslate"><span class="pre">RunEngine.__call__</span></code>. One caveat: the code
+composes them so that the <em>last</em> entry is outermost, while the docstring claims
+the opposite. A checker must be outermost, so the order matters and the
+discrepancy is worth resolving upstream.</p>
 </section>
 </section>
 
@@ -569,20 +665,20 @@ published against the old numbers.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="architecture.html"
+       href="decisions/0002-switched-to-python-copier-template.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The working architecture</p>
+        <p class="prev-next-title">2. Adopt python-copier-template for project structure</p>
       </div>
     </a>
     <a class="right-next"
-       href="decisions/0003-anti-collision-is-soft-machine-protection.html"
+       href="exploration.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">3. Anti-collision is soft machine protection, not a safety function</p>
+        <p class="prev-next-title">Exploration</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -605,7 +701,10 @@ published against the old numbers.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-the-numbering">A note on the numbering</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blocking">Blocking</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#architectural">Architectural</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#component-level">Component-level</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#answered">Answered</a></li>
 </ul>
   </nav></div>
 
@@ -613,7 +712,7 @@ published against the old numbers.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/open-questions.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -628,7 +727,7 @@ published against the old numbers.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/explanations/decisions.md.txt">
+    <a href="../_sources/explanations/open-questions.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

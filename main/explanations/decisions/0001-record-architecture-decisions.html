@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>1. Record architecture decisions &#8212; bluesky-architecture 0.1.dev2+g8e98543f4 documentation</title>
+    <title>1. Record architecture decisions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
   
   
   
@@ -31,7 +31,6 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -41,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=4a58b78f"></script>
+    <script src="../../_static/documentation_options.js?v=476db245"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -60,7 +59,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="2. Adopt python-copier-template for project structure" href="0002-switched-to-python-copier-template.html" />
-    <link rel="prev" title="Architectural Decision Records" href="../decisions.html" />
+    <link rel="prev" title="7. The coarse model must be derived automatically from the mesh" href="0007-the-coarse-model-must-be-derived-automatically.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -154,32 +153,63 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../how-to.html">
-    How-to Guides
+  <a class="nav-link nav-internal" href="../architecture.html">
+    The working architecture
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../../explanations.html">
-    Explanations
+  <a class="nav-link nav-internal" href="../decisions.html">
+    Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference.html">
-    Reference
+  <a class="nav-link nav-internal" href="../open-questions.html">
+    Open questions
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../exploration.html">
+    Exploration
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
+    The anti-collision service
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../pinned-references.html">
+    Pinned references
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../session-notes.html">
+    Where the work stands
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -226,17 +256,6 @@
           
           
           <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
-        </li>
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://pypi.org/project/bluesky-architecture" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
         </li>
 </ul></div>
       
@@ -307,29 +326,50 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../how-to.html">
-    How-to Guides
+  <a class="nav-link nav-internal" href="../architecture.html">
+    The working architecture
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../../explanations.html">
-    Explanations
+  <a class="nav-link nav-internal" href="../decisions.html">
+    Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference.html">
-    Reference
+  <a class="nav-link nav-internal" href="../open-questions.html">
+    Open questions
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../exploration.html">
+    Exploration
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
+    The anti-collision service
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../pinned-references.html">
+    Pinned references
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../session-notes.html">
+    Where the work stands
   </a>
 </li>
 
@@ -371,17 +411,6 @@
           
           <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://pypi.org/project/bluesky-architecture" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
-        </li>
 </ul></div>
         
           <div class="navbar-item">
@@ -422,12 +451,16 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../decisions.html">Architectural Decision Records</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">1. Record architecture decisions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1"><a class="reference internal" href="../handover.html">Handover — validation architecture for Bluesky at DLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">1. Record architecture decisions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
 </ul>
 </div>
 </nav></div>
@@ -469,10 +502,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../../explanations.html" class="nav-link">Explanations</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../decisions.html" class="nav-link">Architectural Decision Records</a></li>
+    <li class="breadcrumb-item"><a href="../decisions.html" class="nav-link">Decisions</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">1. Record architecture decisions</span></li>
   </ul>
@@ -523,12 +553,12 @@ paste from existing ones.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../decisions.html"
+       href="0007-the-coarse-model-must-be-derived-automatically.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Architectural Decision Records</p>
+        <p class="prev-next-title">7. The coarse model must be derived automatically from the mesh</p>
       </div>
     </a>
     <a class="right-next"

@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Decisions &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
+    <title>9. Checking is a plan preprocessor, and the certificate is a recipe &#8212; bluesky-architecture 0.1.dev28+g29746cf6e documentation</title>
   
   
   
@@ -27,26 +27,26 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=476db245"></script>
-    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions';</script>
+    <script src="../../_static/documentation_options.js?v=476db245"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions/0009-checking-is-a-plan-preprocessor';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -55,19 +55,19 @@
             false;
         </script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
-    <link rel="icon" href="../_static/dls-logo.svg"/>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="3. Anti-collision is soft machine protection, not a safety function" href="decisions/0003-anti-collision-is-soft-machine-protection.html" />
-    <link rel="prev" title="The working architecture" href="architecture.html" />
+    <link rel="icon" href="../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="10. The checker is the solver, and runs in three modes" href="0010-the-checker-is-the-solver.html" />
+    <link rel="prev" title="4. Validation runs in a second, read-only process" href="0004-validation-runs-in-a-second-read-only-process.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
   
     
-    <script src="../_static/searchtools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script src="../searchindex.js"></script>
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
   
   </head>
   <body data-default-mode="">
@@ -87,7 +87,7 @@
   <dialog id="pst-search-dialog">
     
 <form class="bd-search d-flex align-items-center"
-      action="../search.html"
+      action="../../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -123,7 +123,7 @@
     
   
 
-<a class="navbar-brand logo" href="../index.html">
+<a class="navbar-brand logo" href="../../index.html">
   
   
   
@@ -134,8 +134,8 @@
       
     
     
-    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
-    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">bluesky-architecture</p>
@@ -153,35 +153,35 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+  <a class="nav-link nav-internal" href="../open-questions.html">
     Open questions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
     The anti-collision service
   </a>
 </li>
@@ -195,14 +195,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="pinned-references.html">
+  <a class="nav-link dropdown-item nav-internal" href="../pinned-references.html">
     Pinned references
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="session-notes.html">
+  <a class="nav-link dropdown-item nav-internal" href="../session-notes.html">
     Where the work stands
   </a>
 </li>
@@ -326,49 +326,49 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="open-questions.html">
+  <a class="nav-link nav-internal" href="../open-questions.html">
     Open questions
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="exploration.html">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="anti-collision-service.html">
+  <a class="nav-link nav-internal" href="../anti-collision-service.html">
     The anti-collision service
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="pinned-references.html">
+  <a class="nav-link nav-internal" href="../pinned-references.html">
     Pinned references
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="session-notes.html">
+  <a class="nav-link nav-internal" href="../session-notes.html">
     Where the work stands
   </a>
 </li>
@@ -450,17 +450,17 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
 </ul>
 </div>
 </nav></div>
@@ -497,11 +497,14 @@
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
-      <a href="../index.html" class="nav-link" aria-label="Home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Decisions</span></li>
+    
+    <li class="breadcrumb-item"><a href="../decisions.html" class="nav-link">Decisions</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">9. Checking is a plan preprocessor, and the certificate is a recipe</span></li>
   </ul>
 </nav>
 </div>
@@ -518,43 +521,120 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="decisions">
-<h1>Decisions<a class="headerlink" href="#decisions" title="Link to this heading">#</a></h1>
-<p>The load-bearing choices, in <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">Nygard format</a>:
-context, decision, consequences. The consequences section is the useful part —
-it is where the cost of each choice is written down.</p>
-<p>If you are reading them all, read in this order. ADR-0003 first, because it is
-the classification everything else is licensed by; ADR-0008 second, because it
-is the one that bears on queueing.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-</ul>
+  <section id="checking-is-a-plan-preprocessor-and-the-certificate-is-a-recipe">
+<h1>9. Checking is a plan preprocessor, and the certificate is a recipe<a class="headerlink" href="#checking-is-a-plan-preprocessor-and-the-certificate-is-a-recipe" title="Link to this heading">#</a></h1>
+<section id="status">
+<h2>Status<a class="headerlink" href="#status" title="Link to this heading">#</a></h2>
+<p>Accepted</p>
+</section>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h2>
+<p>Every move of a collidable axis must be checked, whether it originates in a
+scan, a <code class="docutils literal notranslate"><span class="pre">bps.mv</span></code>, or a terminal. Kinematics and branch selection only apply to
+derived axes, but checking applies to all of them — a raw motor is the
+degenerate case, an axis whose projection is the identity and whose branch set
+has one member.</p>
+<p>The obvious place to check is inside the device, which is where the earlier
+design put it by injecting a solver. That has three problems. Raw motors have no
+<code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code> and so nowhere to inject anything. Per-device checking
+cannot see that two devices are moving together, and <code class="docutils literal notranslate"><span class="pre">bps.mv(m1,</span> <span class="pre">x,</span> <span class="pre">m2,</span> <span class="pre">y)</span></code> is
+one motion — checking each <code class="docutils literal notranslate"><span class="pre">set</span></code> independently checks states the machine never
+occupies. And it made devices non-standalone, which created a loop where the
+validator instantiates devices that reference the solver the validator exists to
+serve.</p>
+<p>Separately, insertion-time validation emits state that execution depends on: the
+kinematic branch each window will run on. The obvious design is for it to emit
+the joint positions it validated. That works for step scans and fails for fly
+scans, for three independent reasons — size (an hour at 20 kHz is ~72M points ×
+6 axes), streaming (chunk N+1 is generated while N executes), and densification
+happening at runtime by construction.</p>
+</section>
+<section id="decision">
+<h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">#</a></h2>
+<p>Checking happens in a <strong>plan preprocessor</strong>, installed on <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code> by
+the beamline’s configuration. It observes the message stream, certifies moves as
+a group, and passes the decision down by <strong>wrapping the value</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Certified</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">T</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+</pre></div>
 </div>
-<section id="a-note-on-the-numbering">
-<h2>A note on the numbering<a class="headerlink" href="#a-note-on-the-numbering" title="Link to this heading">#</a></h2>
-<p>These were renumbered once, in a single pass before this repo was first pushed.
-Two ADRs were superseded during the design and have been folded into the ones
-that superseded them, with <strong>what they decided recorded as a note there</strong> rather
-than deleted — the superseded reasoning is usually why the current decision has
-the shape it does.</p>
-<ul class="simple">
-<li><p>The certificate ADR is now part of ADR-0009.</p></li>
-<li><p>The machine-scoped-solver ADR is now part of ADR-0010.</p></li>
-</ul>
-<p><strong>This will not happen again.</strong> From the first push, an ADR keeps its number
-permanently, and a superseded one is marked superseded in place — never removed,
-never renumbered. The one-time exception was taken because nothing had been
-published against the old numbers.</p>
+<p><code class="docutils literal notranslate"><span class="pre">check_valid()</span></code> is cheap and local — PV values against thresholds. It does not
+call the anti-collision service.</p>
+<p><code class="docutils literal notranslate"><span class="pre">StandardMovable</span></code> and <code class="docutils literal notranslate"><span class="pre">StandardFlyable</span></code> support wrapped values. A collidable
+axis given a <strong>bare</strong> value raises; there is no fallback to self-certification.</p>
+<p>The certificate the validator emits carries <strong>branch selection per window</strong>, not
+positions. The branch must reach runtime inverse kinematics; it cannot be
+resolved away at insertion. It is invalidated by any state change within the
+declared collision scope, and if invalid, execution obtains a new one.</p>
+</section>
+<section id="consequences">
+<h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">#</a></h2>
+<p><strong>A standard <code class="docutils literal notranslate"><span class="pre">bps.mv</span></code> plan works unmodified.</strong> <code class="docutils literal notranslate"><span class="pre">RunEngine.__call__</span></code> composes
+preprocessors over every plan, so the checker sees the <code class="docutils literal notranslate"><span class="pre">set</span></code> messages without
+the plan knowing it exists. A plan author cannot forget to opt in, which for a
+safety-adjacent property is the requirement. It is forget-proof rather than
+tamper-proof — the list is public and mutable — and the device-side raise is
+what makes it robust rather than conventional.</p>
+<p><strong>The branch and its target cannot desync.</strong> Because the decision travels <em>as</em>
+the value rather than beside it, the failure mode where a branch prepared for
+one window is applied at a different position becomes unrepresentable.</p>
+<blockquote>
+<div><p><strong>What this superseded, recorded rather than deleted.</strong> The certificate was
+previously its own decision, and it guarded that desync hazard with machinery:
+certificate entries recorded the derived values they were solved for, <code class="docutils literal notranslate"><span class="pre">set</span></code>
+asserted a match before applying, and <code class="docutils literal notranslate"><span class="pre">prepare</span></code> cleared the stashed branch
+after one use. Wrapping the value in <code class="docutils literal notranslate"><span class="pre">Certified</span></code> makes the branch and its
+target one object, so none of that is needed. <strong>The hazard was real; the guard
+is now structural rather than asserted.</strong> The earlier version is why anyone
+thought about the hazard at all, which is the reason it is written down here
+instead of edited away.</p>
+</div></blockquote>
+<p><strong>Runtime must be able to run the inverse cheaply</strong>, which is only tolerable
+because the branch-fixed inverse is closed-form and vectorised — measured at
+0.1 µs per point.</p>
+<p><strong>Devices become standalone again.</strong> They receive a branch rather than owning a
+solver, which removes the loop hazard. Selection sits at the message layer,
+which is the only place the whole machine is visible — so machine-scoped
+selection is now structural rather than conventional.</p>
+<p><strong>Self-certification is banned rather than provided</strong>, because it is only sound
+when one device moves at a time. Two devices certifying in isolation each check
+against the other’s <em>current</em> position rather than its <em>target</em>, so two
+individually-safe moves can collide, and nothing inside a device can detect that
+condition.</p>
+<p><strong>The ban is scoped to collidable axes</strong>, via the collision-scope declaration.
+Plans moving axes that cannot reach anything are unaffected, which is what makes
+this deployable against an existing estate.</p>
+<p><strong>Interactive use must be a one-liner.</strong> If the sanctioned route is more awkward
+than a raw <code class="docutils literal notranslate"><span class="pre">caput</span></code>, the bypass wins and is worse than what was banned.
+Ergonomics here is a design requirement, not documentation.</p>
+<p><strong>There is no backstop for motion outside this RunEngine</strong> — another hutch,
+engineering mode, a direct <code class="docutils literal notranslate"><span class="pre">caput</span></code>. A service-side watchdog was considered and
+rejected: there is not enough stopping distance to abort usefully once a
+collision is detected. The design is a gatekeeper with nothing behind it, which
+is defensible only under the classification in ADR-0003.</p>
+<p><strong>The preprocessor reads the certificate when there is one</strong>, taking the branch
+decision rather than repeating the search. That makes the certificate an
+optimisation on the unvalidated path rather than a prerequisite — which it has
+to be, since adaptive plans never have one.</p>
+<p><strong>It is a class, exported from the beamline module</strong> the way devices are, rather
+than a function plus an instruction to keep a reference. One instance by
+construction, and the same object serves the interactive path — one policy, no
+second implementation to drift. It does bypass the RunEngine when used that way,
+so it cannot see a scan in flight.</p>
+<p><strong>Per-beamline wiring is narrower than it first looked.</strong> The checker needs no
+injection mechanism — it is wired at RunEngine construction and reached
+interactively by import, so it is never a plan parameter. What remains is a
+generic <code class="docutils literal notranslate"><span class="pre">scanspec_scan</span></code> needing a beamline’s trigger strategy, for which
+blueapi’s existing name resolution is the obvious fit; but <code class="docutils literal notranslate"><span class="pre">register_device</span></code>
+rejects anything that is not a bluesky protocol, so that is not free today.</p>
+<p><strong>Where it lives.</strong> <code class="docutils literal notranslate"><span class="pre">Transform</span></code> belongs in its own package, since analysis needs
+it and should not have to install ophyd-async. The checker plausibly belongs in
+ophyd-async — it is in scope there and needs <code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code> internals —
+and can be split out later if that turns out wrong.</p>
+<p>Where a replacement certificate comes from mid-scan is not settled — Q6 in
+<a class="reference internal" href="../open-questions.html"><span class="std std-doc">Open questions</span></a>.</p>
+<p>What the checker <em>is</em>, as opposed to how it hooks in, is ADR-0010.</p>
 </section>
 </section>
 
@@ -569,20 +649,20 @@ published against the old numbers.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="architecture.html"
+       href="0004-validation-runs-in-a-second-read-only-process.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The working architecture</p>
+        <p class="prev-next-title">4. Validation runs in a second, read-only process</p>
       </div>
     </a>
     <a class="right-next"
-       href="decisions/0003-anti-collision-is-soft-machine-protection.html"
+       href="0010-the-checker-is-the-solver.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">3. Anti-collision is soft machine protection, not a safety function</p>
+        <p class="prev-next-title">10. The checker is the solver, and runs in three modes</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -605,7 +685,10 @@ published against the old numbers.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-the-numbering">A note on the numbering</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status">Status</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context">Context</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decision">Decision</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences">Consequences</a></li>
 </ul>
   </nav></div>
 
@@ -613,7 +696,7 @@ published against the old numbers.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions/0009-checking-is-a-plan-preprocessor.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -628,7 +711,7 @@ published against the old numbers.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/explanations/decisions.md.txt">
+    <a href="../../_sources/explanations/decisions/0009-checking-is-a-plan-preprocessor.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
@@ -647,8 +730,8 @@ published against the old numbers.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
