@@ -23,8 +23,8 @@ down in the code — those cases are called out. Nothing here was run.
 ## blueapi
 
 Two processes: a FastAPI service, and one subprocess holding the devices and the
-RunEngine. `set_start_method("spawn", force=True)` at `service/runner.py:25`, and
-the pool is `Pool(initializer=_init_worker, processes=1)` at `:57` — one
+RunEngine. `set_start_method("spawn", force=True)` at [`service/runner.py:25`](https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/runner.py#L25), and
+the pool is `Pool(initializer=_init_worker, processes=1)` at [`:57`](https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/runner.py#L57) — one
 subprocess, not a pool of many.
 
 The shape to notice is that **submitting and starting are two separate calls.**
@@ -61,28 +61,28 @@ sequenceDiagram
 ```
 
 **There is no queue, and that is deliberate** — it is blueapi's own ADR-0003,
-"No Queues". `_pending_tasks` at `worker/task_worker.py:96` is a `dict`, not an
-ordered structure, and `_task_channel` at `:140` is `Queue(maxsize=1)`: a handoff
+"No Queues". `_pending_tasks` at [`worker/task_worker.py:96`](https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L96) is a `dict`, not an
+ordered structure, and `_task_channel` at [`:140`](https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L140) is `Queue(maxsize=1)`: a handoff
 slot for the task currently being started, not a backlog. A submitted task waits
 until a client explicitly starts it, and if one is already running the start call
-raises `WorkerBusyError` at `:298`.
+raises `WorkerBusyError` at [`:298`](https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L298).
 
 **Parameters are validated at submit time**, before a task_id is returned —
-`task.prepare_params(self._ctx)` at `:274`, commented "Will raise if parameters
+`task.prepare_params(self._ctx)` at [`:274`](https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L274), commented "Will raise if parameters
 are invalid". So an invalid plan fails at `POST /tasks`, not later.
 
 **Tasks live in the subprocess and do not survive its reload.**
-`DELETE /environment` (`service/main.py:223`) schedules `runner.reload()`, which
+`DELETE /environment` ([`service/main.py:223`](https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/main.py#L223)) schedules `runner.reload()`, which
 stops and restarts the subprocess. `_pending_tasks` is ordinary process memory,
 so anything submitted and not yet started is gone. Nothing persists tasks
 anywhere else.
 
 ## bluesky-queueserver
 
-Three processes, plus Redis. `WatchdogProcess` (`start_manager.py:28`) supervises
-`RunEngineManager` (`manager.py:179`), which in turn drives `RunEngineWorker`
-(`worker.py:90`). Clients speak 0MQ to the manager at `tcp://*:60615`
-(`manager.py:255`), optionally encrypted with a private key. The HTTP interface
+Three processes, plus Redis. `WatchdogProcess` ([`start_manager.py:28`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/start_manager.py#L28)) supervises
+`RunEngineManager` ([`manager.py:179`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L179)), which in turn drives `RunEngineWorker`
+([`worker.py:90`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/worker.py#L90)). Clients speak 0MQ to the manager at `tcp://*:60615`
+([`manager.py:255`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L255)), optionally encrypted with a private key. The HTTP interface
 is a separate package, `bluesky-httpserver`, and is not in this repo.
 
 ```{mermaid}
@@ -114,23 +114,23 @@ sequenceDiagram
 ```
 
 **The queue is the point, and it is in Redis.** `PlanQueueOperations`
-(`plan_queue_ops.py:13`) holds the queue, the `running_plan` key (`:85`) and
-`plan_history` (`:87`) under a `qs_default` name prefix. That is what makes the
+([`plan_queue_ops.py:13`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L13)) holds the queue, the `running_plan` key ([`:85`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L85)) and
+`plan_history` ([`:87`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L87)) under a `qs_default` name prefix. That is what makes the
 queue outlive the manager process, and it is the structural difference from
 blueapi rather than a feature difference.
 
-**Position is a first-class argument.** `add_item_to_queue` at `:968` takes
-`pos`, `before_uid` and `after_uid`; there are `pop_item_from_queue` (`:780`) and
-a batch form (`:847`). Items have uids, so a client can address, move and remove
+**Position is a first-class argument.** `add_item_to_queue` at [`:968`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L968) takes
+`pos`, `before_uid` and `after_uid`; there are `pop_item_from_queue` ([`:780`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L780)) and
+a batch form ([`:847`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L847)). Items have uids, so a client can address, move and remove
 a specific entry.
 
 **Validation happens on add**, against the allowed-plans and allowed-devices
-lists — `validate_plan(...)` at `manager.py:2263`.
+lists — `validate_plan(...)` at [`manager.py:2263`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L2263).
 
 **Starting is a queue-level verb, not a per-item one.** `queue_start` begins
 processing and keeps going; its docstring notes items can be added while it runs.
 `queue_stop` lets the running plan finish and does not start the next one. There
-is also an autostart mode, persisted to Redis (`manager.py:346`), where adding an
+is also an autostart mode, persisted to Redis ([`manager.py:346`](https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L346)), where adding an
 item is enough to begin execution.
 
 ## Side by side
