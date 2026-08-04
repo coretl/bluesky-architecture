@@ -206,6 +206,29 @@ The structure works as designed; its value is set entirely by the fraction of
 pairs that never interact. Here only 39%, because permanently-touching parts
 flag at every interval. *Reproduce:* `bench_temporal.mjs`.
 
+**What this result is now worth, given the reachability relation.** The
+amendment to [](../decisions/0006-two-tier-collision-checking.md) has the service
+publish a static axis-to-axis relation: which pairs can *ever* touch, over every
+position the model permits. That removes the never-interacting pairs before any
+checking starts — which is where all 363× came from. So the relation banks the
+temporal tree's win statically, once per geometry version, rather than
+rediscovering it per trajectory.
+
+What is left for a temporal structure is the narrower case: pairs that *can*
+interact but do not on this particular trajectory. The measurement above says
+nothing about how many of those there are, because it never separated them from
+the pairs that can never interact at all. That is a different benchmark, and
+nobody has run it.
+
+Two consequences worth stating, since this is why the temporal BVH appears in no
+ADR and is not in [](../architecture.md):
+
+- The design does **not** rest on it, and never did. It is an
+  optimisation measured early, when the coarse tier looked like the binding
+  cost. Coarse-model fit quality turned out to be the binding term (Q1).
+- Its headline number is **not wrong, but it is now double-counted**. Quoting
+  363× alongside the relation would claim the same saving twice.
+
 ## Two things that are not performance
 
 **The collision service runs headless.** Real i16 geometry, 233k triangles,
