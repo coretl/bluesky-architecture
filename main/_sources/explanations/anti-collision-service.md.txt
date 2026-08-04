@@ -125,6 +125,27 @@ glTF's `xyzw`.
 
 ## What the design needs from it
 
+**Two questions, and no others.** The service owns the geometry; the checker
+owns transforms, branches, soft limits and windows. That reduces the interface
+to *given an axis, what can it ever collide with* and *given these axis moves,
+do they collide*.
+
+**A static reachability relation, axis to axis.** The first question is about
+every position of every axis the model permits, not the current pose, so it is
+answerable once from the geometry and the limit-switch positions. It exists to
+bound the second: the checker gathers state only for axes that can ever interact
+with the one moving. The machinery is already present — `buildAdjacencyPairs` in
+`js/device.js:25` computes the pairs to skip, and the checked set is its
+complement — but it is not exposed on the API. It must never omit a pair that
+can touch; extra pairs cost only state gathering.
+
+**Statelessness.** The service should hold no notion of where anything is, and
+the caller supplies full state per request. This is not a preference: the
+validator asks about the *projected end state* of a running task, so a service
+answering from its own idea of "current pose" would answer the wrong question
+for every insertion-time check made while a scan is running. It also makes the
+batch API a pure function of its request.
+
 **A batch API.** The executor submits a few seconds of motion at the servo rate
 — order 15,000 points — checked ahead of the motion. The current WebSocket
 vocabulary is `setJoints` (one pose) and `getCollisions` (current pose), so a
@@ -134,7 +155,7 @@ it is cheapest to influence now, while the API is being written.
 **Per-point verdicts that name the implicated pair**, not a boolean. Without the
 pair, the exact tier cannot be restricted to what the coarse tier flagged, and
 the tiering buys nothing — measured, ~105 s versus a few seconds per batch. This
-is ADR-0006, and it is the load-bearing requirement on the contract.
+is ADR-0006, and it is the requirement the contract turns on.
 
 **Padding as a request parameter.** Insertion-time and runtime want very
 different margins against the same geometry; two models that can drift apart is
@@ -146,9 +167,15 @@ and stops the motors. A watchdog was considered and rejected — there is not
 enough stopping distance to abort usefully once a collision is detected — so
 there is no backstop behind this.
 
-**A version or hash for the geometry**, recorded alongside a verdict. If the
-model changes, a scan validated against the old geometry is stale and nothing
-currently detects that.
+**A version or hash covering the geometry *and* the limit-switch positions**,
+recorded alongside a verdict and alongside the relation. Both are statically
+defined by the service and both change the relation, so one hash covers them.
+Without it, a scan validated against superseded geometry is stale and nothing
+detects it, and a cached relation outlives the model it was derived from.
+
+Soft limits are deliberately not in this. They live in the checker and are
+applied at validation time, so tightening one cannot invalidate anything the
+service holds.
 
 ## Findings to raise
 

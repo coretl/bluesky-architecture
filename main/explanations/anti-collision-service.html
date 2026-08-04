@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The anti-collision service &#8212; bluesky-architecture 0.1.dev31+g11ed109fb documentation</title>
+    <title>The anti-collision service &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=700c8fb2"></script>
+    <script src="../_static/documentation_options.js?v=f2ca2743"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -590,6 +590,24 @@ glTF’s <code class="docutils literal notranslate"><span class="pre">xyzw</span
 </section>
 <section id="what-the-design-needs-from-it">
 <h2>What the design needs from it<a class="headerlink" href="#what-the-design-needs-from-it" title="Link to this heading">#</a></h2>
+<p><strong>Two questions, and no others.</strong> The service owns the geometry; the checker
+owns transforms, branches, soft limits and windows. That reduces the interface
+to <em>given an axis, what can it ever collide with</em> and <em>given these axis moves,
+do they collide</em>.</p>
+<p><strong>A static reachability relation, axis to axis.</strong> The first question is about
+every position of every axis the model permits, not the current pose, so it is
+answerable once from the geometry and the limit-switch positions. It exists to
+bound the second: the checker gathers state only for axes that can ever interact
+with the one moving. The machinery is already present — <code class="docutils literal notranslate"><span class="pre">buildAdjacencyPairs</span></code> in
+<code class="docutils literal notranslate"><span class="pre">js/device.js:25</span></code> computes the pairs to skip, and the checked set is its
+complement — but it is not exposed on the API. It must never omit a pair that
+can touch; extra pairs cost only state gathering.</p>
+<p><strong>Statelessness.</strong> The service should hold no notion of where anything is, and
+the caller supplies full state per request. This is not a preference: the
+validator asks about the <em>projected end state</em> of a running task, so a service
+answering from its own idea of “current pose” would answer the wrong question
+for every insertion-time check made while a scan is running. It also makes the
+batch API a pure function of its request.</p>
 <p><strong>A batch API.</strong> The executor submits a few seconds of motion at the servo rate
 — order 15,000 points — checked ahead of the motion. The current WebSocket
 vocabulary is <code class="docutils literal notranslate"><span class="pre">setJoints</span></code> (one pose) and <code class="docutils literal notranslate"><span class="pre">getCollisions</span></code> (current pose), so a
@@ -598,7 +616,7 @@ it is cheapest to influence now, while the API is being written.</p>
 <p><strong>Per-point verdicts that name the implicated pair</strong>, not a boolean. Without the
 pair, the exact tier cannot be restricted to what the coarse tier flagged, and
 the tiering buys nothing — measured, ~105 s versus a few seconds per batch. This
-is ADR-0006, and it is the load-bearing requirement on the contract.</p>
+is ADR-0006, and it is the requirement the contract turns on.</p>
 <p><strong>Padding as a request parameter.</strong> Insertion-time and runtime want very
 different margins against the same geometry; two models that can drift apart is
 strictly worse than one model with two margins. <code class="docutils literal notranslate"><span class="pre">coal</span></code>’s <code class="docutils literal notranslate"><span class="pre">security_margin</span></code> is
@@ -607,9 +625,14 @@ exactly this shape, if the engine ever moves there.</p>
 and stops the motors. A watchdog was considered and rejected — there is not
 enough stopping distance to abort usefully once a collision is detected — so
 there is no backstop behind this.</p>
-<p><strong>A version or hash for the geometry</strong>, recorded alongside a verdict. If the
-model changes, a scan validated against the old geometry is stale and nothing
-currently detects that.</p>
+<p><strong>A version or hash covering the geometry <em>and</em> the limit-switch positions</strong>,
+recorded alongside a verdict and alongside the relation. Both are statically
+defined by the service and both change the relation, so one hash covers them.
+Without it, a scan validated against superseded geometry is stale and nothing
+detects it, and a cached relation outlives the model it was derived from.</p>
+<p>Soft limits are deliberately not in this. They live in the checker and are
+applied at validation time, so tightening one cannot invalidate anything the
+service holds.</p>
 </section>
 <section id="findings-to-raise">
 <h2>Findings to raise<a class="headerlink" href="#findings-to-raise" title="Link to this heading">#</a></h2>

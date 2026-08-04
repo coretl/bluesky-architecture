@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5. Transform is pure, synchronous, array-safe maths &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
+    <title>9. The checker is the solver, and runs in three modes &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=30646c52"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions/0005-transform-is-pure-synchronous-maths';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions/0009-the-checker-is-the-solver';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -58,8 +58,8 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6. Collision checking is two tiers, split by geometry type" href="0006-two-tier-collision-checking.html" />
-    <link rel="prev" title="4. Validation runs in a second, read-only process" href="0004-validation-runs-in-a-second-read-only-process.html" />
+    <link rel="next" title="Exploration" href="../exploration.html" />
+    <link rel="prev" title="8. Checking is a plan preprocessor, and the certificate is a recipe" href="0008-checking-is-a-plan-preprocessor.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -390,11 +390,11 @@
 <li class="toctree-l1"><a class="reference internal" href="0002-anti-collision-is-soft-machine-protection.html">2. Anti-collision is soft machine protection, not a safety function</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0003-validation-state-is-owned-by-the-queue.html">3. Validation state is owned by the queue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">5. Transform is pure, synchronous, array-safe maths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0008-checking-is-a-plan-preprocessor.html">8. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="0009-the-checker-is-the-solver.html">9. The checker is the solver, and runs in three modes</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">9. The checker is the solver, and runs in three modes</a></li>
 </ul>
 </div>
 </nav></div>
@@ -438,7 +438,7 @@
     
     <li class="breadcrumb-item"><a href="../decisions.html" class="nav-link">Decisions</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">5. Transform is pure, synchronous, array-safe maths</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">9. The checker is the solver, and runs in three modes</span></li>
   </ul>
 </nav>
 </div>
@@ -455,59 +455,136 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="transform-is-pure-synchronous-array-safe-maths">
-<h1>5. Transform is pure, synchronous, array-safe maths<a class="headerlink" href="#transform-is-pure-synchronous-array-safe-maths" title="Link to this heading">#</a></h1>
+  <section id="the-checker-is-the-solver-and-runs-in-three-modes">
+<h1>9. The checker is the solver, and runs in three modes<a class="headerlink" href="#the-checker-is-the-solver-and-runs-in-three-modes" title="Link to this heading">#</a></h1>
 <section id="status">
 <h2>Status<a class="headerlink" href="#status" title="Link to this heading">#</a></h2>
 <p>Accepted</p>
 </section>
 <section id="context">
 <h2>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">Transform</span></code> converts between raw axis values and derived coordinates. Both
-directions are used, in different places and for different reasons, and the
-temptation to make either async has come up more than once.</p>
-<p>The forward direction is called from the monitor callback path
-(<code class="docutils literal notranslate"><span class="pre">_make_derived_readings</span></code>, <code class="docutils literal notranslate"><span class="pre">get_locations</span></code>). The inverse is called from
-user-supplied <code class="docutils literal notranslate"><span class="pre">set_derived</span></code> implementations.</p>
+<p>The design carried two components that looked different. A <strong>solver</strong> performed
+machine-scoped branch selection subject to collision constraints. A <strong>checker</strong>
+verified that a move was safe. Separately, a <strong>validator</strong> walked a whole plan
+offline to produce a verdict and a certificate.</p>
+<p>All three take the same inputs — transforms, current state, targets, limits —
+consult the same anti-collision service, and produce answers of the same shape.</p>
 </section>
 <section id="decision">
 <h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">#</a></h2>
-<p>Both directions stay synchronous, and a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> holds no device references
-and performs no I/O. The same expression must work on scalars and on arrays.</p>
-<p>The branch is an <strong>argument to the inverse, never a field</strong>.</p>
+<p>They are one component.</p>
+<p>Selection <em>is</em> checking with a search over branches, so there is no separate
+solver. That component runs in three modes, which differ <strong>only in the state
+they read</strong>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>mode</p></th>
+<th class="head"><p>reads</p></th>
+<th class="head"><p>emits</p></th>
+<th class="head"><p>on failure</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>validator</p></td>
+<td><p>whole plan, projected state</p></td>
+<td><p>certificate + verdict</p></td>
+<td><p>✗ or ?</p></td>
+</tr>
+<tr class="row-odd"><td><p>preprocessor</p></td>
+<td><p>Msg stream, live state</p></td>
+<td><p>wrapped values</p></td>
+<td><p>raise</p></td>
+</tr>
+<tr class="row-even"><td><p>interactive</p></td>
+<td><p>one call, live state</p></td>
+<td><p>the move</p></td>
+<td><p>raise</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>It considers four things, only the last of which is remote:</p>
+<ul class="simple">
+<li><p>transforms with branches, projecting derived targets into joint space</p></li>
+<li><p>position limits</p></li>
+<li><p>velocity limits</p></li>
+<li><p>an anti-collision service, <strong>optionally</strong></p></li>
+</ul>
 </section>
 <section id="consequences">
 <h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">#</a></h2>
-<p>These are two decisions that look like one, and they rest on different grounds:</p>
-<ul class="simple">
-<li><p><strong>Forward is forced.</strong> Async on the monitor path means task scheduling,
-ordering and backpressure on every derived signal update.</p></li>
-<li><p><strong>Inverse is chosen.</strong> Once branch and constraints are fixed the inverse is
-closed-form. Sync enforces that a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> is pure maths: portable to
-analysis, cacheable, testable without hardware, runnable in a subprocess.
-Admitting I/O makes every downstream assumption conditional.</p></li>
-</ul>
-<p>If the inverse is ever revisited, that should not drag the forward into the
-discussion.</p>
-<p>Branch stays out of the class because the instance is what gets serialised into
-RunStart, and the branch must not reach analysis. Constraint mode, by contrast,
-<em>is</em> legitimate <code class="docutils literal notranslate"><span class="pre">Transform</span></code> state — it changes the mapping, whereas branch
-selects among solutions of a fixed mapping. They look alike and are not.</p>
-<p>Array-safety holds for free via numpy broadcasting for simple transforms. It
-does <strong>not</strong> hold for diffcalc, whose API is scalar and loops internally — so a
-diffractometer’s forward transform should be the maths written directly in
-numpy, with diffcalc as a round-trip test oracle rather than as the
-implementation.</p>
-<p>A framework-level round-trip property test over every registered transform is
-worth more than asking each implementer to remember: writing one found two real
-bugs in a few hundred lines of carefully-written code.</p>
-<p><code class="docutils literal notranslate"><span class="pre">Transform</span></code> also needs a type discriminator. <code class="docutils literal notranslate"><span class="pre">model_dump_json()</span></code> currently
-produces <code class="docutils literal notranslate"><span class="pre">{&quot;distance&quot;:</span> <span class="pre">2.0}</span></code> with no type tag, so analysis receiving JSON cannot
-reconstruct the class — the <code class="docutils literal notranslate"><span class="pre">discriminated_union_of_subclasses</span></code> pattern scanspec
-already uses would fix it. And because <code class="docutils literal notranslate"><span class="pre">Transform</span></code> lives in <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code>,
-an analysis pipeline must install ophyd-async to convert angles to hkl, which
-argues for extraction into a dependency-light package. Both are worth settling
-before transforms proliferate across dodal.</p>
+<p><strong>The modes must never differ in algorithm.</strong> If the validator picks one branch
+and the preprocessor would pick another, the certificate is worthless: the
+executor either ignores it or moves somewhere nothing checked. Same transforms,
+same targets, same limits ⟹ same branch, whichever mode is running.</p>
+<p>That is a property test rather than a convention, and it should exist from the
+start. Two implementations of the same logic drifting apart is the single
+failure mode this project has hit most often, and it is silent.</p>
+<p><strong>Branch selection is not solely a collision concern.</strong> With the service
+optional, the same component still does transforms, selection and limit
+checking. Without a service, selection falls back to position limits plus
+continuity — stay on the branch you are on.</p>
+<p>That gives a deployment path the separate framing did not: the preprocessor can
+go to every beamline, with collision checking lighting up where the service
+exists.</p>
+<p><strong>Velocity limits are shared with the padding calculation.</strong> The swept-path
+inflation needs the commanded Δθ per segment, which comes from velocity. Once
+the component has that number, checking velocity limits is nearly free — but the
+two uses must share it rather than each fetching it, or they can disagree about
+how fast the machine is about to move.</p>
+<p><strong>Enumeration stays device-scoped, selection stays machine-scoped.</strong> Each device
+knows its own kinematics and lists its candidate branches; choosing across
+devices is a joint constraint-satisfaction problem, because two diffractometers
+give 8×8 combinations per window and a combination can work when neither
+device’s locally preferred choice does. Living at the message layer makes that
+structural — it is the only place the whole machine is visible.</p>
+<blockquote>
+<div><p><strong>What this superseded, recorded rather than deleted.</strong> Machine-scoped
+selection was previously its own decision, and it put the machine-scoped
+<em>solver</em> somewhere: injected into each collision-constrained device, with the
+null case an explicit solver that raises rather than <code class="docutils literal notranslate"><span class="pre">None</span></code>. <code class="docutils literal notranslate"><span class="pre">None</span></code> would have
+conflated “single-valued, nothing to choose” with “must not move” — two states
+with opposite required behaviour, where getting it wrong means an unchecked
+move.</p>
+<p>Two things replaced it. Selection moved to the message layer (ADR-0008), so
+devices no longer own a solver and the loop hazard — the validation process
+instantiates devices, which reference the solver the process exists to serve —
+disappeared. And selection turned out not to be a separate thing from
+checking at all, which is this ADR.</p>
+<p><strong>The <code class="docutils literal notranslate"><span class="pre">None</span></code> distinction survives, in a different shape.</strong> “Nothing to choose”
+is a single-member branch set; “must not move” is an uncertified value. They
+are no longer representable by the same thing, so the conflation is now
+impossible rather than forbidden.</p>
+</div></blockquote>
+<p><strong>The failure taxonomy is unchanged and still matters.</strong> <em>Infeasible</em> means the
+collision involves only choice-free devices, so no search helps — report
+immediately, and check it first because it is cheap. <em>Unsatisfiable</em> means
+choices exist but no assignment works — report after the search, naming the
+window and the binding constraint. The user’s next action differs.</p>
+<p><strong>A device can need checking without having anything to choose.</strong> A two-jack
+system has a single-valued inverse and can still crash, which is why the
+collidable scope and the set of branched transforms are different sets.</p>
+<p><strong>Registration therefore takes two overlapping sets</strong>, not one: every
+<code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code> with branches, so it can project; and the collidable
+scope, so it knows what to check. A single-valued transform outside the scope is
+in neither; a raw collidable motor is only in the second.</p>
+<blockquote>
+<div><p><strong>Amended: the two-set framing was wrong.</strong> It survived because the example
+supporting it was never tested. Nobody could name a device with branches that
+cannot collide — anything with branches is an articulated chain, and
+articulated chains self-collide — so the set of branched devices sits inside
+the collidable set rather than overlapping it.</p>
+<p>The deeper error is that the two are not the same kind of fact. <strong>“Has
+branches” is a property of the device</strong>, readable off its transform, and is
+never registered. <strong>“Can collide” is external</strong>, and now arrives as the
+axis-to-axis reachability relation in ADR-0006 rather than as a flat scope
+list. So there is one input, not two overlapping ones.</p>
+<p>What survives is the observation that drove it: a raw collidable motor has no
+transform to project through and still needs checking. That is the degenerate
+case in ADR-0008, not a second registration list.</p>
+</div></blockquote>
+<p>The forward path stays pure regardless, so monitor updates, analysis and
+descriptors are unaffected.</p>
 </section>
 </section>
 
@@ -522,20 +599,20 @@ before transforms proliferate across dodal.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="0004-validation-runs-in-a-second-read-only-process.html"
+       href="0008-checking-is-a-plan-preprocessor.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">4. Validation runs in a second, read-only process</p>
+        <p class="prev-next-title">8. Checking is a plan preprocessor, and the certificate is a recipe</p>
       </div>
     </a>
     <a class="right-next"
-       href="0006-two-tier-collision-checking.html"
+       href="../exploration.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">6. Collision checking is two tiers, split by geometry type</p>
+        <p class="prev-next-title">Exploration</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -569,7 +646,7 @@ before transforms proliferate across dodal.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions/0005-transform-is-pure-synchronous-maths.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions/0009-the-checker-is-the-solver.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -584,7 +661,7 @@ before transforms proliferate across dodal.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../_sources/explanations/decisions/0005-transform-is-pure-synchronous-maths.md.txt">
+    <a href="../../_sources/explanations/decisions/0009-the-checker-is-the-solver.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

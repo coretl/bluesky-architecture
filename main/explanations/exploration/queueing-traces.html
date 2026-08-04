@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>blueapi and bluesky-queueserver, traced &#8212; bluesky-architecture 0.1.dev31+g11ed109fb documentation</title>
+    <title>blueapi and bluesky-queueserver, traced &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=700c8fb2"></script>
+    <script src="../../_static/documentation_options.js?v=f2ca2743"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1001,14 +1001,14 @@ the submitter. queueserver has <em>somewhere it could live</em> — entries are 
 by uid and stored in Redis — where blueapi’s <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> dict is process
 memory keyed by task_id. What neither has today is an API for a third party to
 attach state to an entry and have it revoked on a condition.</p>
-<p>That matters here because of <a class="reference internal" href="../decisions/0008-validation-state-is-owned-by-the-queue.html"><span class="std std-doc">8. Validation state is owned by the queue</span></a>,
+<p>That matters here because of <a class="reference internal" href="../decisions/0003-validation-state-is-owned-by-the-queue.html"><span class="std std-doc">3. Validation state is owned by the queue</span></a>,
 and working out what it would take in either system is not attempted on this
 page.</p>
 </section>
 <section id="what-this-does-not-cover">
 <h2>What this does not cover<a class="headerlink" href="#what-this-does-not-cover" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">daq-queuing-service</span></code></strong> — DLS’s own queuing service, which ADR-0008 names as
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">daq-queuing-service</span></code></strong> — DLS’s own queuing service, which ADR-0003 names as
 the obvious place for verdicts to live. Reachable, not read. A three-way
 comparison was scoped out of this page rather than done badly.</p></li>
 <li><p><strong>Failure and restart behaviour</strong> beyond what the code states. Redis

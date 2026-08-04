@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Pinned references &#8212; bluesky-architecture 0.1.dev31+g11ed109fb documentation</title>
+    <title>Pinned references &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=700c8fb2"></script>
+    <script src="../_static/documentation_options.js?v=f2ca2743"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -490,7 +490,7 @@ code the claim was made about.</p>
 </div>
 <section id="specific-things-read-and-where">
 <h2>Specific things read, and where<a class="headerlink" href="#specific-things-read-and-where" title="Link to this heading">#</a></h2>
-<p>Recorded because these are the load-bearing reads, and because a file that has
+<p>Recorded because these are the reads the claims rest on, and because a file that has
 moved is easier to find again than a claim with no address.</p>
 <p><strong>blueapi</strong> — <code class="docutils literal notranslate"><span class="pre">src/blueapi/core/context.py</span></code>. Plan parameter injection is
 <code class="docutils literal notranslate"><span class="pre">_convert_type</span></code> at <code class="docutils literal notranslate"><span class="pre">:305</span></code>, which builds the <code class="docutils literal notranslate"><span class="pre">Reference</span></code> pydantic type at <code class="docutils literal notranslate"><span class="pre">:250</span></code>
@@ -525,7 +525,7 @@ is at <code class="docutils literal notranslate"><span class="pre">:26</span></c
 <code class="docutils literal notranslate"><span class="pre">TYPE_CHECKING</span></code> at <code class="docutils literal notranslate"><span class="pre">:57</span></code>. <code class="docutils literal notranslate"><span class="pre">SignalTransformer</span></code> at <code class="docutils literal notranslate"><span class="pre">:80</span></code> already holds the
 transform class, raw devices, raw constants and transform devices; they are just
 not public. <code class="docutils literal notranslate"><span class="pre">DerivedSignalFactory</span></code> is in <code class="docutils literal notranslate"><span class="pre">_derived_signal.py:27</span></code>, and the
-annotations on <code class="docutils literal notranslate"><span class="pre">raw_to_derived</span></code> are load-bearing — <code class="docutils literal notranslate"><span class="pre">:66</span></code> type-checks the wired
+annotations on <code class="docutils literal notranslate"><span class="pre">raw_to_derived</span></code> do real work — <code class="docutils literal notranslate"><span class="pre">:66</span></code> type-checks the wired
 devices against them and <code class="docutils literal notranslate"><span class="pre">:283</span></code> derives the signal datatype from the return
 annotation.</p>
 <p><strong>anti-collision service</strong> — <code class="docutils literal notranslate"><span class="pre">js/collision.js</span></code>. The mesh-vs-mesh test is

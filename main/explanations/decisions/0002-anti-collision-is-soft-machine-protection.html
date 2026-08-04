@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5. Transform is pure, synchronous, array-safe maths &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
+    <title>2. Anti-collision is soft machine protection, not a safety function &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=30646c52"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions/0005-transform-is-pure-synchronous-maths';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions/0002-anti-collision-is-soft-machine-protection';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -58,8 +58,8 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6. Collision checking is two tiers, split by geometry type" href="0006-two-tier-collision-checking.html" />
-    <link rel="prev" title="4. Validation runs in a second, read-only process" href="0004-validation-runs-in-a-second-read-only-process.html" />
+    <link rel="next" title="3. Validation state is owned by the queue" href="0003-validation-state-is-owned-by-the-queue.html" />
+    <link rel="prev" title="1. Record architecture decisions" href="0001-record-architecture-decisions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -387,10 +387,10 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../open-questions.html">Open questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="0002-anti-collision-is-soft-machine-protection.html">2. Anti-collision is soft machine protection, not a safety function</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">2. Anti-collision is soft machine protection, not a safety function</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0003-validation-state-is-owned-by-the-queue.html">3. Validation state is owned by the queue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">5. Transform is pure, synchronous, array-safe maths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0008-checking-is-a-plan-preprocessor.html">8. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
@@ -438,7 +438,7 @@
     
     <li class="breadcrumb-item"><a href="../decisions.html" class="nav-link">Decisions</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">5. Transform is pure, synchronous, array-safe maths</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">2. Anti-collision is soft machine protection, not a safety function</span></li>
   </ul>
 </nav>
 </div>
@@ -455,59 +455,41 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="transform-is-pure-synchronous-array-safe-maths">
-<h1>5. Transform is pure, synchronous, array-safe maths<a class="headerlink" href="#transform-is-pure-synchronous-array-safe-maths" title="Link to this heading">#</a></h1>
+  <section id="anti-collision-is-soft-machine-protection-not-a-safety-function">
+<h1>2. Anti-collision is soft machine protection, not a safety function<a class="headerlink" href="#anti-collision-is-soft-machine-protection-not-a-safety-function" title="Link to this heading">#</a></h1>
 <section id="status">
 <h2>Status<a class="headerlink" href="#status" title="Link to this heading">#</a></h2>
 <p>Accepted</p>
 </section>
 <section id="context">
 <h2>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">Transform</span></code> converts between raw axis values and derived coordinates. Both
-directions are used, in different places and for different reasons, and the
-temptation to make either async has come up more than once.</p>
-<p>The forward direction is called from the monitor callback path
-(<code class="docutils literal notranslate"><span class="pre">_make_derived_readings</span></code>, <code class="docutils literal notranslate"><span class="pre">get_locations</span></code>). The inverse is called from
-user-supplied <code class="docutils literal notranslate"><span class="pre">set_derived</span></code> implementations.</p>
+<p>Anti-collision checking sits between the user’s scan request and motion on a
+beamline. It is natural to read that as a safety system, and someone joining
+later will read it that way unless told otherwise.</p>
+<p>Catastrophic cases are already guarded elsewhere: at the robot controller and by
+door interlocks. What this layer handles is constraints too dynamic to express
+there — a detector that must stay 20 mm from the sample, entry points confined
+to a 90° arc, sample environment that changes between experiments.</p>
 </section>
 <section id="decision">
 <h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">#</a></h2>
-<p>Both directions stay synchronous, and a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> holds no device references
-and performs no I/O. The same expression must work on scalars and on arrays.</p>
-<p>The branch is an <strong>argument to the inverse, never a field</strong>.</p>
+<p>This layer is <strong>soft machine protection, not a safety function</strong>. State it in
+these words.</p>
 </section>
 <section id="consequences">
 <h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">#</a></h2>
-<p>These are two decisions that look like one, and they rest on different grounds:</p>
+<p>Independence of implementation is not required, which is what makes two
+otherwise indefensible choices acceptable:</p>
 <ul class="simple">
-<li><p><strong>Forward is forced.</strong> Async on the monitor path means task scheduling,
-ordering and backpressure on every derived signal update.</p></li>
-<li><p><strong>Inverse is chosen.</strong> Once branch and constraints are fixed the inverse is
-closed-form. Sync enforces that a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> is pure maths: portable to
-analysis, cacheable, testable without hardware, runnable in a subprocess.
-Admitting I/O makes every downstream assumption conditional.</p></li>
+<li><p>Flyscan execution may depend on an external network service, with defined
+fail-closed behaviour, rather than needing a local guaranteed path.</p></li>
+<li><p>The coarse geometric model may be probabilistic rather than provably sound,
+trading a small false-negative rate for not rejecting legitimate scans.</p></li>
 </ul>
-<p>If the inverse is ever revisited, that should not drag the forward into the
-discussion.</p>
-<p>Branch stays out of the class because the instance is what gets serialised into
-RunStart, and the branch must not reach analysis. Constraint mode, by contrast,
-<em>is</em> legitimate <code class="docutils literal notranslate"><span class="pre">Transform</span></code> state — it changes the mapping, whereas branch
-selects among solutions of a fixed mapping. They look alike and are not.</p>
-<p>Array-safety holds for free via numpy broadcasting for simple transforms. It
-does <strong>not</strong> hold for diffcalc, whose API is scalar and loops internally — so a
-diffractometer’s forward transform should be the maths written directly in
-numpy, with diffcalc as a round-trip test oracle rather than as the
-implementation.</p>
-<p>A framework-level round-trip property test over every registered transform is
-worth more than asking each implementer to remember: writing one found two real
-bugs in a few hundred lines of carefully-written code.</p>
-<p><code class="docutils literal notranslate"><span class="pre">Transform</span></code> also needs a type discriminator. <code class="docutils literal notranslate"><span class="pre">model_dump_json()</span></code> currently
-produces <code class="docutils literal notranslate"><span class="pre">{&quot;distance&quot;:</span> <span class="pre">2.0}</span></code> with no type tag, so analysis receiving JSON cannot
-reconstruct the class — the <code class="docutils literal notranslate"><span class="pre">discriminated_union_of_subclasses</span></code> pattern scanspec
-already uses would fix it. And because <code class="docutils literal notranslate"><span class="pre">Transform</span></code> lives in <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code>,
-an analysis pipeline must install ophyd-async to convert angles to hkl, which
-argues for extraction into a dependency-light package. Both are worth settling
-before transforms proliferate across dodal.</p>
+<p>Both are only acceptable under this classification. <strong>If anyone reclassifies
+this layer as a safety function, both must be revisited</strong> — and that
+reclassification is exactly the kind of thing that happens quietly, in a
+meeting, without anyone revisiting the consequences.</p>
 </section>
 </section>
 
@@ -522,20 +504,20 @@ before transforms proliferate across dodal.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="0004-validation-runs-in-a-second-read-only-process.html"
+       href="0001-record-architecture-decisions.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">4. Validation runs in a second, read-only process</p>
+        <p class="prev-next-title">1. Record architecture decisions</p>
       </div>
     </a>
     <a class="right-next"
-       href="0006-two-tier-collision-checking.html"
+       href="0003-validation-state-is-owned-by-the-queue.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">6. Collision checking is two tiers, split by geometry type</p>
+        <p class="prev-next-title">3. Validation state is owned by the queue</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -569,7 +551,7 @@ before transforms proliferate across dodal.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions/0005-transform-is-pure-synchronous-maths.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/decisions/0002-anti-collision-is-soft-machine-protection.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -584,7 +566,7 @@ before transforms proliferate across dodal.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../_sources/explanations/decisions/0005-transform-is-pure-synchronous-maths.md.txt">
+    <a href="../../_sources/explanations/decisions/0002-anti-collision-is-soft-machine-protection.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Collision libraries: survey and re-architecture &#8212; bluesky-architecture 0.1.dev31+g11ed109fb documentation</title>
+    <title>Collision libraries: survey and re-architecture &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=700c8fb2"></script>
+    <script src="../../_static/documentation_options.js?v=f2ca2743"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -466,7 +466,7 @@ in <a class="reference internal" href="../anti-collision-service.html"><span cla
 exists <em>outside</em> DLS, and the re-architecture that follows from it.</p>
 <p>All measurements are on the <strong>real i16 geometry</strong> from <code class="docutils literal notranslate"><span class="pre">garethnisbet/Robot</span></code>
 (<code class="docutils literal notranslate"><span class="pre">i16_scene.glb</span></code>, 18 meshes, 233,034 triangles), in a container, single machine.
-Directional, not final — the caveats at the end are load-bearing.</p>
+Directional, not final — the caveats at the end matter.</p>
 <section id="conclusions-first">
 <h2>Conclusions first<a class="headerlink" href="#conclusions-first" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
@@ -685,7 +685,7 @@ gap is <code class="docutils literal notranslate"><span class="pre">intersectsGe
 <p>The design this replaced padded the coarse model for <em>typical</em> joint velocity
 over 0.1 s, knowingly accepting that a fast segment could slip between samples
 and be caught later by the fine check — a deliberate trade of soundness for
-usability, defensible only under the ADR-0003 classification.</p>
+usability, defensible only under the ADR-0002 classification.</p>
 <p>I expected continuous collision detection to remove the trade, and predicted it
 would let the validator stay at 10 Hz. <strong>Measured, that prediction is wrong in
 its reasoning and right in its conclusion.</strong></p>
@@ -697,7 +697,7 @@ the relative motion. Rates and costs are tabulated in
 2× at diffractometer speeds and 3× at robot speeds</strong> — real, but nothing like
 the order of magnitude assumed. It does not on its own justify rebuilding the
 coarse tier around swept volumes.</p>
-<p>The genuinely useful findings are the other two:</p>
+<p>The useful findings are the other two:</p>
 <p><strong>The executor is already sound and the padding there is redundant.</strong> Discrete
 checking needs 50 Hz at diffractometer speeds and 400 Hz at robot speeds. The
 executor samples at 5 kHz — 12× to 100× more than soundness requires. Whatever
@@ -833,7 +833,7 @@ reused and the BVH called directly):</p>
 </div>
 <p><strong>At any affordable ray density the missable feature is larger than the
 clearances this system exists to enforce.</strong> “The detector must stay 20 mm from
-the sample” is one of the motivating constraints in ADR-0003; 16,384 rays per
+the sample” is one of the motivating constraints in ADR-0002; 16,384 rays per
 pose costs 137 ms and can still miss 31 mm.</p>
 <p>This matters because of what the fine tier is <em>for</em>. The coarse tier
 over-approximates and flags; the fine tier clears the ones flagged only because
@@ -869,7 +869,7 @@ scene assembly earlier, which is not where the parallelism is.</p>
 <p>Gareth’s project grew anti-collision out of a visualiser, and the two roles
 should be separated rather than merged:</p>
 <p><strong>Keep as the viewer and model-authoring tool.</strong> The three.js application is
-genuinely good at what it was built for, and the <code class="docutils literal notranslate"><span class="pre">*_config.json</span></code> + <code class="docutils literal notranslate"><span class="pre">*_scene.glb</span></code>
+good at what it was built for, and the <code class="docutils literal notranslate"><span class="pre">*_config.json</span></code> + <code class="docutils literal notranslate"><span class="pre">*_scene.glb</span></code>
 pair is a portable scene description that a checker and a viewer can both
 consume. That format is the interface between the two halves, and it already
 exists.</p>

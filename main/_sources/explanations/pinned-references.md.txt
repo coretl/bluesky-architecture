@@ -16,7 +16,7 @@ code the claim was made about.
 
 ## Specific things read, and where
 
-Recorded because these are the load-bearing reads, and because a file that has
+Recorded because these are the reads the claims rest on, and because a file that has
 moved is easier to find again than a claim with no address.
 
 **blueapi** — `src/blueapi/core/context.py`. Plan parameter injection is
@@ -56,7 +56,7 @@ is at `:26`, generic over `RawT`/`DerivedT` with the methods declared under
 `TYPE_CHECKING` at `:57`. `SignalTransformer` at `:80` already holds the
 transform class, raw devices, raw constants and transform devices; they are just
 not public. `DerivedSignalFactory` is in `_derived_signal.py:27`, and the
-annotations on `raw_to_derived` are load-bearing — `:66` type-checks the wired
+annotations on `raw_to_derived` do real work — `:66` type-checks the wired
 devices against them and `:283` derives the signal datatype from the return
 annotation.
 

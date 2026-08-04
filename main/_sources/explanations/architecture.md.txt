@@ -448,18 +448,47 @@ the raw devices and the transform parameter sources. What is missing is public
 access to them, and to the derived axis names, so the checker can be told about
 a `DerivedSignalFactory` and work out the rest itself.
 
-### Registration takes two overlapping sets
+### What the checker asks the service, and what it keeps
 
-The checker needs **every factory with branches**, so it can project; and the
-**collidable scope**, so it knows what to check. A mirror with a single-valued
-transform outside the scope is in neither. A raw collidable motor is only in the
-second. Keeping them distinct in the registration API is worth doing from the
-start, because assuming one list works right up until a beamline has both.
+The division is that the service owns the geometry and the checker owns
+everything else — transforms, branches, soft limits, windows. That gives the
+service exactly two questions to answer:
+
+1. **Given an axis, what can it *ever* collide with?** Not at the current pose —
+   over every position of every axis the model permits. This is statically
+   knowable from the geometry and the limit-switch positions, with no knowledge
+   of where anything is now.
+2. **Given this set of axis moves, do they collide?**
+
+The first is an **axis-to-axis relation**, and it is what makes the second
+tractable: it bounds the state the checker has to gather. To check a move of one
+axis, the checker needs the positions of the axes that can ever interact with
+it, not the whole machine. The relation is expected to be trimmed by hand at
+first.
+
+The relation must never omit a pair that can touch; extra pairs only cost state
+gathering. It is computed **after** the exemption set, so permanently-touching
+pairs do not appear in it — which makes it depend on that set being settled, and
+it is not. See [](open-questions.md).
+
+**The service is stateless**, and holds no notion of current pose. That is what
+lets the validator ask about the *projected end state* of a running task rather
+than about live PVs, and it makes the batch API a pure function of what is sent.
+See [](decisions/0006-two-tier-collision-checking.md).
+
+**Limits are split by kind.** Limit-switch positions are part of the model, held
+by the service, because the reachability relation is computed from them. Soft
+limits are applied by the checker at validation time and the service never sees
+them — so tightening a soft limit cannot silently invalidate a cached relation.
+
+The checker is told the relation and nothing else about geometry. Which axes
+have branches is not registered: it is a property of the device, read off the
+transform.
 
 ### Windows and turnarounds
 
-scanspec2's `_step_windows` yields one window per setpoint, so per-window branch
-is per-point branch for step scans with no special case.
+Iterating a scanspec2 `Scan` yields one `Window` per setpoint, so per-window
+branch is per-point branch for step scans with no special case.
 
 **Turnaround trajectories are in joint space and need checking too, and scanspec
 does not produce them.** Easy to forget for exactly that reason. The same

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>What we got wrong &#8212; bluesky-architecture 0.1.dev31+g11ed109fb documentation</title>
+    <title>What we got wrong &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=700c8fb2"></script>
+    <script src="../../_static/documentation_options.js?v=f2ca2743"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -467,7 +467,7 @@ rather than quietly editing the conclusions.</p>
 <h2>From facts<a class="headerlink" href="#from-facts" title="Link to this heading">#</a></h2>
 <p>These came from Tom, correcting the design as it was being written.</p>
 <p><strong>1. “For a flyscan the chunk deadline is milliseconds.”</strong>
-Chunking is at most 1 Hz, so ~500 ms. This was the load-bearing premise for
+Chunking is at most 1 Hz, so ~500 ms. This was the premise for
 “shared library, not a service”, and that conclusion collapsed with it.</p>
 <p><strong>2. “<code class="docutils literal notranslate"><span class="pre">derived_to_raw</span></code> is never called.”</strong>
 It is — from <code class="docutils literal notranslate"><span class="pre">sim/_mirror_vertical.py:71</span></code> and <code class="docutils literal notranslate"><span class="pre">_mirror_horizontal.py:39</span></code>, inside

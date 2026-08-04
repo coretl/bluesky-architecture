@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Open questions &#8212; bluesky-architecture 0.1.dev31+g11ed109fb documentation</title>
+    <title>Open questions &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=700c8fb2"></script>
+    <script src="../_static/documentation_options.js?v=f2ca2743"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Exploration" href="exploration.html" />
-    <link rel="prev" title="2. Adopt python-copier-template for project structure" href="decisions/0002-switched-to-python-copier-template.html" />
+    <link rel="next" title="1. Record architecture decisions" href="decisions/0001-record-architecture-decisions.html" />
+    <link rel="prev" title="Decisions" href="decisions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -385,17 +385,16 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-anti-collision-is-soft-machine-protection.html">3. Anti-collision is soft machine protection, not a safety function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0008-validation-state-is-owned-by-the-queue.html">8. Validation state is owned by the queue</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Open questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0002-anti-collision-is-soft-machine-protection.html">2. Anti-collision is soft machine protection, not a safety function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0003-validation-state-is-owned-by-the-queue.html">3. Validation state is owned by the queue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0009-checking-is-a-plan-preprocessor.html">9. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0010-the-checker-is-the-solver.html">10. The checker is the solver, and runs in three modes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Open questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0008-checking-is-a-plan-preprocessor.html">8. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0009-the-checker-is-the-solver.html">9. The checker is the solver, and runs in three modes</a></li>
 </ul>
 </div>
 </nav></div>
@@ -461,6 +460,9 @@
 <p>Ranked by how much they would move the design. Answered ones are kept at the
 bottom because knowing a question is closed is worth as much as knowing it is
 open.</p>
+<p>Numbers are stable identifiers, not positions — questions are referenced by
+number from the ADRs and elsewhere, so a new one is appended with the next free
+number and filed under the heading that matches its weight.</p>
 <section id="blocking">
 <h2>Blocking<a class="headerlink" href="#blocking" title="Link to this heading">#</a></h2>
 <p><strong>Q1. How tight can an automatically-derived coarse model be?</strong>
@@ -484,6 +486,21 @@ computation.</em></p>
 Every padding and sample-rate figure scales linearly with it, and the two
 regimes tested (1.6 vs 8 rad/s) swing the required validator rate by 8×. <em>An
 afternoon with whoever owns the motion controllers.</em></p>
+<p><strong>Q18. How are permanently-touching pairs handled?</strong>
+The reachability relation in ADR-0006 is computed <em>after</em> the exemption set, so
+this gates the relation as well as every false-positive figure (Q2). The obvious
+answer — exempt a pair once and for all — is wrong on an articulated arm: <strong>a
+self-touching pair can collide</strong> if the elbow rotates transversely and
+cable management is attached to it. An exemption therefore cannot be a static
+property of a pair; it has to be conditioned on something, and what that
+something is has not been worked out. The answer decides whether the relation
+can be built before Q2 is settled or has to wait for it.</p>
+<p>Also unresolved underneath it: the limit-switch positions the relation is
+computed from. All ten movable joints in <code class="docutils literal notranslate"><span class="pre">i16_config.json</span></code> carry
+<code class="docutils literal notranslate"><span class="pre">limits:</span> <span class="pre">[-180,</span> <span class="pre">180]</span></code>, identical, which reads as a default rather than a
+measurement. If those are the real numbers the relation is close to complete and
+bounds nothing. Same shape as Q3 — the model is only as good as numbers nobody
+has supplied yet.</p>
 </section>
 <section id="architectural">
 <h2>Architectural<a class="headerlink" href="#architectural" title="Link to this heading">#</a></h2>
@@ -496,8 +513,9 @@ Measuring an OBB descent is the strongest remaining argument for <code class="do
 JavaScript stack.</p>
 <p><strong>Q5. The batch API contract.</strong> Input shape and units, per-point verdicts rather
 than a boolean, request-time padding, whether coarse-then-fine happens in one
-call, statefulness, transport and concurrency. Being added by the service
-author; cheapest to influence now.</p>
+call, transport and concurrency. Being added by the service author; cheapest to
+influence now. Statefulness is no longer part of this question — the service is
+stateless and the caller supplies full state, per the amendment to ADR-0006.</p>
 <p><strong>Q6. Where does a replacement certificate come from mid-scan?</strong> If the executor
 mints its own, the validator/executor split blurs and the executor is now
 solving. If it calls the validator, mid-scan execution depends on a process
@@ -519,7 +537,7 @@ are not the same question. An entry at <strong>⏳</strong> is merely not valida
 the rule could be “wait” — but validation is asynchronous, and a queue that
 stalls on it has serialised itself behind the validator. An entry at <strong>?</strong> can
 <em>never</em> be validated, and must still run, so “wait” is not available at all.
-Neither rule is written down. ADR-0008 raises the ⏳ half and leaves it open.</p>
+Neither rule is written down. ADR-0003 raises the ⏳ half and leaves it open.</p>
 </section>
 <section id="component-level">
 <h2>Component-level<a class="headerlink" href="#component-level" title="Link to this heading">#</a></h2>
@@ -532,7 +550,7 @@ collaborators would solve it and give the validator substitution for free. The
 blocker is concrete: <code class="docutils literal notranslate"><span class="pre">Device</span></code> is a union of bluesky protocols and
 <code class="docutils literal notranslate"><span class="pre">register_device</span></code> rejects anything failing <code class="docutils literal notranslate"><span class="pre">is_bluesky_compatible_device</span></code>.
 Whether that is a small extension or a rewrite is an hour’s reading.</p>
-<p>The checker is <em>not</em> in this question, which is a narrowing since ADR-0009: it
+<p>The checker is <em>not</em> in this question, which is a narrowing since ADR-0008: it
 is wired at RunEngine construction and reached interactively by import, so it
 never travels as a plan parameter.</p>
 <p>Related and unmeasured: whether <code class="docutils literal notranslate"><span class="pre">_convert_type</span></code> can be taught to resolve
@@ -594,7 +612,7 @@ effect of refreshing world matrices, which is one line of pure CPU maths.</p>
 <p><strong>Where does checking hook in, for raw as well as derived axes?</strong> A plan
 preprocessor on <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code>, passing its decision down by wrapping the
 value in <code class="docutils literal notranslate"><span class="pre">Certified[T]</span></code>. Raw motors are the degenerate case rather than a
-special one. See ADR-0009. What remains open is the per-beamline wiring for
+special one. See ADR-0008. What remains open is the per-beamline wiring for
 generic plans, which is Q10.</p>
 <p><strong>Is there a hook for preprocessors on the RunEngine?</strong> Yes —
 <code class="docutils literal notranslate"><span class="pre">RE.preprocessors</span></code>, applied in <code class="docutils literal notranslate"><span class="pre">RunEngine.__call__</span></code>. One caveat: the code
@@ -615,20 +633,20 @@ discrepancy is worth resolving upstream.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="decisions/0002-switched-to-python-copier-template.html"
+       href="decisions.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">2. Adopt python-copier-template for project structure</p>
+        <p class="prev-next-title">Decisions</p>
       </div>
     </a>
     <a class="right-next"
-       href="exploration.html"
+       href="decisions/0001-record-architecture-decisions.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Exploration</p>
+        <p class="prev-next-title">1. Record architecture decisions</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

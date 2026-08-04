@@ -17,7 +17,7 @@ rather than quietly editing the conclusions.
 These came from Tom, correcting the design as it was being written.
 
 **1. "For a flyscan the chunk deadline is milliseconds."**
-Chunking is at most 1 Hz, so ~500 ms. This was the load-bearing premise for
+Chunking is at most 1 Hz, so ~500 ms. This was the premise for
 "shared library, not a service", and that conclusion collapsed with it.
 
 **2. "`derived_to_raw` is never called."**
