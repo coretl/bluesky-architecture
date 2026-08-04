@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>blueapi and bluesky-queueserver, traced &#8212; bluesky-architecture 0.1.dev30+g71074f392 documentation</title>
+    <title>blueapi and bluesky-queueserver, traced &#8212; bluesky-architecture 0.1.dev31+g11ed109fb documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=933afed0"></script>
+    <script src="../../_static/documentation_options.js?v=700c8fb2"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -830,8 +830,8 @@ down in the code — those cases are called out. Nothing here was run.</p>
 <section id="blueapi">
 <h2>blueapi<a class="headerlink" href="#blueapi" title="Link to this heading">#</a></h2>
 <p>Two processes: a FastAPI service, and one subprocess holding the devices and the
-RunEngine. <code class="docutils literal notranslate"><span class="pre">set_start_method(&quot;spawn&quot;,</span> <span class="pre">force=True)</span></code> at <code class="docutils literal notranslate"><span class="pre">service/runner.py:25</span></code>, and
-the pool is <code class="docutils literal notranslate"><span class="pre">Pool(initializer=_init_worker,</span> <span class="pre">processes=1)</span></code> at <code class="docutils literal notranslate"><span class="pre">:57</span></code> — one
+RunEngine. <code class="docutils literal notranslate"><span class="pre">set_start_method(&quot;spawn&quot;,</span> <span class="pre">force=True)</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/runner.py#L25"><code class="docutils literal notranslate"><span class="pre">service/runner.py:25</span></code></a>, and
+the pool is <code class="docutils literal notranslate"><span class="pre">Pool(initializer=_init_worker,</span> <span class="pre">processes=1)</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/runner.py#L57"><code class="docutils literal notranslate"><span class="pre">:57</span></code></a> — one
 subprocess, not a pool of many.</p>
 <p>The shape to notice is that <strong>submitting and starting are two separate calls.</strong></p>
 <pre  class="mermaid">
@@ -864,26 +864,26 @@ subprocess, not a pool of many.</p>
     RE--&gt;&gt;W: result, or exception
     W-&gt;&gt;W: _pending_tasks.pop → _completed_tasks
     </pre><p><strong>There is no queue, and that is deliberate</strong> — it is blueapi’s own ADR-0003,
-“No Queues”. <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> at <code class="docutils literal notranslate"><span class="pre">worker/task_worker.py:96</span></code> is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>, not an
-ordered structure, and <code class="docutils literal notranslate"><span class="pre">_task_channel</span></code> at <code class="docutils literal notranslate"><span class="pre">:140</span></code> is <code class="docutils literal notranslate"><span class="pre">Queue(maxsize=1)</span></code>: a handoff
+“No Queues”. <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L96"><code class="docutils literal notranslate"><span class="pre">worker/task_worker.py:96</span></code></a> is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>, not an
+ordered structure, and <code class="docutils literal notranslate"><span class="pre">_task_channel</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L140"><code class="docutils literal notranslate"><span class="pre">:140</span></code></a> is <code class="docutils literal notranslate"><span class="pre">Queue(maxsize=1)</span></code>: a handoff
 slot for the task currently being started, not a backlog. A submitted task waits
 until a client explicitly starts it, and if one is already running the start call
-raises <code class="docutils literal notranslate"><span class="pre">WorkerBusyError</span></code> at <code class="docutils literal notranslate"><span class="pre">:298</span></code>.</p>
+raises <code class="docutils literal notranslate"><span class="pre">WorkerBusyError</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L298"><code class="docutils literal notranslate"><span class="pre">:298</span></code></a>.</p>
 <p><strong>Parameters are validated at submit time</strong>, before a task_id is returned —
-<code class="docutils literal notranslate"><span class="pre">task.prepare_params(self._ctx)</span></code> at <code class="docutils literal notranslate"><span class="pre">:274</span></code>, commented “Will raise if parameters
+<code class="docutils literal notranslate"><span class="pre">task.prepare_params(self._ctx)</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L274"><code class="docutils literal notranslate"><span class="pre">:274</span></code></a>, commented “Will raise if parameters
 are invalid”. So an invalid plan fails at <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/tasks</span></code>, not later.</p>
 <p><strong>Tasks live in the subprocess and do not survive its reload.</strong>
-<code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/environment</span></code> (<code class="docutils literal notranslate"><span class="pre">service/main.py:223</span></code>) schedules <code class="docutils literal notranslate"><span class="pre">runner.reload()</span></code>, which
+<code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/environment</span></code> (<a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/main.py#L223"><code class="docutils literal notranslate"><span class="pre">service/main.py:223</span></code></a>) schedules <code class="docutils literal notranslate"><span class="pre">runner.reload()</span></code>, which
 stops and restarts the subprocess. <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> is ordinary process memory,
 so anything submitted and not yet started is gone. Nothing persists tasks
 anywhere else.</p>
 </section>
 <section id="bluesky-queueserver">
 <h2>bluesky-queueserver<a class="headerlink" href="#bluesky-queueserver" title="Link to this heading">#</a></h2>
-<p>Three processes, plus Redis. <code class="docutils literal notranslate"><span class="pre">WatchdogProcess</span></code> (<code class="docutils literal notranslate"><span class="pre">start_manager.py:28</span></code>) supervises
-<code class="docutils literal notranslate"><span class="pre">RunEngineManager</span></code> (<code class="docutils literal notranslate"><span class="pre">manager.py:179</span></code>), which in turn drives <code class="docutils literal notranslate"><span class="pre">RunEngineWorker</span></code>
-(<code class="docutils literal notranslate"><span class="pre">worker.py:90</span></code>). Clients speak 0MQ to the manager at <code class="docutils literal notranslate"><span class="pre">tcp://*:60615</span></code>
-(<code class="docutils literal notranslate"><span class="pre">manager.py:255</span></code>), optionally encrypted with a private key. The HTTP interface
+<p>Three processes, plus Redis. <code class="docutils literal notranslate"><span class="pre">WatchdogProcess</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/start_manager.py#L28"><code class="docutils literal notranslate"><span class="pre">start_manager.py:28</span></code></a>) supervises
+<code class="docutils literal notranslate"><span class="pre">RunEngineManager</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L179"><code class="docutils literal notranslate"><span class="pre">manager.py:179</span></code></a>), which in turn drives <code class="docutils literal notranslate"><span class="pre">RunEngineWorker</span></code>
+(<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/worker.py#L90"><code class="docutils literal notranslate"><span class="pre">worker.py:90</span></code></a>). Clients speak 0MQ to the manager at <code class="docutils literal notranslate"><span class="pre">tcp://*:60615</span></code>
+(<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L255"><code class="docutils literal notranslate"><span class="pre">manager.py:255</span></code></a>), optionally encrypted with a private key. The HTTP interface
 is a separate package, <code class="docutils literal notranslate"><span class="pre">bluesky-httpserver</span></code>, and is not in this repo.</p>
 <pre  class="mermaid">
         sequenceDiagram
@@ -912,20 +912,20 @@ is a separate package, <code class="docutils literal notranslate"><span class="p
     M-&gt;&gt;Q: append to plan_history, clear running_plan
     M-&gt;&gt;Q: take the next item, until the queue is empty or stopped
     </pre><p><strong>The queue is the point, and it is in Redis.</strong> <code class="docutils literal notranslate"><span class="pre">PlanQueueOperations</span></code>
-(<code class="docutils literal notranslate"><span class="pre">plan_queue_ops.py:13</span></code>) holds the queue, the <code class="docutils literal notranslate"><span class="pre">running_plan</span></code> key (<code class="docutils literal notranslate"><span class="pre">:85</span></code>) and
-<code class="docutils literal notranslate"><span class="pre">plan_history</span></code> (<code class="docutils literal notranslate"><span class="pre">:87</span></code>) under a <code class="docutils literal notranslate"><span class="pre">qs_default</span></code> name prefix. That is what makes the
+(<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L13"><code class="docutils literal notranslate"><span class="pre">plan_queue_ops.py:13</span></code></a>) holds the queue, the <code class="docutils literal notranslate"><span class="pre">running_plan</span></code> key (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L85"><code class="docutils literal notranslate"><span class="pre">:85</span></code></a>) and
+<code class="docutils literal notranslate"><span class="pre">plan_history</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L87"><code class="docutils literal notranslate"><span class="pre">:87</span></code></a>) under a <code class="docutils literal notranslate"><span class="pre">qs_default</span></code> name prefix. That is what makes the
 queue outlive the manager process, and it is the structural difference from
 blueapi rather than a feature difference.</p>
-<p><strong>Position is a first-class argument.</strong> <code class="docutils literal notranslate"><span class="pre">add_item_to_queue</span></code> at <code class="docutils literal notranslate"><span class="pre">:968</span></code> takes
-<code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">before_uid</span></code> and <code class="docutils literal notranslate"><span class="pre">after_uid</span></code>; there are <code class="docutils literal notranslate"><span class="pre">pop_item_from_queue</span></code> (<code class="docutils literal notranslate"><span class="pre">:780</span></code>) and
-a batch form (<code class="docutils literal notranslate"><span class="pre">:847</span></code>). Items have uids, so a client can address, move and remove
+<p><strong>Position is a first-class argument.</strong> <code class="docutils literal notranslate"><span class="pre">add_item_to_queue</span></code> at <a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L968"><code class="docutils literal notranslate"><span class="pre">:968</span></code></a> takes
+<code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">before_uid</span></code> and <code class="docutils literal notranslate"><span class="pre">after_uid</span></code>; there are <code class="docutils literal notranslate"><span class="pre">pop_item_from_queue</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L780"><code class="docutils literal notranslate"><span class="pre">:780</span></code></a>) and
+a batch form (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L847"><code class="docutils literal notranslate"><span class="pre">:847</span></code></a>). Items have uids, so a client can address, move and remove
 a specific entry.</p>
 <p><strong>Validation happens on add</strong>, against the allowed-plans and allowed-devices
-lists — <code class="docutils literal notranslate"><span class="pre">validate_plan(...)</span></code> at <code class="docutils literal notranslate"><span class="pre">manager.py:2263</span></code>.</p>
+lists — <code class="docutils literal notranslate"><span class="pre">validate_plan(...)</span></code> at <a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L2263"><code class="docutils literal notranslate"><span class="pre">manager.py:2263</span></code></a>.</p>
 <p><strong>Starting is a queue-level verb, not a per-item one.</strong> <code class="docutils literal notranslate"><span class="pre">queue_start</span></code> begins
 processing and keeps going; its docstring notes items can be added while it runs.
 <code class="docutils literal notranslate"><span class="pre">queue_stop</span></code> lets the running plan finish and does not start the next one. There
-is also an autostart mode, persisted to Redis (<code class="docutils literal notranslate"><span class="pre">manager.py:346</span></code>), where adding an
+is also an autostart mode, persisted to Redis (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L346"><code class="docutils literal notranslate"><span class="pre">manager.py:346</span></code></a>), where adding an
 item is enough to begin execution.</p>
 </section>
 <section id="side-by-side">
