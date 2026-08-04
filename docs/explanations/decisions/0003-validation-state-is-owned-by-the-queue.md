@@ -1,4 +1,4 @@
-# 7. Validation state is owned by the queue
+# 3. Validation state is owned by the queue
 
 ## Status
 

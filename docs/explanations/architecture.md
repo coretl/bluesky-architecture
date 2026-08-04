@@ -474,7 +474,7 @@ it is not. See [](open-questions.md).
 **The service is stateless**, and holds no notion of current pose. That is what
 lets the validator ask about the *projected end state* of a running task rather
 than about live PVs, and it makes the batch API a pure function of what is sent.
-See [](decisions/0005-two-tier-collision-checking.md).
+See [](decisions/0006-two-tier-collision-checking.md).
 
 **Limits are split by kind.** Limit-switch positions are part of the model, held
 by the service, because the reachability relation is computed from them. Soft

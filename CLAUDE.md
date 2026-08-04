@@ -20,22 +20,19 @@ measurement goes in `exploration/measurements.md` *and* gets a script. A
 reversal goes in `exploration/reversals.md`. A settled choice becomes an ADR and
 is reflected in `architecture.md`.
 
-## ADR numbers are permanent
+## ADRs
 
-They were renumbered twice, in two single passes: once before the repo was first
-pushed, when two superseded ADRs were folded into the ones that superseded them,
-and once just after, when the project-template ADR was dropped. Both times the
-reasoning from a removed ADR was preserved as a note in its successor.
+**Ask before editing an existing ADR.** Amendments go at the end under their own
+heading, saying what changed and why; the original decision and its reasoning
+stay where they are.
 
-**Renumbering is now closed.** From here an ADR keeps its number, and a
-superseded one is marked superseded in place — never deleted, never renumbered,
-never quietly rewritten. Amendments go at the end of an ADR under their own
-heading, saying what changed and why, rather than editing the original decision.
-The rationale is in `decisions.md`.
+They are numbered so that numerical order is also reading order, and
+`decisions.md` globs the directory rather than listing them. If a new ADR only
+makes sense in the middle, that is a reason to raise it, not to quietly reorder.
 
 Note that blueapi has its own ADR-0003 ("No Queues"), a different document from
-this project's. It is referenced from ADR-0007. Always write "blueapi ADR-0003"
-when you mean theirs.
+this project's. It is referenced from our ADR-0003. Always write "blueapi
+ADR-0003" when you mean theirs.
 
 ## The one rule
 

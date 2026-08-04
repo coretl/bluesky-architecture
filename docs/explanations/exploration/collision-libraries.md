@@ -21,7 +21,7 @@ Directional, not final — the caveats at the end matter.
 1. **Split the tiers by geometry type, not by language or process.** Spheres
    and capsules for every point of a trajectory; triangle meshes only for the
    points that tier flags. This is what every fast implementation does. Now
-   ADR-0005.
+   ADR-0006.
 2. **The coarse tier fits the batch budget in plain numpy** — 1.1–1.6 s for a
    15,000-point batch, single core, with a sound hierarchical broad phase. No
    GPU required to meet the deadline for the tier that runs on every point.
@@ -42,7 +42,7 @@ Directional, not final — the caveats at the end matter.
    meshes and every CAD revision would need re-authoring, so the coarse model
    must be derived automatically. That rules out hand-built capsules and makes
    the mesh's own BVH nodes attractive: conservative by construction, no second
-   artefact to version, and incapable of drifting out of sync. Now ADR-0006.
+   artefact to version, and incapable of drifting out of sync. Now ADR-0007.
 6. **The binding constraint is coarse-model fit quality, not speed.** Fitted
    spheres leave 63–173 mm of error on i16 meshes against 3.3 mm of motion
    padding at 200 Hz. Until something automatic gets that into single digits,

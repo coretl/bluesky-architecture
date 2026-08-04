@@ -1,4 +1,4 @@
-# 4. Transform is pure, synchronous, array-safe maths
+# 5. Transform is pure, synchronous, array-safe maths
 
 ## Status
 

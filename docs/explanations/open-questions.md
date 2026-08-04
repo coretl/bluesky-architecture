@@ -35,7 +35,7 @@ regimes tested (1.6 vs 8 rad/s) swing the required validator rate by 8×. *An
 afternoon with whoever owns the motion controllers.*
 
 **Q18. How are permanently-touching pairs handled?**
-The reachability relation in ADR-0005 is computed *after* the exemption set, so
+The reachability relation in ADR-0006 is computed *after* the exemption set, so
 this gates the relation as well as every false-positive figure (Q2). The obvious
 answer — exempt a pair once and for all — is wrong on an articulated arm: **a
 self-touching pair can collide** if the elbow rotates transversely and
@@ -65,7 +65,7 @@ JavaScript stack.
 than a boolean, request-time padding, whether coarse-then-fine happens in one
 call, transport and concurrency. Being added by the service author; cheapest to
 influence now. Statefulness is no longer part of this question — the service is
-stateless and the caller supplies full state, per the amendment to ADR-0005.
+stateless and the caller supplies full state, per the amendment to ADR-0006.
 
 **Q6. Where does a replacement certificate come from mid-scan?** If the executor
 mints its own, the validator/executor split blurs and the executor is now
@@ -75,7 +75,7 @@ that is meant to be non-blocking. Currently unstated either way.
 **Q7. Fallback budget cap.** Needs a hard cap on exact-tier work per batch, plus
 defined behaviour on exceeding it. The behaviour is settled in kind — **treat as
 collision**, which at insertion time means ✗ and at runtime means the stop in
-ADR-0005 — so what is open is the number. This may be the *answer* to Q1 rather
+ADR-0006 — so what is open is the number. This may be the *answer* to Q1 rather
 than a detail: a cap converts an unmeasurable false-positive rate into a bounded
 cost, so the design does not need the rate to be small, only to stay correct
 when it is not.
@@ -91,7 +91,7 @@ are not the same question. An entry at **⏳** is merely not validated *yet*, so
 the rule could be "wait" — but validation is asynchronous, and a queue that
 stalls on it has serialised itself behind the validator. An entry at **?** can
 *never* be validated, and must still run, so "wait" is not available at all.
-Neither rule is written down. ADR-0007 raises the ⏳ half and leaves it open.
+Neither rule is written down. ADR-0003 raises the ⏳ half and leaves it open.
 
 ## Component-level
 

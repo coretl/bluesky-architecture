@@ -1,4 +1,4 @@
-# 3. Validation runs in a second, read-only process
+# 4. Validation runs in a second, read-only process
 
 ## Status
 

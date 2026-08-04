@@ -1,4 +1,4 @@
-# 5. Collision checking is two tiers, split by geometry type
+# 6. Collision checking is two tiers, split by geometry type
 
 ## Status
 
@@ -70,7 +70,7 @@ over-approximation is acceptable and is expected to be trimmed by hand at first.
 
 **Statelessness is what makes validation correct.** A service holding "current
 pose" would answer about live PVs, and the validator has to ask about the
-*projected end state* of a running task (ADR-0003). Statelessness also makes the
+*projected end state* of a running task (ADR-0004). Statelessness also makes the
 batch API a pure function of its request, so it is cacheable and testable
 without a machine.
 

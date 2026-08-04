@@ -111,7 +111,7 @@ in neither; a raw collidable motor is only in the second.
 > The deeper error is that the two are not the same kind of fact. **"Has
 > branches" is a property of the device**, readable off its transform, and is
 > never registered. **"Can collide" is external**, and now arrives as the
-> axis-to-axis reachability relation in ADR-0005 rather than as a flat scope
+> axis-to-axis reachability relation in ADR-0006 rather than as a flat scope
 > list. So there is one input, not two overlapping ones.
 >
 > What survives is the observation that drove it: a raw collidable motor has no

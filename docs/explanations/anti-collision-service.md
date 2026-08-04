@@ -155,7 +155,7 @@ it is cheapest to influence now, while the API is being written.
 **Per-point verdicts that name the implicated pair**, not a boolean. Without the
 pair, the exact tier cannot be restricted to what the coarse tier flagged, and
 the tiering buys nothing — measured, ~105 s versus a few seconds per batch. This
-is ADR-0005, and it is the requirement the contract turns on.
+is ADR-0006, and it is the requirement the contract turns on.
 
 **Padding as a request parameter.** Insertion-time and runtime want very
 different margins against the same geometry; two models that can drift apart is

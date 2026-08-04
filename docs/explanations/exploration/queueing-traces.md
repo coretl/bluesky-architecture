@@ -161,13 +161,13 @@ by uid and stored in Redis — where blueapi's `_pending_tasks` dict is process
 memory keyed by task_id. What neither has today is an API for a third party to
 attach state to an entry and have it revoked on a condition.
 
-That matters here because of [](../decisions/0007-validation-state-is-owned-by-the-queue.md),
+That matters here because of [](../decisions/0003-validation-state-is-owned-by-the-queue.md),
 and working out what it would take in either system is not attempted on this
 page.
 
 ## What this does not cover
 
-- **`daq-queuing-service`** — DLS's own queuing service, which ADR-0007 names as
+- **`daq-queuing-service`** — DLS's own queuing service, which ADR-0003 names as
   the obvious place for verdicts to live. Reachable, not read. A three-way
   comparison was scoped out of this page rather than done badly.
 - **Failure and restart behaviour** beyond what the code states. Redis
