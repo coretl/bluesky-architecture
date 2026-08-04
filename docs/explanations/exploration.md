@@ -19,6 +19,7 @@ exploration/measurements
 exploration/reversals
 exploration/collision-libraries
 exploration/queueing-traces
+exploration/queueing-merge-pitch
 anti-collision-service
 pinned-references
 session-notes
