@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>blueapi and bluesky-queueserver, traced &#8212; bluesky-architecture 0.1.dev41+gf83959c7d documentation</title>
+    <title>A merged blueapi and bluesky-queueserver &#8212; bluesky-architecture 0.1.dev41+gf83959c7d documentation</title>
   
   
   
@@ -402,7 +402,7 @@ mermaid.initialize(
 
 window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/exploration/queueing-traces';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/exploration/queueing-merge-design';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -414,8 +414,8 @@ window.runMermaid = runMermaid;</script>
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="A merged blueapi and bluesky-queueserver" href="queueing-merge-design.html" />
-    <link rel="prev" title="Collision libraries: survey and re-architecture" href="collision-libraries.html" />
+    <link rel="next" title="Kinematics: what exists, and what we would have to write" href="kinematics-libraries.html" />
+    <link rel="prev" title="blueapi and bluesky-queueserver, traced" href="queueing-traces.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -744,8 +744,8 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l1"><a class="reference internal" href="measurements.html">Measurements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reversals.html">What we got wrong</a></li>
 <li class="toctree-l1"><a class="reference internal" href="collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">blueapi and bluesky-queueserver, traced</a></li>
-<li class="toctree-l1"><a class="reference internal" href="queueing-merge-design.html">A merged blueapi and bluesky-queueserver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queueing-traces.html">blueapi and bluesky-queueserver, traced</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">A merged blueapi and bluesky-queueserver</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kinematics-libraries.html">Kinematics: what exists, and what we would have to write</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../anti-collision-service.html">The anti-collision service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pinned-references.html">Pinned references</a></li>
@@ -793,7 +793,7 @@ window.runMermaid = runMermaid;</script>
     
     <li class="breadcrumb-item"><a href="../exploration.html" class="nav-link">Exploration</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">blueapi and bluesky-queueserver, traced</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">A merged blueapi and bluesky-queueserver</span></li>
   </ul>
 </nav>
 </div>
@@ -810,217 +810,357 @@ window.runMermaid = runMermaid;</script>
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="blueapi-and-bluesky-queueserver-traced">
-<h1>blueapi and bluesky-queueserver, traced<a class="headerlink" href="#blueapi-and-bluesky-queueserver-traced" title="Link to this heading">#</a></h1>
-<p>How a scan gets from a client to a RunEngine in each of the two systems, in
-matching notation, plus what each one does and does not provide.</p>
-<p><strong>Descriptive, not a recommendation.</strong> This page does not argue for either. It
-exists because “blueapi and queueserver both queue scans” is true at a level of
-detail that hides every difference that matters, and because the two are usually
-compared from memory.</p>
-<p>Read at the revisions pinned in <a class="reference internal" href="../pinned-references.html"><span class="std std-doc">Pinned references</span></a>: blueapi
-<code class="docutils literal notranslate"><span class="pre">b7676359</span></code>, bluesky-queueserver <code class="docutils literal notranslate"><span class="pre">0a084cf</span></code> (tagged v0.0.25). Both were re-fetched
-and checked out at those SHAs to write this; queueserver’s <code class="docutils literal notranslate"><span class="pre">main</span></code> is still
-exactly the pinned commit.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Everything here is read from source. That establishes <strong>what calls what, where
-state is held, and what the API surface is</strong>. It does not establish behaviour
-under concurrency, failure or restart, except where that behaviour is written
-down in the code — those cases are called out. Nothing here was run.</p>
-</div>
-<section id="blueapi">
-<h2>blueapi<a class="headerlink" href="#blueapi" title="Link to this heading">#</a></h2>
-<p>Two processes: a FastAPI service, and one subprocess holding the devices and the
-RunEngine. <code class="docutils literal notranslate"><span class="pre">set_start_method(&quot;spawn&quot;,</span> <span class="pre">force=True)</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/runner.py#L25"><code class="docutils literal notranslate"><span class="pre">service/runner.py:25</span></code></a>, and
-the pool is <code class="docutils literal notranslate"><span class="pre">Pool(initializer=_init_worker,</span> <span class="pre">processes=1)</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/runner.py#L57"><code class="docutils literal notranslate"><span class="pre">:57</span></code></a> — one
-subprocess, not a pool of many.</p>
-<p>The shape to notice is that <strong>submitting and starting are two separate calls.</strong></p>
+  <section id="a-merged-blueapi-and-bluesky-queueserver">
+<h1>A merged blueapi and bluesky-queueserver<a class="headerlink" href="#a-merged-blueapi-and-bluesky-queueserver" title="Link to this heading">#</a></h1>
+<p>What the merged system looks like, what its HTTP surface should be, and what the
+superset of the two validation stacks actually is.</p>
+<p>Read at the revisions in <a class="reference internal" href="../pinned-references.html"><span class="std std-doc">Pinned references</span></a>: blueapi <code class="docutils literal notranslate"><span class="pre">b7676359</span></code>,
+bluesky-queueserver <code class="docutils literal notranslate"><span class="pre">0a084cf</span></code>, bluesky-httpserver <code class="docutils literal notranslate"><span class="pre">d53d171</span></code>. How each works
+today is traced in <a class="reference internal" href="queueing-traces.html"><span class="std std-doc">blueapi and bluesky-queueserver, traced</span></a>.</p>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
 <pre  class="mermaid">
-        sequenceDiagram
-    autonumber
-    participant C as client
-    participant A as FastAPI&lt;br/&gt;service process
-    participant D as WorkerDispatcher&lt;br/&gt;Pool(processes=1)
-    participant W as TaskWorker&lt;br/&gt;subprocess
-    participant RE as RunEngine
+        flowchart TB
+    QSC[&quot;qserver CLI / GUI&quot;]
+    BAC[&quot;blueapi CLI&quot;]
+    SW[&quot;SynchWeb&quot;]
 
-    C-&gt;&gt;A: POST /tasks {name, params}
-    A-&gt;&gt;D: run(submit_task)
-    D-&gt;&gt;W: submit_task(task)
-    W-&gt;&gt;W: prepare_params — raises if params invalid
-    W-&gt;&gt;W: _pending_tasks[uuid4] = TrackableTask
-    W--&gt;&gt;A: task_id
-    A--&gt;&gt;C: 201, Location: /tasks/{task_id}
+    QSC -- &quot;HTTP&quot; --&gt; API
+    BAC -- &quot;HTTP&quot; --&gt; API
+    SW -- &quot;writes plans&quot; --&gt; ISPYB[(&quot;ISPyB&quot;)]
 
-    Note over C,RE: nothing is running. A second, explicit call starts it.
+    API[&quot;&lt;b&gt;HTTP API&lt;/b&gt;&lt;br/&gt;queueserver surface&lt;br/&gt;+ verdicts + sources&quot;]
+    API --&gt; MGR
 
-    C-&gt;&gt;A: PUT /worker/task {task_id}
-    A-&gt;&gt;D: run(get_active_task)
-    A--&gt;&gt;C: 409 Conflict, if a task is active and incomplete
-    A-&gt;&gt;D: run(begin_task)
-    D-&gt;&gt;W: begin_task(task_id)
-    W-&gt;&gt;W: raise WorkerBusyError unless state is IDLE
-    W-&gt;&gt;W: _task_channel.put(task) — Queue(maxsize=1)
-    W-&gt;&gt;RE: task.do_task(ctx)
-    RE--&gt;&gt;W: result, or exception
-    W-&gt;&gt;W: _pending_tasks.pop → _completed_tasks
-    </pre><p><strong>There is no queue, and that is deliberate</strong> — it is blueapi’s own ADR-0003,
-“No Queues”. <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L96"><code class="docutils literal notranslate"><span class="pre">worker/task_worker.py:96</span></code></a> is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>, not an
-ordered structure, and <code class="docutils literal notranslate"><span class="pre">_task_channel</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L140"><code class="docutils literal notranslate"><span class="pre">:140</span></code></a> is <code class="docutils literal notranslate"><span class="pre">Queue(maxsize=1)</span></code>: a handoff
-slot for the task currently being started, not a backlog. A submitted task waits
-until a client explicitly starts it, and if one is already running the start call
-raises <code class="docutils literal notranslate"><span class="pre">WorkerBusyError</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L298"><code class="docutils literal notranslate"><span class="pre">:298</span></code></a>.</p>
-<p><strong>Parameters are validated at submit time</strong>, before a task_id is returned —
-<code class="docutils literal notranslate"><span class="pre">task.prepare_params(self._ctx)</span></code> at <a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/worker/task_worker.py#L274"><code class="docutils literal notranslate"><span class="pre">:274</span></code></a>, commented “Will raise if parameters
-are invalid”. So an invalid plan fails at <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/tasks</span></code>, not later.</p>
-<p><strong>Tasks live in the subprocess and do not survive its reload.</strong>
-<code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/environment</span></code> (<a class="reference external" href="https://github.com/DiamondLightSource/blueapi/blob/b767635920d1675bc4db58c6bbf80c29378aa3f7/src/blueapi/service/main.py#L223"><code class="docutils literal notranslate"><span class="pre">service/main.py:223</span></code></a>) schedules <code class="docutils literal notranslate"><span class="pre">runner.reload()</span></code>, which
-stops and restarts the subprocess. <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> is ordinary process memory,
-so anything submitted and not yet started is gone. Nothing persists tasks
-anywhere else.</p>
+    subgraph M [&quot;MANAGER &amp;mdash; rust&quot;]
+        MGR[&quot;queue, entry state, verdicts&lt;br/&gt;⏳ &amp;nbsp; ✓ &amp;nbsp; ✗ &amp;nbsp; ?&quot;]
+        SRC{{&quot;source plugin&quot;}}
+    end
+
+    STORE[(&quot;queue store&lt;br/&gt;Redis or SQL&quot;)]
+    MGR -- &quot;entries + verdicts&lt;br/&gt;↑ persisted state&quot; --&gt; STORE
+    MGR --&gt; SRC
+    ISPYB -- &quot;next collection&quot; --&gt; SRC
+    STORE -- &quot;next entry&quot; --&gt; SRC
+
+    SRC -- &quot;item to validate&lt;br/&gt;↑ ✓ / ✗ / ? + certificate&quot; --&gt; VW
+    SRC -- &quot;item + certificate&lt;br/&gt;↑ result, abort on failure&quot; --&gt; EW
+
+    subgraph W [&quot;WORKERS &amp;mdash; python&quot;]
+        VW[&quot;&lt;b&gt;VALIDATION&lt;/b&gt;&lt;br/&gt;read-only devices&lt;br/&gt;args · timing · collisions&quot;]
+        EW[&quot;&lt;b&gt;EXECUTION&lt;/b&gt;&lt;br/&gt;owns devices, RunEngine&quot;]
+    end
+
+    VW -- &quot;joint arrays, batched&lt;br/&gt;↑ per-point verdicts&quot; --&gt; AC
+    EW -- &quot;joint arrays, batched&lt;br/&gt;↑ per-point verdicts&quot; --&gt; AC
+    AC[&quot;anti-collision service&lt;br/&gt;stateless&quot;]
+    </pre><p>Three claims in that picture carry the design.</p>
+<p><strong>The manager owns entry state, and it is the only thing that does.</strong> Verdicts
+live on entries because they are revoked when control leaves the queue — see
+<a class="reference internal" href="../decisions/0003-validation-state-is-owned-by-the-queue.html"><span class="std std-doc">3. Validation state is owned by the queue</span></a>. Neither system
+can do this today.</p>
+<p><strong>The source plugin sits between the manager and the workers</strong>, not in front of
+the queue. Switching from queue to ISPyB to manual changes where the <em>next item</em>
+comes from, without changing anything downstream. An ISPyB collection and a
+queued plan reach the validation worker identically.</p>
+<p><strong>Two workers, one codebase.</strong> The validation worker is the execution worker
+with read-only devices and message interpretation instead of execution
+(ADR-0004). Not a second implementation — same plan loading, same registries,
+same parameter model.</p>
 </section>
-<section id="bluesky-queueserver">
-<h2>bluesky-queueserver<a class="headerlink" href="#bluesky-queueserver" title="Link to this heading">#</a></h2>
-<p>Three processes, plus Redis. <code class="docutils literal notranslate"><span class="pre">WatchdogProcess</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/start_manager.py#L28"><code class="docutils literal notranslate"><span class="pre">start_manager.py:28</span></code></a>) supervises
-<code class="docutils literal notranslate"><span class="pre">RunEngineManager</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L179"><code class="docutils literal notranslate"><span class="pre">manager.py:179</span></code></a>), which in turn drives <code class="docutils literal notranslate"><span class="pre">RunEngineWorker</span></code>
-(<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/worker.py#L90"><code class="docutils literal notranslate"><span class="pre">worker.py:90</span></code></a>). Clients speak 0MQ to the manager at <code class="docutils literal notranslate"><span class="pre">tcp://*:60615</span></code>
-(<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L255"><code class="docutils literal notranslate"><span class="pre">manager.py:255</span></code></a>), optionally encrypted with a private key. The HTTP interface
-is a separate package, <code class="docutils literal notranslate"><span class="pre">bluesky-httpserver</span></code>, and is not in this repo.</p>
-<pre  class="mermaid">
-        sequenceDiagram
-    autonumber
-    participant C as client&lt;br/&gt;qserver / httpserver
-    participant M as RE Manager&lt;br/&gt;0MQ process
-    participant Q as Redis&lt;br/&gt;plan queue
-    participant W as RE Worker&lt;br/&gt;process
-    participant RE as RunEngine
-
-    C-&gt;&gt;M: 0MQ queue_item_add {item}
-    M-&gt;&gt;M: validate_plan vs allowed_plans / allowed_devices
-    M-&gt;&gt;Q: add_item_to_queue(pos / before_uid / after_uid)
-    Q--&gt;&gt;M: item, with uid
-    M--&gt;&gt;C: success, qsize
-
-    Note over C,RE: the item is in Redis. It outlives the manager process.
-
-    C-&gt;&gt;M: 0MQ queue_start
-    M-&gt;&gt;Q: process_next_item → set_next_item_as_running
-    Q--&gt;&gt;M: item, also written to the running_plan key
-    M-&gt;&gt;W: run the plan (JSON-RPC over a pipe)
-    W-&gt;&gt;RE: RE(plan)
-    RE--&gt;&gt;W: result, or exception
-    W--&gt;&gt;M: plan result
-    M-&gt;&gt;Q: append to plan_history, clear running_plan
-    M-&gt;&gt;Q: take the next item, until the queue is empty or stopped
-    </pre><p><strong>The queue is the point, and it is in Redis.</strong> <code class="docutils literal notranslate"><span class="pre">PlanQueueOperations</span></code>
-(<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L13"><code class="docutils literal notranslate"><span class="pre">plan_queue_ops.py:13</span></code></a>) holds the queue, the <code class="docutils literal notranslate"><span class="pre">running_plan</span></code> key (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L85"><code class="docutils literal notranslate"><span class="pre">:85</span></code></a>) and
-<code class="docutils literal notranslate"><span class="pre">plan_history</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L87"><code class="docutils literal notranslate"><span class="pre">:87</span></code></a>) under a <code class="docutils literal notranslate"><span class="pre">qs_default</span></code> name prefix. That is what makes the
-queue outlive the manager process, and it is the structural difference from
-blueapi rather than a feature difference.</p>
-<p><strong>Position is a first-class argument.</strong> <code class="docutils literal notranslate"><span class="pre">add_item_to_queue</span></code> at <a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L968"><code class="docutils literal notranslate"><span class="pre">:968</span></code></a> takes
-<code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">before_uid</span></code> and <code class="docutils literal notranslate"><span class="pre">after_uid</span></code>; there are <code class="docutils literal notranslate"><span class="pre">pop_item_from_queue</span></code> (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L780"><code class="docutils literal notranslate"><span class="pre">:780</span></code></a>) and
-a batch form (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/plan_queue_ops.py#L847"><code class="docutils literal notranslate"><span class="pre">:847</span></code></a>). Items have uids, so a client can address, move and remove
-a specific entry.</p>
-<p><strong>Validation happens on add</strong>, against the allowed-plans and allowed-devices
-lists — <code class="docutils literal notranslate"><span class="pre">validate_plan(...)</span></code> at <a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L2263"><code class="docutils literal notranslate"><span class="pre">manager.py:2263</span></code></a>.</p>
-<p><strong>Starting is a queue-level verb, not a per-item one.</strong> <code class="docutils literal notranslate"><span class="pre">queue_start</span></code> begins
-processing and keeps going; its docstring notes items can be added while it runs.
-<code class="docutils literal notranslate"><span class="pre">queue_stop</span></code> lets the running plan finish and does not start the next one. There
-is also an autostart mode, persisted to Redis (<a class="reference external" href="https://github.com/bluesky/bluesky-queueserver/blob/0a084cfb722308f384847c24e6a43a8f572f302e/src/bluesky_queueserver/manager/manager.py#L346"><code class="docutils literal notranslate"><span class="pre">manager.py:346</span></code></a>), where adding an
-item is enough to begin execution.</p>
+<section id="the-http-interface">
+<h2>The HTTP interface<a class="headerlink" href="#the-http-interface" title="Link to this heading">#</a></h2>
+<p>bluesky-httpserver exposes <strong>65 routes</strong> today. blueapi exposes 19. The
+queueserver surface is the larger and better-shaped of the two and should be the
+base.</p>
+<section id="keep-as-is">
+<h3>Keep as-is<a class="headerlink" href="#keep-as-is" title="Link to this heading">#</a></h3>
+<p>The queue, run-engine and environment verbs are the reason to start from this
+surface: <code class="docutils literal notranslate"><span class="pre">/queue/item/{add,add/batch,get,move,move/batch,remove,remove/batch,update,execute}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/queue/{get,start,stop,stop/cancel,clear,mode/set,autostart}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/re/{pause,resume,stop,abort,halt,runs,metadata}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/environment/{open,close,update}</span></code>, <code class="docutils literal notranslate"><span class="pre">/history/{get,clear}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/{plans,devices}/{allowed,existing}</span></code>, <code class="docutils literal notranslate"><span class="pre">/permissions/{get,set,reload}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/lock</span></code>, <code class="docutils literal notranslate"><span class="pre">/unlock</span></code>, <code class="docutils literal notranslate"><span class="pre">/lock/info</span></code>, <code class="docutils literal notranslate"><span class="pre">/status</span></code>, <code class="docutils literal notranslate"><span class="pre">/ping</span></code>, <code class="docutils literal notranslate"><span class="pre">/task/{status,result}</span></code>.</p>
+<p>That is a complete queue API, and blueapi has no equivalent for most of it.</p>
 </section>
-<section id="side-by-side">
-<h2>Side by side<a class="headerlink" href="#side-by-side" title="Link to this heading">#</a></h2>
-<p>Descriptive. “—” means the mechanism does not exist, not that it could not be
-added.</p>
+<section id="add-for-validation">
+<h3>Add, for validation<a class="headerlink" href="#add-for-validation" title="Link to this heading">#</a></h3>
+<p>Validation is not a call the client makes — it happens on insertion. What the
+API needs is a way to <em>see</em> the result, and a way to ask before committing.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
-<tr class="row-odd"><th class="head"><p></p></th>
-<th class="head"><p>blueapi <code class="docutils literal notranslate"><span class="pre">b7676359</span></code></p></th>
-<th class="head"><p>bluesky-queueserver <code class="docutils literal notranslate"><span class="pre">0a084cf</span></code></p></th>
+<tr class="row-odd"><th class="head"><p>route</p></th>
+<th class="head"><p>purpose</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>processes</p></td>
-<td><p>2: service + 1 subprocess</p></td>
-<td><p>3: watchdog, manager, worker</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/queue/item/get</span></code> <em>(extended)</em></p></td>
+<td><p>return <code class="docutils literal notranslate"><span class="pre">verdict</span></code> (⏳/✓/✗/?), <code class="docutils literal notranslate"><span class="pre">certificate</span></code> and <code class="docutils literal notranslate"><span class="pre">verdict_reason</span></code> on the item</p></td>
 </tr>
-<tr class="row-odd"><td><p>client transport</p></td>
-<td><p>HTTP/REST, FastAPI</p></td>
-<td><p>0MQ, optionally encrypted</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/queue/get</span></code> <em>(extended)</em></p></td>
+<td><p>the same fields per entry, so a GUI can render the queue with ticks</p></td>
 </tr>
-<tr class="row-even"><td><p>HTTP front end</p></td>
-<td><p>built in</p></td>
-<td><p>separate package (<code class="docutils literal notranslate"><span class="pre">bluesky-httpserver</span></code>)</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/queue/item/validate</span></code></p></td>
+<td><p>validate a candidate item <strong>without inserting it</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p>where submitted work lives</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code> in subprocess memory</p></td>
-<td><p>Redis</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/validation/status</span></code></p></td>
+<td><p>is the validation worker up, and what is its backlog</p></td>
 </tr>
-<tr class="row-even"><td><p>survives a process restart</p></td>
-<td><p>no</p></td>
-<td><p>yes</p></td>
-</tr>
-<tr class="row-odd"><td><p>ordered queue</p></td>
-<td><p>—</p></td>
-<td><p>yes</p></td>
-</tr>
-<tr class="row-even"><td><p>reorder / insert at position</p></td>
-<td><p>—</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">before_uid</span></code>, <code class="docutils literal notranslate"><span class="pre">after_uid</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>address one entry</p></td>
-<td><p>task_id (uuid4)</p></td>
-<td><p>item uid</p></td>
-</tr>
-<tr class="row-even"><td><p>params validated at submit</p></td>
-<td><p>yes, <code class="docutils literal notranslate"><span class="pre">prepare_params</span></code></p></td>
-<td><p>yes, <code class="docutils literal notranslate"><span class="pre">validate_plan</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>what starts execution</p></td>
-<td><p>explicit <code class="docutils literal notranslate"><span class="pre">PUT</span> <span class="pre">/worker/task</span></code> per task</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">queue_start</span></code> for the queue, or autostart</p></td>
-</tr>
-<tr class="row-even"><td><p>concurrent tasks</p></td>
-<td><p>one; <code class="docutils literal notranslate"><span class="pre">WorkerBusyError</span></code> / 409</p></td>
-<td><p>one; queue serialises</p></td>
-</tr>
-<tr class="row-odd"><td><p>completed-work record</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">_completed_tasks</span></code> in memory</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">plan_history</span></code> in Redis</p></td>
-</tr>
-<tr class="row-even"><td><p>per-entry state a caller can set</p></td>
-<td><p>—</p></td>
-<td><p>—</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/queue/item/revalidate</span></code></p></td>
+<td><p>force revalidation, for when the world changed and the automatic rule did not catch it</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>The last row is the one to look at twice, and it is the same answer for both:
-neither has a place to hang arbitrary per-entry state set by something other than
-the submitter. queueserver has <em>somewhere it could live</em> — entries are addressable
-by uid and stored in Redis — where blueapi’s <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> dict is process
-memory keyed by task_id. What neither has today is an API for a third party to
-attach state to an entry and have it revoked on a condition.</p>
-<p>That matters here because of <a class="reference internal" href="../decisions/0003-validation-state-is-owned-by-the-queue.html"><span class="std std-doc">3. Validation state is owned by the queue</span></a>,
-and working out what it would take in either system is not attempted on this
-page.</p>
+<p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/queue/item/validate</span></code> exists in neither system and is worth the most: it
+puts validation before commitment, which is where a user actually wants it.</p>
 </section>
-<section id="what-this-does-not-cover">
-<h2>What this does not cover<a class="headerlink" href="#what-this-does-not-cover" title="Link to this heading">#</a></h2>
+<section id="add-for-sources">
+<h3>Add, for sources<a class="headerlink" href="#add-for-sources" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>route</p></th>
+<th class="head"><p>purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/source</span></code></p></td>
+<td><p>current source, and what is available</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/source/set</span></code></p></td>
+<td><p>switch between <code class="docutils literal notranslate"><span class="pre">queue</span></code>, <code class="docutils literal notranslate"><span class="pre">ispyb</span></code>, <code class="docutils literal notranslate"><span class="pre">manual</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/source/{name}/status</span></code></p></td>
+<td><p>backlog and health for one source</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Deliberately not “an ISPyB endpoint”. A source is a plugin with three
+operations — <em>peek</em>, <em>claim</em>, <em>report</em> — so ISPyB is one implementation and the
+Redis queue is another. Anything that can offer work becomes a source without
+the manager changing.</p>
+</section>
+<section id="problematic-and-what-to-do-about-them">
+<h3>Problematic, and what to do about them<a class="headerlink" href="#problematic-and-what-to-do-about-them" title="Link to this heading">#</a></h3>
+<p><strong>Remove: the test surface.</strong> <code class="docutils literal notranslate"><span class="pre">/test/manager/kill</span></code>, <code class="docutils literal notranslate"><span class="pre">/test/server/sleep</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/test/set_delay</span></code>, <code class="docutils literal notranslate"><span class="pre">/test/set_info</span></code>, <code class="docutils literal notranslate"><span class="pre">/test/set_instrument</span></code> and
+<code class="docutils literal notranslate"><span class="pre">/testing_custom_router_1</span></code> — six routes that exist for the test suite and ship
+in the production API. They should not be reachable on a beamline.</p>
+<p><strong>Reconsider: arbitrary code injection.</strong> <code class="docutils literal notranslate"><span class="pre">/script/upload</span></code> and
+<code class="docutils literal notranslate"><span class="pre">/function/execute</span></code> load code into the worker namespace and call into it. They
+are useful, and they are also a hole straight through everything else here — a
+queue of validated plans means nothing if a client can upload a script that
+moves motors directly. They cannot simply be deleted, because they are used, but
+they need permissioning separate from queue submission and they need to be
+visible in the manager’s state, so that “the beamline is under queue control”
+stays a statement that can be checked. Same class of problem as the
+uncertified-value ban in <a class="reference internal" href="../decisions/0008-checking-is-a-plan-preprocessor.html"><span class="std std-doc">8. Checking is a plan preprocessor, and the certificate is a recipe</span></a>.</p>
+<p><strong>Consolidate: console output.</strong> <code class="docutils literal notranslate"><span class="pre">/console_output</span></code>, <code class="docutils literal notranslate"><span class="pre">/console_output/uid</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/console_output_update</span></code> and <code class="docutils literal notranslate"><span class="pre">/stream_console_output</span></code> are four routes for one
+concern; blueapi uses a message bus instead. One streaming endpoint.</p>
+<p><strong>Move out: <code class="docutils literal notranslate"><span class="pre">/queue/upload/spreadsheet</span></code>.</strong> Parsing a spreadsheet into queue
+items is a client concern that has ended up in the server. It becomes a client
+calling <code class="docutils literal notranslate"><span class="pre">/queue/item/add/batch</span></code>.</p>
+<p><strong>Merge: <code class="docutils literal notranslate"><span class="pre">/environment/destroy</span></code> into <code class="docutils literal notranslate"><span class="pre">/environment/close</span></code></strong> with a <code class="docutils literal notranslate"><span class="pre">force</span></code> flag.</p>
+</section>
+</section>
+<section id="validation-compared-by-level">
+<h2>Validation compared, by level<a class="headerlink" href="#validation-compared-by-level" title="Link to this heading">#</a></h2>
+<p>Both systems validate. They do it in different processes, against different
+things, and catch different failures.</p>
+<section id="what-each-actually-does">
+<h3>What each actually does<a class="headerlink" href="#what-each-actually-does" title="Link to this heading">#</a></h3>
+<p><strong>blueapi</strong> builds a pydantic model from the <strong>live plan function’s type
+annotations</strong> at registration — <code class="docutils literal notranslate"><span class="pre">create_model(plan.__name__,</span> <span class="pre">**self._type_spec_for_function(plan))</span></code>
+in <code class="docutils literal notranslate"><span class="pre">core/context.py:355</span></code>. Submitting a task runs
+<code class="docutils literal notranslate"><span class="pre">TypeAdapter(model).validate_python(task.params)</span></code> in <code class="docutils literal notranslate"><span class="pre">worker/task.py</span></code>.</p>
+<p>Device-typed parameters are wrapped in a generated <code class="docutils literal notranslate"><span class="pre">Reference</span></code> type
+(<code class="docutils literal notranslate"><span class="pre">core/context.py:366</span></code>) whose validator calls <code class="docutils literal notranslate"><span class="pre">find_device(value)</span></code>, checks the
+result against the declared protocol via <code class="docutils literal notranslate"><span class="pre">is_compatible(val,</span> <span class="pre">origin,</span> <span class="pre">args)</span></code>, and
+<strong>returns the device object</strong>. Deserialisation and validation are one step.</p>
+<p><strong>bluesky-queueserver</strong> validates against a <strong>serialised description</strong> of the
+plan signature, downloaded from the worker into the manager as <code class="docutils literal notranslate"><span class="pre">allowed_plans</span></code>.
+<code class="docutils literal notranslate"><span class="pre">validate_plan</span></code> (<code class="docutils literal notranslate"><span class="pre">profile_ops.py:2550</span></code>) checks the plan name is permitted, then
+<code class="docutils literal notranslate"><span class="pre">_validate_plan_parameters</span></code> binds arguments with <code class="docutils literal notranslate"><span class="pre">inspect.Signature.bind</span></code> and
+validates them against a pydantic model built from the description —
+<code class="docutils literal notranslate"><span class="pre">pydantic_construct_model_class(parameters)</span></code>.</p>
+<p>Device names are checked <strong>as names</strong>, against <code class="docutils literal notranslate"><span class="pre">allowed_devices</span></code> patterns. They
+become objects later, in the worker, in <code class="docutils literal notranslate"><span class="pre">prepare_plan</span></code> (<code class="docutils literal notranslate"><span class="pre">profile_ops.py:845</span></code>),
+which takes <code class="docutils literal notranslate"><span class="pre">devices_in_nspace</span></code> and converts names at execution time.</p>
+</section>
+<section id="the-comparison">
+<h3>The comparison<a class="headerlink" href="#the-comparison" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>blueapi</p></th>
+<th class="head"><p>queueserver</p></th>
+<th class="head"><p>superset</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>where it runs</strong></p></td>
+<td><p>worker subprocess</p></td>
+<td><p>manager</p></td>
+<td><p><strong>validation worker</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>validated against</strong></p></td>
+<td><p>live function annotations</p></td>
+<td><p>serialised signature description</p></td>
+<td><p>live annotations</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>when</strong></p></td>
+<td><p>on <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/tasks</span></code></p></td>
+<td><p>on <code class="docutils literal notranslate"><span class="pre">queue_item_add</span></code></p></td>
+<td><p>asynchronously, after insertion</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>argument binding</strong></p></td>
+<td><p>pydantic model fields</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">inspect.Signature.bind</span></code></p></td>
+<td><p>bind, then types</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>type checking</strong></p></td>
+<td><p>pydantic, real annotations</p></td>
+<td><p>pydantic, from description</p></td>
+<td><p>pydantic, real annotations</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>name → device</strong></p></td>
+<td><p>during validation, via <code class="docutils literal notranslate"><span class="pre">Reference</span></code></p></td>
+<td><p>names matched to patterns; resolved at execution</p></td>
+<td><p>during validation</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>protocol conformance</strong></p></td>
+<td><p>yes, <code class="docutils literal notranslate"><span class="pre">is_compatible</span></code> against <code class="docutils literal notranslate"><span class="pre">Movable[float]</span></code></p></td>
+<td><p>none</p></td>
+<td><p><strong>blueapi’s</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>device exists</strong></p></td>
+<td><p>yes, <code class="docutils literal notranslate"><span class="pre">find_device</span></code></p></td>
+<td><p>pattern match only</p></td>
+<td><p><strong>blueapi’s</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>device connected</strong></p></td>
+<td><p>at environment build only</p></td>
+<td><p>not checked</p></td>
+<td><p><strong>neither is enough</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>per-group permissions</strong></p></td>
+<td><p>OPA, coarse</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">allowed_plans</span></code>/<code class="docutils literal notranslate"><span class="pre">allowed_devices</span></code>, fine-grained</p></td>
+<td><p><strong>queueserver’s, in the manager</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>scanspec / nested models</strong></p></td>
+<td><p>works; any pydantic model is a valid parameter</p></td>
+<td><p>depends on the description round-tripping the annotation</p></td>
+<td><p><strong>blueapi’s</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>plan feasibility</strong></p></td>
+<td><p>none</p></td>
+<td><p>none</p></td>
+<td><p><strong>new</strong> — the validation worker</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="three-findings">
+<h3>Three findings<a class="headerlink" href="#three-findings" title="Link to this heading">#</a></h3>
+<p><strong>1. The validator does all of it, and the manager needs no pydantic.</strong></p>
+<p>The level difference is real: blueapi validates against live objects and so can
+only run where they are, while queueserver validates against a description and
+so can run in the manager with no environment open. The tempting conclusion is
+to keep both — a cheap description check in the manager, a live check in the
+worker.</p>
+<p>That is the wrong conclusion, and an earlier version of this page drew it. It
+reconciles the two designs rather than choosing between them, and it buys one
+thing (synchronous rejection) at the price of maintaining a second
+representation of every plan signature forever.</p>
+<p><strong>Once the validation worker checks arguments, the manager has no reason to.</strong>
+It keeps two jobs, neither of which needs a schema library:</p>
 <ul class="simple">
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">daq-queuing-service</span></code></strong> — DLS’s own queuing service, which ADR-0003 names as
-the obvious place for verdicts to live. Reachable, not read. A three-way
-comparison was scoped out of this page rather than done badly.</p></li>
-<li><p><strong>Failure and restart behaviour</strong> beyond what the code states. Redis
-persistence is a code fact; whether a queue survives a <em>worker</em> crash
-mid-plan in practice is not.</p></li>
-<li><p><strong>Authorisation.</strong> blueapi has OIDC and OPA hooks visible in <code class="docutils literal notranslate"><span class="pre">service/main.py</span></code>;
-queueserver has a lock-key mechanism on queue-mutating calls. Neither was
-traced.</p></li>
-<li><p><strong>Anything run.</strong> No process was started, no plan executed.</p></li>
+<li><p><strong>Permissions.</strong> Is this plan name, and are these device names, allowed for
+this user group? String set membership. It stays in the manager precisely
+because it is an authorisation decision, and authorisation should not be
+delegated to the process that loads user-adjacent code.</p></li>
+<li><p><strong>The catalogue.</strong> <code class="docutils literal notranslate"><span class="pre">/plans/allowed</span></code> and <code class="docutils literal notranslate"><span class="pre">/devices/allowed</span></code> still have to be
+served so clients can populate a GUI. The validator publishes it; the manager
+caches and serves it as <strong>opaque JSON</strong>, without interpreting it.</p></li>
 </ul>
+<p><strong>2. Which removes the description-format problem entirely.</strong> The earlier
+version of this page called it the largest unknown: a description would have to
+round-trip a recursive discriminated union to express something like
+<code class="docutils literal notranslate"><span class="pre">Spec[Movable]</span></code>, and if it could not, manager-side validation would silently
+degrade to “some object was supplied”.</p>
+<p>There is now nothing to round-trip. The validator holds the live function and
+its real annotations, which is where blueapi already validates today. The
+catalogue still describes plans well enough for a client to render a form, but
+nothing depends on that description being <em>sound</em> — only on it being useful.</p>
+<p><strong>3. Connection is checked by neither, and it is the one that bites.</strong> blueapi
+connects devices when the environment is built (<code class="docutils literal notranslate"><span class="pre">context.py:276</span></code>,
+<code class="docutils literal notranslate"><span class="pre">build_and_connect</span></code>) and reports connection errors then. queueserver does not
+check. Neither re-checks at submission or before execution, so a device that
+dropped an hour ago passes every existing check and fails at the first <code class="docutils literal notranslate"><span class="pre">set</span></code>.</p>
+<p>The validation worker holds the devices open read-only, so it can check
+connectivity while validating — and it should, because a scan that will die on a
+dead device is exactly what insertion-time validation is for.</p>
+</section>
+<section id="what-the-superset-is">
+<h3>What the superset is<a class="headerlink" href="#what-the-superset-is" title="Link to this heading">#</a></h3>
+<p>In the manager, synchronously, on <code class="docutils literal notranslate"><span class="pre">queue_item_add</span></code>:</p>
+<ol class="arabic simple">
+<li><p>plan name in <code class="docutils literal notranslate"><span class="pre">allowed_plans</span></code> for the user group <em>(queueserver)</em></p></li>
+<li><p>device names permitted by <code class="docutils literal notranslate"><span class="pre">allowed_devices</span></code> patterns <em>(queueserver)</em></p></li>
+</ol>
+<p>Both are string matching against lists the validator published. Nothing else is
+rejected at insertion — the item enters the queue at ⏳.</p>
+<p>In the validation worker, asynchronously, with read-only devices:</p>
+<ol class="arabic simple" start="3">
+<li><p>arguments bind to the real signature <em>(blueapi + queueserver)</em></p></li>
+<li><p>types validate against the real annotations <em>(blueapi)</em></p></li>
+<li><p>names resolve to real devices <em>(blueapi)</em></p></li>
+<li><p>devices satisfy the declared protocols <em>(blueapi)</em></p></li>
+<li><p><strong>devices are connected</strong> <em>(new)</em></p></li>
+<li><p><strong>the plan is feasible</strong> — argument semantics, scan timing, limits, branch
+selection, anti-collision <em>(new; the subject of the rest of this repo)</em></p></li>
+</ol>
+<p>Steps 3–8 produce the verdict that lands on the entry, which sits at ⏳ until
+they finish.</p>
+<p><strong>Making all validation asynchronous is a simplification, not a concession.</strong>
+ADR-0003 already says every plan goes to the validator and is held at ⏳ — so
+rejecting <em>some</em> items synchronously was the inconsistency. Two further
+properties fall out:</p>
+<ul class="simple">
+<li><p><strong>Insertion never fails for validation reasons.</strong> If the validation worker is
+down, items still queue and sit at ⏳ until it returns. Queueing does not
+depend on the validator being up, only on getting a verdict does.</p></li>
+<li><p><strong>There is one place where a plan can be judged wrong</strong>, so there is no second
+implementation to drift from the first — the failure this project has hit most
+often (ADR-0009).</p></li>
+</ul>
+<p>A client that wants an answer before committing calls
+<code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/queue/item/validate</span></code>, which routes to the same validator and returns the
+same verdict without inserting anything.</p>
+</section>
+</section>
+<section id="what-is-not-settled">
+<h2>What is not settled<a class="headerlink" href="#what-is-not-settled" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Migration.</strong> Both systems are in production; neither community can take a
+flag day.</p></li>
+<li><p><strong>Whether the validator needs its own environment open to check arguments.</strong>
+Steps 3–4 need only the plan signature; steps 5–8 need devices. If the
+validator can answer 3–4 with no devices connected, most malformed items are
+still caught while the beamline is down, which is most of what synchronous
+manager-side checking was buying.</p></li>
+<li><p><strong>How the catalogue stays current.</strong> The manager serves what the validator
+published, so there is a staleness question when plans are reloaded — smaller
+than the description-format problem it replaces, but not nothing.</p></li>
+</ul>
+<p>The Rust question is no longer on this list. With no schema validation in the
+manager, its jobs are queue state, string-set permissions, opaque JSON caching
+and routing, none of which argue for or against any particular language.</p>
 </section>
 </section>
 
@@ -1035,20 +1175,20 @@ traced.</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="collision-libraries.html"
+       href="queueing-traces.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Collision libraries: survey and re-architecture</p>
+        <p class="prev-next-title">blueapi and bluesky-queueserver, traced</p>
       </div>
     </a>
     <a class="right-next"
-       href="queueing-merge-design.html"
+       href="kinematics-libraries.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">A merged blueapi and bluesky-queueserver</p>
+        <p class="prev-next-title">Kinematics: what exists, and what we would have to write</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1071,10 +1211,22 @@ traced.</p></li>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blueapi">blueapi</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bluesky-queueserver">bluesky-queueserver</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#side-by-side">Side by side</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-does-not-cover">What this does not cover</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture">Architecture</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-http-interface">The HTTP interface</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-as-is">Keep as-is</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-for-validation">Add, for validation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-for-sources">Add, for sources</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#problematic-and-what-to-do-about-them">Problematic, and what to do about them</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-compared-by-level">Validation compared, by level</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-each-actually-does">What each actually does</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-comparison">The comparison</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-findings">Three findings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-superset-is">What the superset is</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-not-settled">What is not settled</a></li>
 </ul>
   </nav></div>
 
@@ -1082,7 +1234,7 @@ traced.</p></li>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/exploration/queueing-traces.md">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/exploration/queueing-merge-design.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -1097,7 +1249,7 @@ traced.</p></li>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../_sources/explanations/exploration/queueing-traces.md.txt">
+    <a href="../../_sources/explanations/exploration/queueing-merge-design.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
