@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The working architecture &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
+    <title>The working architecture &#8212; bluesky-architecture 0.1.dev39+gffbb5c7d5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=f2ca2743"></script>
+    <script src="../_static/documentation_options.js?v=be2c8ff5"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1038,7 +1038,9 @@ applies to rather than stashed beside it, so that desync is unrepresentable.</p>
 <p>External, and a hard runtime dependency of flyscan execution. It owns the
 geometry:</p>
 <ul class="simple">
-<li><p><strong>static environment</strong> as a point cloud, from scans of the hutch</p></li>
+<li><p><strong>environment</strong> as a point cloud, from a LIDAR scan of the hutch. “Static” is
+the wrong word for it: the scan captures transient contents — racks, cables,
+user kit — so it changes between experiments while the machine does not</p></li>
 <li><p><strong>movable bodies</strong> as CAD meshes, articulated by a joint chain from config</p></li>
 <li><p>a declaration of which axes are <strong>collidable</strong> — typically a handful per
 beamline</p></li>
@@ -1254,7 +1256,7 @@ it is not. See <a class="reference internal" href="open-questions.html"><span cl
 <p><strong>The service is stateless</strong>, and holds no notion of current pose. That is what
 lets the validator ask about the <em>projected end state</em> of a running task rather
 than about live PVs, and it makes the batch API a pure function of what is sent.
-See <a class="reference internal" href="decisions/0006-two-tier-collision-checking.html"><span class="std std-doc">6. Collision checking is two tiers, split by geometry type</span></a>.</p>
+See <a class="reference internal" href="decisions/0006-two-tier-collision-checking.html"><span class="std std-doc">6. Collision checking is two tiers, and the service answers two questions</span></a>.</p>
 <p><strong>Limits are split by kind.</strong> Limit-switch positions are part of the model, held
 by the service, because the reachability relation is computed from them. Soft
 limits are applied by the checker at validation time and the service never sees

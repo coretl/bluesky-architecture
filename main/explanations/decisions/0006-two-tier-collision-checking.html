@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>6. Collision checking is two tiers, split by geometry type &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
+    <title>6. Collision checking is two tiers, and the service answers two questions &#8212; bluesky-architecture 0.1.dev39+gffbb5c7d5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=f2ca2743"></script>
+    <script src="../../_static/documentation_options.js?v=be2c8ff5"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -391,7 +391,7 @@
 <li class="toctree-l1"><a class="reference internal" href="0003-validation-state-is-owned-by-the-queue.html">3. Validation state is owned by the queue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">6. Collision checking is two tiers, split by geometry type</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">6. Collision checking is two tiers, and the service answers two questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0008-checking-is-a-plan-preprocessor.html">8. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="0009-the-checker-is-the-solver.html">9. The checker is the solver, and runs in three modes</a></li>
@@ -438,7 +438,7 @@
     
     <li class="breadcrumb-item"><a href="../decisions.html" class="nav-link">Decisions</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">6. Collision checking is two tiers, split by geometry type</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">6. Collision checking is two tiers, and the service answers two questions</span></li>
   </ul>
 </nav>
 </div>
@@ -455,8 +455,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="collision-checking-is-two-tiers-split-by-geometry-type">
-<h1>6. Collision checking is two tiers, split by geometry type<a class="headerlink" href="#collision-checking-is-two-tiers-split-by-geometry-type" title="Link to this heading">#</a></h1>
+  <section id="collision-checking-is-two-tiers-and-the-service-answers-two-questions">
+<h1>6. Collision checking is two tiers, and the service answers two questions<a class="headerlink" href="#collision-checking-is-two-tiers-and-the-service-answers-two-questions" title="Link to this heading">#</a></h1>
 <section id="status">
 <h2>Status<a class="headerlink" href="#status" title="Link to this heading">#</a></h2>
 <p>Accepted</p>
@@ -468,71 +468,92 @@ on real i16 geometry, proving two meshes do not touch costs 250 µs in C++ and
 ~1550 µs in JavaScript, and a batch is 15,000 points. Every fast implementation
 in the field — cuRobo, CAPT, MoveIt, Tesseract — uses cheap primitives on the
 hot path and reserves meshes for verification.</p>
+<p>Separately, the interface to the service needs settling. The service owns the
+geometry and the checker owns transforms, branches, soft limits and windows, so
+what passes between them should be as narrow as that division allows.</p>
 </section>
 <section id="decision">
 <h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">#</a></h2>
-<p>A <strong>coarse</strong> tier of conservative bounding volumes runs on every trajectory
-point. An <strong>exact</strong> triangle tier runs only on the pairs the coarse tier flags.</p>
-<p>The coarse tier must report <strong>which pair</strong> is implicated, not a boolean per
-point.</p>
+<p><strong>Two tiers, split by geometry type.</strong> A <strong>coarse</strong> tier of conservative
+bounding volumes runs on every trajectory point. An <strong>exact</strong> triangle tier runs
+only on the pairs the coarse tier flags. The coarse tier must report <strong>which
+pair</strong> is implicated, not a boolean per point.</p>
+<p><strong>The service is stateless and answers exactly two questions:</strong></p>
+<ol class="arabic simple">
+<li><p><em>Given an axis, what can it ever collide with?</em> Over every position of every
+axis the model permits, not at the current pose.</p></li>
+<li><p><em>Given this set of axis moves, do they collide?</em> Full state supplied by the
+caller.</p></li>
+</ol>
 </section>
 <section id="consequences">
 <h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">#</a></h2>
-<p>That last sentence is the whole decision. If the coarse tier returns only
-“something collided at this point”, the exact tier cannot be restricted to the
-implicated pair and has to re-check everything — which measured ~105 s per batch
-against a few seconds for the correct arrangement. The contract is
-<code class="docutils literal notranslate"><span class="pre">(point,</span> <span class="pre">body_a,</span> <span class="pre">body_b)</span></code> triples.</p>
+<section id="the-tiering">
+<h3>The tiering<a class="headerlink" href="#the-tiering" title="Link to this heading">#</a></h3>
+<p><strong>Naming the pair is the whole of the first decision.</strong> If the coarse tier
+returns only “something collided at this point”, the exact tier cannot be
+restricted to the implicated pair and has to re-check everything — measured at
+~105 s per batch against a few seconds for the correct arrangement. The contract
+is <code class="docutils literal notranslate"><span class="pre">(point,</span> <span class="pre">body_a,</span> <span class="pre">body_b)</span></code> triples.</p>
 <p>The tiers split by <em>geometry type</em>, not by language or process. Both can live in
 the same service; neither implies a machine boundary.</p>
 <p>The exact tier’s cost is therefore <strong>flag-rate driven</strong>, and the coarse tier’s
 false-positive rate is the quantity that matters. That rate is currently
-unmeasurable (the reference model reports collisions at its own nominal-valid
-pose), so the design must not depend on it being small.</p>
-<p>The mechanism for that is a <strong>hard cap on fallback work</strong>, with defined
-behaviour on exceeding it — treat as collision and stop. A cap converts an
-unmeasurable cost into a bounded one, which is a stronger position than
-obtaining the number.</p>
-<p>Note the asymmetry between the two collision problems. Self-collision can
-escalate from coarse to exact because the CAD mesh is ground truth. Environment
-collision cannot: the static world is a point cloud, which is already a sampling
-of the real surface, so its proximity threshold <em>is</em> the model rather than
-padding on top of one.</p>
+unmeasurable — the reference model reports collisions at its own nominal-valid
+pose — so the design must not depend on it being small. The mechanism is a
+<strong>hard cap on fallback work</strong> with defined behaviour on exceeding it: treat as
+collision and stop. A cap converts an unmeasurable cost into a bounded one,
+which is a stronger position than obtaining the number.</p>
+<p><strong>The two collision problems are not symmetric.</strong> Self-collision can escalate
+from coarse to exact because the CAD mesh is ground truth. Environment collision
+cannot: the environment is a point cloud, already a sampling of the real
+surface, so its proximity threshold <em>is</em> the model rather than padding on top of
+one.</p>
 </section>
-<section id="amendment-the-service-is-stateless-and-answers-two-questions">
-<h2>Amendment: the service is stateless, and answers two questions<a class="headerlink" href="#amendment-the-service-is-stateless-and-answers-two-questions" title="Link to this heading">#</a></h2>
-<p>Added after the original decision. This settles the interface rather than the
-tiering, and is recorded here because it is the same boundary — the service owns
-the geometry, the checker owns everything else.</p>
-<p><strong>The service holds no state about where anything is.</strong> It answers exactly two
-questions:</p>
-<ol class="arabic simple">
-<li><p><strong>Given an axis, what can it <em>ever</em> collide with?</strong> Over every position of
-every axis the model permits, not at the current pose. Statically knowable
-from the geometry and the limit-switch positions.</p></li>
-<li><p><strong>Given this set of axis moves, do they collide?</strong> Full state supplied by
-the caller.</p></li>
-</ol>
-<p><strong>The first answer is an axis-to-axis relation</strong>, and it exists to bound the
-second. To check a move of one axis, the checker gathers the positions of the
+<section id="the-first-question-a-reachability-relation">
+<h3>The first question: a reachability relation<a class="headerlink" href="#the-first-question-a-reachability-relation" title="Link to this heading">#</a></h3>
+<p><strong>The answer is an axis-to-axis relation</strong>, and it exists to bound the second
+question. To check a move of one axis, the checker gathers the positions of the
 axes that can ever interact with it rather than the whole machine. It must never
 omit a pair that can touch; extra pairs cost only state gathering, so an
-over-approximation is acceptable and is expected to be trimmed by hand at first.</p>
-<p><strong>Statelessness is what makes validation correct.</strong> A service holding “current
-pose” would answer about live PVs, and the validator has to ask about the
-<em>projected end state</em> of a running task (ADR-0004). Statelessness also makes the
-batch API a pure function of its request, so it is cacheable and testable
-without a machine.</p>
-<p><strong>Limit-switch positions belong to the service; soft limits do not.</strong> The
-relation is computed from limit switches, so they are part of the model and are
-covered by the same version hash as the geometry. Soft limits are applied by the
-checker at validation time and the service never learns them — which means
-tightening one cannot silently invalidate a cached relation.</p>
+over-approximation is acceptable, and it is expected to be trimmed by hand at
+first.</p>
+<p><strong>The relation has a static half and a transient half</strong>, and only one of them
+holds still:</p>
+<ul class="simple">
+<li><p><strong>Axis against axis</strong> is derived from the CAD model and the limit-switch
+positions. It changes when the machine is rebuilt.</p></li>
+<li><p><strong>Axis against environment</strong> depends on the point cloud, which is a LIDAR scan
+of the hutch capturing transient contents — racks, cables, user kit. It
+changes between experiments while the machine does not, and a re-scan can only
+<em>add</em> things an axis might reach, so it can invalidate a relation that was
+correct when it was computed.</p></li>
+</ul>
+<p><strong>The version hash therefore covers geometry, limit switches and the point
+cloud.</strong> All three move the relation. The point cloud is why staleness is an
+operational concern rather than a theoretical one, and what follows from that —
+re-scan cadence, whether queued verdicts survive a re-scan — is Q20.</p>
 <p><strong>The relation is computed after the exemption set</strong>, so permanently-touching
 pairs are absent from it. That makes it depend on an unsettled question, and on
-a robot arm the exemption is not simply a property of a pair: a self-touching
-pair <em>can</em> collide if the elbow rotates transversely and cable management is
-attached to it. See <a class="reference internal" href="../open-questions.html"><span class="std std-doc">Open questions</span></a>.</p>
+a robot arm an exemption is not simply a property of a pair: a self-touching
+pair <em>can</em> collide if the elbow rotates transversely with cable management
+attached. That is Q18.</p>
+</section>
+<section id="the-second-question-statelessness">
+<h3>The second question: statelessness<a class="headerlink" href="#the-second-question-statelessness" title="Link to this heading">#</a></h3>
+<p><strong>Statelessness is what keeps validation correct.</strong> A service holding “current
+pose” would answer about live PVs, and the validator has to ask about the
+<em>projected end state</em> of a running task (ADR-0004). It also makes the batch API
+a pure function of its request, so it is cacheable and testable without a
+machine.</p>
+<p><strong>Limit-switch positions belong to the service; soft limits do not.</strong> The
+relation is computed from limit switches, so they are part of the model. Soft
+limits are applied by the checker at validation time and the service never
+learns them, which means tightening one cannot silently invalidate anything the
+service holds.</p>
+<p>See <a class="reference internal" href="../open-questions.html"><span class="std std-doc">Open questions</span></a> for Q18 and Q20, both of which this decision
+depends on and neither of which is settled.</p>
+</section>
 </section>
 </section>
 
@@ -586,8 +607,12 @@ attached to it. See <a class="reference internal" href="../open-questions.html">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status">Status</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context">Context</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decision">Decision</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences">Consequences</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#amendment-the-service-is-stateless-and-answers-two-questions">Amendment: the service is stateless, and answers two questions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences">Consequences</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tiering">The tiering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-first-question-a-reachability-relation">The first question: a reachability relation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-second-question-statelessness">The second question: statelessness</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

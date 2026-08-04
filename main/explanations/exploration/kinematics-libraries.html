@@ -1,0 +1,798 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Kinematics: what exists, and what we would have to write &#8212; bluesky-architecture 0.1.dev39+gffbb5c7d5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../../_static/documentation_options.js?v=be2c8ff5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/exploration/kinematics-libraries';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The anti-collision service" href="../anti-collision-service.html" />
+    <link rel="prev" title="A pitch: merge blueapi and bluesky-queueserver" href="queueing-merge-pitch.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">bluesky-architecture</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../architecture.html">
+    The working architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../decisions.html">
+    Decisions
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
+    Exploration
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../architecture.html">
+    The working architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../decisions.html">
+    Decisions
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
+    Exploration
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/coretl/bluesky-architecture" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="measurements.html">Measurements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reversals.html">What we got wrong</a></li>
+<li class="toctree-l1"><a class="reference internal" href="collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queueing-traces.html">blueapi and bluesky-queueserver, traced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queueing-merge-pitch.html">A pitch: merge blueapi and bluesky-queueserver</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Kinematics: what exists, and what we would have to write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../anti-collision-service.html">The anti-collision service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pinned-references.html">Pinned references</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session-notes.html">Where the work stands</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../exploration.html" class="nav-link">Exploration</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Kinematics: what exists, and what we would have to write</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="kinematics-what-exists-and-what-we-would-have-to-write">
+<h1>Kinematics: what exists, and what we would have to write<a class="headerlink" href="#kinematics-what-exists-and-what-we-would-have-to-write" title="Link to this heading">#</a></h1>
+<p>Prompted by three questions. Are we the first to want a generic kinematics
+library — obviously not, so what is out there? How much should be written here
+versus called out to? And where do the physical assembly parameters come from?</p>
+<p><strong>Descriptive.</strong> This catalogues what each geometry already has and what the
+field offers. It does not pick.</p>
+<section id="the-four-geometries-in-scope">
+<h2>The four geometries in scope<a class="headerlink" href="#the-four-geometries-in-scope" title="Link to this heading">#</a></h2>
+<p>Each already has a correct implementation somewhere. That turns out to be the
+most useful thing on this page, so it is first.</p>
+<section id="diffractometer">
+<h3>Diffractometer<a class="headerlink" href="#diffractometer" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">diffcalc</span></code> here, <code class="docutils literal notranslate"><span class="pre">hklpy</span></code> (over <code class="docutils literal notranslate"><span class="pre">libhkl</span></code>) at NSLS-II. Multi-valued: 8 solutions
+for <code class="docutils literal notranslate"><span class="pre">{qaz:90,</span> <span class="pre">a_eq_b:True,</span> <span class="pre">mu:0}</span></code>, 4 in bisecting mode. Once a branch is fixed
+the inverse is closed-form and vectorises — measured at 0.1 µs/point, flat from
+10k to 100k.</p>
+<p>ADR-0004 already records that diffcalc’s API is scalar and loops internally, so
+it works as a <strong>round-trip test oracle</strong> rather than as the implementation.</p>
+</section>
+<section id="robot-arm">
+<h3>Robot arm<a class="headerlink" href="#robot-arm" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">GNKinematics/kinematics.py</span></code> in <a class="reference external" href="https://github.com/garethnisbet/Robot"><code class="docutils literal notranslate"><span class="pre">garethnisbet/Robot</span></code></a>,
+468 lines, its own package directory. A 6-DOF serial arm with <strong>off-centre base
+rotation</strong>.</p>
+<p>It is <strong>closed-form, not iterative</strong> — cosine-rule triangle solves, with
+<code class="docutils literal notranslate"><span class="pre">NUM_CANDIDATES</span> <span class="pre">=</span> <span class="pre">8</span></code> configurations enumerated and a <code class="docutils literal notranslate"><span class="pre">strategy</span></code> choosing between
+them (<code class="docutils literal notranslate"><span class="pre">minimum_movement</span></code>, <code class="docutils literal notranslate"><span class="pre">minimum_movement_weighted</span></code>).</p>
+<p>That structure is worth naming, because it is this project’s vocabulary arrived
+at independently: <strong>8 candidates are branches, and <code class="docutils literal notranslate"><span class="pre">strategy</span></code> is branch
+selection.</strong> <code class="docutils literal notranslate"><span class="pre">minimum_movement</span></code> is precisely the continuity fallback ADR-0009
+describes — stay on the branch you are on — reached from the robotics side
+rather than the beamline side.</p>
+<p>One thing the code already flags in its own comments: the analytic solver emits
+spurious roots, and the strategy can select one, so roots are filtered before
+the strategy runs.</p>
+<p><code class="docutils literal notranslate"><span class="pre">from_home_positions(v0…v4,</span> <span class="pre">motor_limits,</span> <span class="pre">centre_offset,</span> <span class="pre">tool_offset,</span> <span class="pre">…)</span></code>
+constructs the link vectors and motor offsets from <strong>joint positions at the home
+pose</strong>. That is a direct answer to the assembly-parameter question, and it is
+below.</p>
+</section>
+<section id="two-and-three-jack-tables">
+<h3>Two- and three-jack tables<a class="headerlink" href="#two-and-three-jack-tables" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">CS_2jack.pmc</span></code>, <code class="docutils literal notranslate"><span class="pre">CS_3jack.pmc</span></code> and <code class="docutils literal notranslate"><span class="pre">CS_3jack_mirror.pmc</span></code> in
+<a class="reference external" href="https://github.com/epicsdeb/pmaccoord/tree/master/pmacCoordApp/pmc"><code class="docutils literal notranslate"><span class="pre">epicsdeb/pmaccoord</span></code></a>.
+Fully parameterised on jack positions — <code class="docutils literal notranslate"><span class="pre">$(J1X)</span></code>, <code class="docutils literal notranslate"><span class="pre">$(J1Z)</span></code> and so on are
+substituted at build time, nothing is hard-coded.</p>
+<p>The forward transform takes two vectors between jacks, crosses them for the
+surface normal, and reads pitch and roll off it, with height from the plane
+equation. The inverse builds the normal from pitch and roll and applies the
+plane equation per jack.</p>
+<p><strong>Single-valued: a plane through three points is unique</strong>, so a jack table has
+no branches. It is the degenerate case the design already describes — a
+transform with a one-member branch set that can still collide.</p>
+<p>In the literature this is a <strong>tip-tilt-piston parallel manipulator</strong>, closely
+related to the 3-PRS mechanism, and closed-form direct and inverse kinematics
+are published. Nobody needs to derive it.</p>
+</section>
+<section id="dcm-energy">
+<h3>DCM energy<a class="headerlink" href="#dcm-energy" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">CS_accel_dcm.pmc</span></code> and <code class="docutils literal notranslate"><span class="pre">CS_IDT_sagital_dcm.pmc</span></code> in the same repository. Not read
+in detail here.</p>
+</section>
+</section>
+<section id="where-the-maths-lives-today-and-why-that-is-the-finding">
+<h2>Where the maths lives today, and why that is the finding<a class="headerlink" href="#where-the-maths-lives-today-and-why-that-is-the-finding" title="Link to this heading">#</a></h2>
+<p>All four already have a correct closed form written down: in diffcalc, in
+<code class="docutils literal notranslate"><span class="pre">GNKinematics</span></code>, and in the <code class="docutils literal notranslate"><span class="pre">.pmc</span></code> coordinate-system files. <strong>The work is not
+deriving the maths.</strong> It is putting existing, correct forms into one
+representation, in one place, at the bluesky layer.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">.pmc</span></code> files are worth treating the way ADR-0004 treats diffcalc — as an
+oracle. They are correct for the cases they cover, so a generalised <code class="docutils literal notranslate"><span class="pre">Transform</span></code>
+can be tested against them rather than re-derived from scratch. They are also
+expanded scalar arithmetic, because PMAC has no matrix type, which is why they
+read as they do.</p>
+</section>
+<section id="what-the-field-offers">
+<h2>What the field offers<a class="headerlink" href="#what-the-field-offers" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>what it is</p></th>
+<th class="head"><p>fit here</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/stack-of-tasks/pinocchio">Pinocchio</a></p></td>
+<td><p>rigid-body kinematics and dynamics, C++ with Python bindings, analytical derivatives, handles closed-loop mechanisms</p></td>
+<td><p>the serious option; already the library <code class="docutils literal notranslate"><span class="pre">coal</span></code> belongs to, which the collision survey recommends</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.orocos.org/kdl.html">KDL</a></p></td>
+<td><p>kinematic chains, long-established</p></td>
+<td><p>older, chain-oriented</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/Rhoban/placo">PlaCo</a></p></td>
+<td><p>task-space IK and dynamics for whole-body control</p></td>
+<td><p>aimed at control, not at closed forms</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://drake.mit.edu/">Drake</a></p></td>
+<td><p>full modelling and simulation stack</p></td>
+<td><p>large dependency for what is wanted</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/petercorke/robotics-toolbox-python">robotics-toolbox-python</a></p></td>
+<td><p>Corke’s toolbox, complete and readable</p></td>
+<td><p>good reference, teaching-oriented</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/Phylliade/ikpy">ikpy</a></p></td>
+<td><p>small URDF-driven IK</p></td>
+<td><p>numeric only</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">libhkl</span></code> / <code class="docutils literal notranslate"><span class="pre">hklpy</span></code>, <code class="docutils literal notranslate"><span class="pre">xrayutilities</span></code></p></td>
+<td><p>diffractometer-specific</p></td>
+<td><p>overlaps diffcalc</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The pattern: these libraries solve <strong>numeric inverse kinematics on serial chains
+described by URDF, usually iteratively, usually one pose per call</strong>, for motion
+planning.</p>
+<p>What this design needs is different in kind, not in quality — a <strong>closed-form,
+branch-fixed inverse, vectorised across a whole trajectory, pure and
+serialisable</strong> so it reaches analysis and the collision service (ADR-0004). A
+general numeric IK solver satisfies none of those, and the one number we have
+says why it matters: diffcalc’s general solve is 4.2 ms enumerating 8 solutions,
+against 0.1 µs/point for the branch-fixed closed form.</p>
+<p>So the plausible split is: <strong>borrow the model, write the maths.</strong> A
+URDF-or-similar link and joint description, frame composition and forward
+kinematics are all well served by an existing library. The closed-form inverses
+are ours, because they already exist and because the properties the design needs
+are not what the libraries optimise for.</p>
+<p>That is not a recommendation yet. It is where the evidence points, and the
+counter-argument — that maintaining closed forms per geometry is a long-term
+cost that a numeric solver would avoid — has not been costed.</p>
+</section>
+<section id="where-assembly-parameters-come-from">
+<h2>Where assembly parameters come from<a class="headerlink" href="#where-assembly-parameters-come-from" title="Link to this heading">#</a></h2>
+<p>Today: ask a mechanical engineer to measure a model. Wanted: ask them to export
+a model, and measure it here.</p>
+<p>Two precedents already exist, and they answer different halves:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">from_home_positions</span></code></strong> takes joint positions at the home pose and derives
+link vectors and motor offsets. So the parameters can be <em>measured positions</em>
+rather than a hand-built kinematic description.</p></li>
+<li><p><strong>The <code class="docutils literal notranslate"><span class="pre">.pmc</span></code> macros</strong> parameterise jack coordinates and substitute them at
+build time — the same values, reached by a different route, and a reminder
+that these numbers already live in at least two places per beamline.</p></li>
+</ul>
+<p>If the model is exported CAD, and the anti-collision service already consumes
+<code class="docutils literal notranslate"><span class="pre">*_config.json</span></code> + <code class="docutils literal notranslate"><span class="pre">*_scene.glb</span></code> with joint axes and rest poses, then the same
+artefact could supply the assembly parameters.</p>
+<p><strong>The CAD is nominal.</strong> Components are surveyed in to a tolerance during
+installation, but those survey figures are not recorded anywhere, so nominal is
+all there is. Any model derived from exported CAD therefore carries an
+unquantified as-built error, and there is no artefact to reconcile it against.</p>
+<p>How much that matters depends on what the model is for, and the two answers are
+far apart:</p>
+<ul class="simple">
+<li><p><strong>For collision checking, it is currently in the noise.</strong> Coarse-model fit
+error is 63–173 mm (Q1). Whatever the survey tolerance is, it is not that. If
+Q1 is ever answered and the coarse model gets tight, this becomes the next
+error term to deal with rather than a rounding difference.</p></li>
+<li><p><strong>For positioning, nominal is not enough</strong> — and for diffractometers it never
+was. UB refinement exists precisely to calibrate the real geometry out of a
+nominal description, and it is the only <code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code> use in diffcalc.</p></li>
+</ul>
+<p>There is no equivalent of UB refinement for the non-diffractometer geometries,
+and <strong>for jack tables that is fine</strong> — the tolerances on what is mounted on them
+are not tight enough to need it. Nominal jack positions are good enough for the
+job the transform does.</p>
+<p>If it is ever needed, the shape of the answer is already known and is the same
+shape UB refinement has: <strong>fit against detector data to produce new parameters
+for the transform, and apply those in bluesky.</strong> That falls out of the design
+rather than needing anything new, because a <code class="docutils literal notranslate"><span class="pre">Transform</span></code> already carries its
+geometry parameters as serialised state (ADR-0004) — refinement writes those
+numbers, it does not change the maths.</p>
+<p>Worth noting <code class="docutils literal notranslate"><span class="pre">from_home_positions</span></code> as the contrasting approach already in use:
+it takes <em>measured</em> joint positions rather than nominal ones. So two starting
+points are in play across the geometries one library would have to cover, even
+if neither currently needs a refinement step on top.</p>
+<p>Whatever the source, the parameters have to end up <strong>serialised inside the
+<code class="docutils literal notranslate"><span class="pre">Transform</span></code></strong>, because that is what reaches analysis and the collision service.
+And they have to round-trip: the same numbers must reconstruct a model that
+visibly moves correctly.</p>
+<p>That last requirement is Q19, one layer down. You cannot confirm a kinematic
+model is right by reading it — you confirm it by watching it move. Which is why
+the visualisation and the maths cannot be allowed to drift, and why the options
+listed under Q19 apply here too.</p>
+</section>
+<section id="what-is-not-established">
+<h2>What is not established<a class="headerlink" href="#what-is-not-established" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>The size of the nominal-to-as-built error, for any geometry. It is not
+recorded, so it cannot currently be looked up. Judged not to matter for jack
+tables; unexamined for the others.</p></li>
+<li><p>The DCM coordinate-system files, beyond their existence.</p></li>
+<li><p>Whether Pinocchio’s model representation is a comfortable host for
+closed-form inverses, or fights them.</p></li>
+<li><p>The long-term maintenance cost of hand-written closed forms per geometry,
+which is the strongest argument against the split suggested above.</p></li>
+<li><p>Anything about <code class="docutils literal notranslate"><span class="pre">GNKinematics</span></code> beyond what its source says. Its novelty is not
+assessed here.</p></li>
+</ul>
+</section>
+<section id="sources">
+<h2>Sources<a class="headerlink" href="#sources" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/stack-of-tasks/pinocchio">Pinocchio: a fast and flexible implementation of Rigid Body Dynamics algorithms</a></p></li>
+<li><p><a class="reference external" href="https://stack-of-tasks.github.io/pinocchio/">Pinocchio overview</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Rhoban/placo">PlaCo — Rhoban planning and control</a></p></li>
+<li><p><a class="reference external" href="https://github.com/petercorke/robotics-toolbox-python">robotics-toolbox-python</a></p></li>
+<li><p><a class="reference external" href="https://ntrs.nasa.gov/api/citations/20040171839/downloads/20040171839.pdf">Direct and Inverse Kinematics of a Novel Tip-Tilt-Piston Parallel Manipulator</a> (NASA, 2004)</p></li>
+<li><p><a class="reference external" href="https://www.academia.edu/69708187/Constraint_and_Inverse_Kinematic_Analysis_of_3_PRS_Parallel_Manipulator">Constraint and Inverse Kinematic Analysis of 3-PRS Parallel Manipulator</a></p></li>
+<li><p><a class="reference external" href="https://github.com/epicsdeb/pmaccoord/tree/master/pmacCoordApp/pmc"><code class="docutils literal notranslate"><span class="pre">epicsdeb/pmaccoord</span></code> coordinate-system programs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/garethnisbet/Robot"><code class="docutils literal notranslate"><span class="pre">garethnisbet/Robot</span></code></a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="queueing-merge-pitch.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">A pitch: merge blueapi and bluesky-queueserver</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../anti-collision-service.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The anti-collision service</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-geometries-in-scope">The four geometries in scope</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diffractometer">Diffractometer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#robot-arm">Robot arm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-and-three-jack-tables">Two- and three-jack tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dcm-energy">DCM energy</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-the-maths-lives-today-and-why-that-is-the-finding">Where the maths lives today, and why that is the finding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-field-offers">What the field offers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-assembly-parameters-come-from">Where assembly parameters come from</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-not-established">What is not established</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sources">Sources</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/exploration/kinematics-libraries.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/explanations/exploration/kinematics-libraries.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

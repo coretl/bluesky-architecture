@@ -245,7 +245,9 @@ applies to rather than stashed beside it, so that desync is unrepresentable.
 External, and a hard runtime dependency of flyscan execution. It owns the
 geometry:
 
-- **static environment** as a point cloud, from scans of the hutch
+- **environment** as a point cloud, from a LIDAR scan of the hutch. "Static" is
+  the wrong word for it: the scan captures transient contents — racks, cables,
+  user kit — so it changes between experiments while the machine does not
 - **movable bodies** as CAD meshes, articulated by a joint chain from config
 - a declaration of which axes are **collidable** — typically a handful per
   beamline

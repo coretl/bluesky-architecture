@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Measurements &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
+    <title>Measurements &#8212; bluesky-architecture 0.1.dev39+gffbb5c7d5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=f2ca2743"></script>
+    <script src="../../_static/documentation_options.js?v=be2c8ff5"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -389,6 +389,8 @@
 <li class="toctree-l1"><a class="reference internal" href="reversals.html">What we got wrong</a></li>
 <li class="toctree-l1"><a class="reference internal" href="collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="queueing-traces.html">blueapi and bluesky-queueserver, traced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queueing-merge-pitch.html">A pitch: merge blueapi and bluesky-queueserver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kinematics-libraries.html">Kinematics: what exists, and what we would have to write</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../anti-collision-service.html">The anti-collision service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pinned-references.html">Pinned references</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../session-notes.html">Where the work stands</a></li>
@@ -846,6 +848,27 @@ at 1/256 s and propagates upward free.</p>
 <p>The structure works as designed; its value is set entirely by the fraction of
 pairs that never interact. Here only 39%, because permanently-touching parts
 flag at every interval. <em>Reproduce:</em> <code class="docutils literal notranslate"><span class="pre">bench_temporal.mjs</span></code>.</p>
+<p><strong>What this result is now worth, given the reachability relation.</strong> The
+amendment to <a class="reference internal" href="../decisions/0006-two-tier-collision-checking.html"><span class="std std-doc">6. Collision checking is two tiers, and the service answers two questions</span></a> has the service
+publish a static axis-to-axis relation: which pairs can <em>ever</em> touch, over every
+position the model permits. That removes the never-interacting pairs before any
+checking starts — which is where all 363× came from. So the relation banks the
+temporal tree’s win statically, once per geometry version, rather than
+rediscovering it per trajectory.</p>
+<p>What is left for a temporal structure is the narrower case: pairs that <em>can</em>
+interact but do not on this particular trajectory. The measurement above says
+nothing about how many of those there are, because it never separated them from
+the pairs that can never interact at all. That is a different benchmark, and
+nobody has run it.</p>
+<p>Two consequences worth stating, since this is why the temporal BVH appears in no
+ADR and is not in <a class="reference internal" href="../architecture.html"><span class="std std-doc">The working architecture</span></a>:</p>
+<ul class="simple">
+<li><p>The design does <strong>not</strong> rest on it, and never did. It is an
+optimisation measured early, when the coarse tier looked like the binding
+cost. Coarse-model fit quality turned out to be the binding term (Q1).</p></li>
+<li><p>Its headline number is <strong>not wrong, but it is now double-counted</strong>. Quoting
+363× alongside the relation would claim the same saving twice.</p></li>
+</ul>
 </section>
 <section id="two-things-that-are-not-performance">
 <h2>Two things that are not performance<a class="headerlink" href="#two-things-that-are-not-performance" title="Link to this heading">#</a></h2>

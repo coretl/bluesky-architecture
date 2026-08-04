@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The anti-collision service &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
+    <title>The anti-collision service &#8212; bluesky-architecture 0.1.dev39+gffbb5c7d5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=f2ca2743"></script>
+    <script src="../_static/documentation_options.js?v=be2c8ff5"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Pinned references" href="pinned-references.html" />
-    <link rel="prev" title="blueapi and bluesky-queueserver, traced" href="exploration/queueing-traces.html" />
+    <link rel="prev" title="Kinematics: what exists, and what we would have to write" href="exploration/kinematics-libraries.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -389,6 +389,8 @@
 <li class="toctree-l1"><a class="reference internal" href="exploration/reversals.html">What we got wrong</a></li>
 <li class="toctree-l1"><a class="reference internal" href="exploration/collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="exploration/queueing-traces.html">blueapi and bluesky-queueserver, traced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/queueing-merge-pitch.html">A pitch: merge blueapi and bluesky-queueserver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/kinematics-libraries.html">Kinematics: what exists, and what we would have to write</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">The anti-collision service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pinned-references.html">Pinned references</a></li>
 <li class="toctree-l1"><a class="reference internal" href="session-notes.html">Where the work stands</a></li>
@@ -602,6 +604,14 @@ with the one moving. The machinery is already present — <code class="docutils 
 <code class="docutils literal notranslate"><span class="pre">js/device.js:25</span></code> computes the pairs to skip, and the checked set is its
 complement — but it is not exposed on the API. It must never omit a pair that
 can touch; extra pairs cost only state gathering.</p>
+<p><strong>The relation has a static half and a transient half, and only the first is
+static per geometry version.</strong> Axis-against-axis comes from CAD and limit
+switches and changes when the machine is rebuilt. Axis-against-environment
+depends on the point cloud, which is a LIDAR scan of the hutch capturing
+transient contents — racks, cables, user kit — and so changes between
+experiments without anything about the machine changing. A re-scan can only add
+things an axis might reach, so it can invalidate a relation that was correct
+when it was computed.</p>
 <p><strong>Statelessness.</strong> The service should hold no notion of where anything is, and
 the caller supplies full state per request. This is not a preference: the
 validator asks about the <em>projected end state</em> of a running task, so a service
@@ -625,11 +635,15 @@ exactly this shape, if the engine ever moves there.</p>
 and stops the motors. A watchdog was considered and rejected — there is not
 enough stopping distance to abort usefully once a collision is detected — so
 there is no backstop behind this.</p>
-<p><strong>A version or hash covering the geometry <em>and</em> the limit-switch positions</strong>,
-recorded alongside a verdict and alongside the relation. Both are statically
-defined by the service and both change the relation, so one hash covers them.
-Without it, a scan validated against superseded geometry is stale and nothing
-detects it, and a cached relation outlives the model it was derived from.</p>
+<p><strong>A version or hash covering the geometry, the limit-switch positions <em>and</em> the
+point cloud</strong>, recorded alongside a verdict and alongside the relation. All
+three change the relation, so one hash covers them. Without it, a scan validated
+against superseded geometry is stale and nothing detects it, and a cached
+relation outlives the model it was derived from.</p>
+<p>The point cloud is the reason this is an operational concern rather than a
+theoretical one. It is a LIDAR scan capturing transient hutch contents, so it
+changes when a rack moves or a user brings kit — far more often than the machine
+is rebuilt, and without any of the machine changing.</p>
 <p>Soft limits are deliberately not in this. They live in the checker and are
 applied at validation time, so tightening one cannot invalidate anything the
 service holds.</p>
@@ -720,12 +734,12 @@ and the checking engine becomes headless against the same configs and GLBs. The
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="exploration/queueing-traces.html"
+       href="exploration/kinematics-libraries.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">blueapi and bluesky-queueserver, traced</p>
+        <p class="prev-next-title">Kinematics: what exists, and what we would have to write</p>
       </div>
     </a>
     <a class="right-next"

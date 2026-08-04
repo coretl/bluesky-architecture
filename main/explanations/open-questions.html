@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Open questions &#8212; bluesky-architecture 0.1.dev33+ga4d19d932 documentation</title>
+    <title>Open questions &#8212; bluesky-architecture 0.1.dev39+gffbb5c7d5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=f2ca2743"></script>
+    <script src="../_static/documentation_options.js?v=be2c8ff5"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -391,7 +391,7 @@
 <li class="toctree-l1"><a class="reference internal" href="decisions/0003-validation-state-is-owned-by-the-queue.html">3. Validation state is owned by the queue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0004-validation-runs-in-a-second-read-only-process.html">4. Validation runs in a second, read-only process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0005-transform-is-pure-synchronous-maths.html">5. Transform is pure, synchronous, array-safe maths</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, split by geometry type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decisions/0006-two-tier-collision-checking.html">6. Collision checking is two tiers, and the service answers two questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0007-the-coarse-model-must-be-derived-automatically.html">7. The coarse model must be derived automatically from the mesh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0008-checking-is-a-plan-preprocessor.html">8. Checking is a plan preprocessor, and the certificate is a recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decisions/0009-the-checker-is-the-solver.html">9. The checker is the solver, and runs in three modes</a></li>
@@ -538,6 +538,48 @@ the rule could be “wait” — but validation is asynchronous, and a queue tha
 stalls on it has serialised itself behind the validator. An entry at <strong>?</strong> can
 <em>never</em> be validated, and must still run, so “wait” is not available at all.
 Neither rule is written down. ADR-0003 raises the ⏳ half and leaves it open.</p>
+<p><strong>Q19. How does the model-building UI run the kinematics?</strong> The anti-collision
+service carries its own transforms so that, while building a model, you can
+drive it in cartesian rather than joint space and watch whether it moves
+correctly. That is <code class="docutils literal notranslate"><span class="pre">js/kinematics.js</span></code> — 335 lines of forward kinematics,
+kappa↔euler conversion and virtual angles. The functionality has to be kept,
+<strong>including the smooth animation</strong>, which is the hard part: smooth means a frame
+budget of roughly 16 ms, so anything with a network hop per frame is out unless
+the hop is local or the work is batched.</p>
+<p>It is also exactly the drift hazard ADR-0009 names as the failure this project
+has hit most often — two implementations of the same maths, diverging silently.
+Related to Q14, since it bears on where <code class="docutils literal notranslate"><span class="pre">Transform</span></code> has to be runnable, not just
+where it lives.</p>
+<p>Options, listed but not evaluated:</p>
+<ul class="simple">
+<li><p><strong>Precompute server-side, animate client-side.</strong> The UI asks for a cartesian
+path, Python returns the joint trajectory, the browser interpolates through
+it. Decouples smoothness from call latency entirely, and is the same shape as
+the batch API already being designed.</p></li>
+<li><p><strong>Pyodide.</strong> Run the real Python in the browser. No second implementation at
+all, at the cost of a large payload and a startup delay.</p></li>
+<li><p><strong>Serialise the transform as data, evaluate in JS.</strong> Works if transforms come
+from a fixed vocabulary of closed forms, and needs the type discriminator
+ADR-0005 already asks for.</p></li>
+<li><p><strong>Generate the JavaScript from the Python.</strong> One source, one build step, and
+the generated artefact is checkable.</p></li>
+<li><p><strong>Two implementations, pinned by shared test vectors</strong> generated from Python.
+Cheapest, and explicitly the drift case with a net under it.</p></li>
+<li><p><strong>Per-frame call to a local Python process.</strong> Only viable if it is truly
+local; a round trip to a service is not.</p></li>
+</ul>
+<p><strong>Q20. When is the hutch re-scanned, and what happens to verdicts when it is?</strong>
+The environment point cloud is a LIDAR scan capturing transient contents —
+racks, cables, user kit — so it changes when a user brings equipment in, not
+when the machine is rebuilt. Three things follow and none are settled: how often
+a re-scan happens and who triggers it; whether a re-scan invalidates the
+reachability relation, since new contents can only add things an axis might
+reach; and whether queued verdicts validated against the previous scan are
+revoked. The revocation rule in ADR-0003 covers control leaving the queue, not
+the world changing shape underneath it.</p>
+<p>This is also the case where the model can be wrong in the unsafe direction. If
+kit is moved <em>in</em> after a scan, the cloud understates what is there, and a scan
+validated against it was cleared against a hutch that no longer exists.</p>
 </section>
 <section id="component-level">
 <h2>Component-level<a class="headerlink" href="#component-level" title="Link to this heading">#</a></h2>
