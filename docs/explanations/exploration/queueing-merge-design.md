@@ -169,49 +169,55 @@ which takes `devices_in_nspace` and converts names at execution time.
 
 | | blueapi | queueserver | superset |
 |---|---|---|---|
-| **where it runs** | worker subprocess | manager | **manager** against a description, **worker** for objects |
-| **validated against** | live function annotations | serialised signature description | both |
-| **when** | on `POST /tasks` | on `queue_item_add` | on insertion, and again before execution |
-| **argument binding** | pydantic model fields | `inspect.Signature.bind` | bind first, then types |
-| **type checking** | pydantic, real annotations | pydantic, from description | pydantic; the description must reproduce the annotation |
-| **name → device** | during validation, via `Reference` | names matched to patterns; resolved at execution | **both, at different levels** |
+| **where it runs** | worker subprocess | manager | **validation worker** |
+| **validated against** | live function annotations | serialised signature description | live annotations |
+| **when** | on `POST /tasks` | on `queue_item_add` | asynchronously, after insertion |
+| **argument binding** | pydantic model fields | `inspect.Signature.bind` | bind, then types |
+| **type checking** | pydantic, real annotations | pydantic, from description | pydantic, real annotations |
+| **name → device** | during validation, via `Reference` | names matched to patterns; resolved at execution | during validation |
 | **protocol conformance** | yes, `is_compatible` against `Movable[float]` | none | **blueapi's** |
-| **device exists** | yes, `find_device` | pattern match only | manager checks permitted, worker checks resolves |
+| **device exists** | yes, `find_device` | pattern match only | **blueapi's** |
 | **device connected** | at environment build only | not checked | **neither is enough** |
-| **per-group permissions** | OPA, coarse | `allowed_plans`/`allowed_devices`, fine-grained | **queueserver's** |
-| **scanspec / nested models** | works; any pydantic model is a valid parameter | depends on the description round-tripping the annotation | **blueapi's**, and this is the hard part |
+| **per-group permissions** | OPA, coarse | `allowed_plans`/`allowed_devices`, fine-grained | **queueserver's, in the manager** |
+| **scanspec / nested models** | works; any pydantic model is a valid parameter | depends on the description round-tripping the annotation | **blueapi's** |
 | **plan feasibility** | none | none | **new** — the validation worker |
 
 ### Three findings
 
-**1. The level difference is the architectural problem, and it is also the
-answer.** blueapi validates against live objects, so it can only validate where
-the objects are — in the worker. queueserver validates against a description, so
-it can validate in the manager with no environment open. That is why queueserver
-rejects a bad item at `queue_item_add` while the worker is busy, and blueapi
-cannot.
+**1. The validator does all of it, and the manager needs no pydantic.**
 
-The superset needs both, because they catch different things. A description in
-the manager gives fast, always-available rejection of malformed items. Live
-resolution in the worker catches what a description cannot: that the device
-exists now, satisfies its protocol, and is connected.
+The level difference is real: blueapi validates against live objects and so can
+only run where they are, while queueserver validates against a description and
+so can run in the manager with no environment open. The tempting conclusion is
+to keep both — a cheap description check in the manager, a live check in the
+worker.
 
-So **validation is two-phase, and the phases belong in different processes.**
-That is not a compromise between the two designs; it is what each of them is
-half of.
+That is the wrong conclusion, and an earlier version of this page drew it. It
+reconciles the two designs rather than choosing between them, and it buys one
+thing (synchronous rejection) at the price of maintaining a second
+representation of every plan signature forever.
 
-**2. The description must carry the annotation faithfully, and that is the real
-work.** Manager-side validation is only as good as `allowed_plans`. For
-`count(detectors: list[Readable], num: int)` a description is easy. For a plan
-taking a scanspec `Spec[Movable]` it must round-trip a recursive discriminated
-union — and blueapi already knows this is unsolved from the other direction,
-since `_convert_type` cannot currently resolve `Spec[Movable]` by mapping axis
-names (Q10).
+**Once the validation worker checks arguments, the manager has no reason to.**
+It keeps two jobs, neither of which needs a schema library:
 
-If the description cannot express the type, manager-side validation silently
-degrades to "some object was supplied". **A plan whose signature cannot be
-described is a plan the manager cannot validate, and it should say so** rather
-than pass it quietly.
+- **Permissions.** Is this plan name, and are these device names, allowed for
+  this user group? String set membership. It stays in the manager precisely
+  because it is an authorisation decision, and authorisation should not be
+  delegated to the process that loads user-adjacent code.
+- **The catalogue.** `/plans/allowed` and `/devices/allowed` still have to be
+  served so clients can populate a GUI. The validator publishes it; the manager
+  caches and serves it as **opaque JSON**, without interpreting it.
+
+**2. Which removes the description-format problem entirely.** The earlier
+version of this page called it the largest unknown: a description would have to
+round-trip a recursive discriminated union to express something like
+`Spec[Movable]`, and if it could not, manager-side validation would silently
+degrade to "some object was supplied".
+
+There is now nothing to round-trip. The validator holds the live function and
+its real annotations, which is where blueapi already validates today. The
+catalogue still describes plans well enough for a client to render a form, but
+nothing depends on that description being *sound* — only on it being useful.
 
 **3. Connection is checked by neither, and it is the one that bites.** blueapi
 connects devices when the environment is built (`context.py:276`,
@@ -225,36 +231,56 @@ dead device is exactly what insertion-time validation is for.
 
 ### What the superset is
 
-Synchronous, in the manager, no environment needed:
+In the manager, synchronously, on `queue_item_add`:
 
 1. plan name in `allowed_plans` for the user group *(queueserver)*
-2. arguments bind to the signature *(queueserver)*
-3. types validate against the description *(queueserver)*
-4. device names permitted by `allowed_devices` patterns *(queueserver)*
-5. **fail loudly if the signature cannot be described** *(new)*
+2. device names permitted by `allowed_devices` patterns *(queueserver)*
 
-Asynchronous, in the validation worker with read-only devices:
+Both are string matching against lists the validator published. Nothing else is
+rejected at insertion — the item enters the queue at ⏳.
 
-6. names resolve to real devices *(blueapi)*
-7. devices satisfy the declared protocols *(blueapi)*
-8. **devices are connected** *(new)*
-9. **the plan is feasible** — argument semantics, scan timing, limits, branch
+In the validation worker, asynchronously, with read-only devices:
+
+3. arguments bind to the real signature *(blueapi + queueserver)*
+4. types validate against the real annotations *(blueapi)*
+5. names resolve to real devices *(blueapi)*
+6. devices satisfy the declared protocols *(blueapi)*
+7. **devices are connected** *(new)*
+8. **the plan is feasible** — argument semantics, scan timing, limits, branch
    selection, anti-collision *(new; the subject of the rest of this repo)*
 
-Steps 1–5 reject at `queue_item_add`. Steps 6–9 produce the verdict that lands
-on the entry, which sits at ⏳ until they finish.
+Steps 3–8 produce the verdict that lands on the entry, which sits at ⏳ until
+they finish.
 
-That split falls out of the level difference rather than being imposed on it,
-which is the argument for it.
+**Making all validation asynchronous is a simplification, not a concession.**
+ADR-0003 already says every plan goes to the validator and is held at ⏳ — so
+rejecting *some* items synchronously was the inconsistency. Two further
+properties fall out:
+
+- **Insertion never fails for validation reasons.** If the validation worker is
+  down, items still queue and sit at ⏳ until it returns. Queueing does not
+  depend on the validator being up, only on getting a verdict does.
+- **There is one place where a plan can be judged wrong**, so there is no second
+  implementation to drift from the first — the failure this project has hit most
+  often (ADR-0009).
+
+A client that wants an answer before committing calls
+`POST /queue/item/validate`, which routes to the same validator and returns the
+same verdict without inserting anything.
 
 ## What is not settled
 
-- **The description format.** Whether queueserver's parameter description can
-  express what blueapi's annotations express, or needs replacing. Largest
-  unknown, and it gates manager-side validation entirely.
-- **Whether the manager can be Rust if steps 1–5 need pydantic.** Either they
-  move to a Rust schema validator, or the manager delegates them to a Python
-  sidecar, or the manager is not Rust. This is the sharpest technical objection
-  to the shape above and it has no answer yet.
 - **Migration.** Both systems are in production; neither community can take a
   flag day.
+- **Whether the validator needs its own environment open to check arguments.**
+  Steps 3–4 need only the plan signature; steps 5–8 need devices. If the
+  validator can answer 3–4 with no devices connected, most malformed items are
+  still caught while the beamline is down, which is most of what synchronous
+  manager-side checking was buying.
+- **How the catalogue stays current.** The manager serves what the validator
+  published, so there is a staleness question when plans are reloaded — smaller
+  than the description-format problem it replaces, but not nothing.
+
+The Rust question is no longer on this list. With no schema validation in the
+manager, its jobs are queue state, string-set permissions, opaque JSON caching
+and routing, none of which argue for or against any particular language.
