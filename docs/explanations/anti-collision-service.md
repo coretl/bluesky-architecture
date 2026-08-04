@@ -139,6 +139,15 @@ with the one moving. The machinery is already present — `buildAdjacencyPairs` 
 complement — but it is not exposed on the API. It must never omit a pair that
 can touch; extra pairs cost only state gathering.
 
+**The relation has a static half and a transient half, and only the first is
+static per geometry version.** Axis-against-axis comes from CAD and limit
+switches and changes when the machine is rebuilt. Axis-against-environment
+depends on the point cloud, which is a LIDAR scan of the hutch capturing
+transient contents — racks, cables, user kit — and so changes between
+experiments without anything about the machine changing. A re-scan can only add
+things an axis might reach, so it can invalidate a relation that was correct
+when it was computed.
+
 **Statelessness.** The service should hold no notion of where anything is, and
 the caller supplies full state per request. This is not a preference: the
 validator asks about the *projected end state* of a running task, so a service
@@ -167,11 +176,16 @@ and stops the motors. A watchdog was considered and rejected — there is not
 enough stopping distance to abort usefully once a collision is detected — so
 there is no backstop behind this.
 
-**A version or hash covering the geometry *and* the limit-switch positions**,
-recorded alongside a verdict and alongside the relation. Both are statically
-defined by the service and both change the relation, so one hash covers them.
-Without it, a scan validated against superseded geometry is stale and nothing
-detects it, and a cached relation outlives the model it was derived from.
+**A version or hash covering the geometry, the limit-switch positions *and* the
+point cloud**, recorded alongside a verdict and alongside the relation. All
+three change the relation, so one hash covers them. Without it, a scan validated
+against superseded geometry is stale and nothing detects it, and a cached
+relation outlives the model it was derived from.
+
+The point cloud is the reason this is an operational concern rather than a
+theoretical one. It is a LIDAR scan capturing transient hutch contents, so it
+changes when a rack moves or a user brings kit — far more often than the machine
+is rebuilt, and without any of the machine changing.
 
 Soft limits are deliberately not in this. They live in the checker and are
 applied at validation time, so tightening one cannot invalidate anything the

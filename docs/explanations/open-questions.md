@@ -125,6 +125,20 @@ Options, listed but not evaluated:
 - **Per-frame call to a local Python process.** Only viable if it is truly
   local; a round trip to a service is not.
 
+**Q20. When is the hutch re-scanned, and what happens to verdicts when it is?**
+The environment point cloud is a LIDAR scan capturing transient contents —
+racks, cables, user kit — so it changes when a user brings equipment in, not
+when the machine is rebuilt. Three things follow and none are settled: how often
+a re-scan happens and who triggers it; whether a re-scan invalidates the
+reachability relation, since new contents can only add things an axis might
+reach; and whether queued verdicts validated against the previous scan are
+revoked. The revocation rule in ADR-0003 covers control leaving the queue, not
+the world changing shape underneath it.
+
+This is also the case where the model can be wrong in the unsafe direction. If
+kit is moved *in* after a scan, the cloud understates what is there, and a scan
+validated against it was cleared against a hutch that no longer exists.
+
 ## Component-level
 
 **Q10. How do generic plans get beamline-specific collaborators?** A generic

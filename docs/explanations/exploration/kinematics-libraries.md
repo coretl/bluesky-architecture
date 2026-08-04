@@ -134,9 +134,30 @@ Two precedents already exist, and they answer different halves:
 
 If the model is exported CAD, and the anti-collision service already consumes
 `*_config.json` + `*_scene.glb` with joint axes and rest poses, then the same
-artefact could supply the assembly parameters. That is a hypothesis, not a
-finding: nobody has checked whether the exported geometry carries enough
-precision, or whether the joint frames in those configs are surveyed or nominal.
+artefact could supply the assembly parameters.
+
+**The CAD is nominal.** Components are surveyed in to a tolerance during
+installation, but those survey figures are not recorded anywhere, so nominal is
+all there is. Any model derived from exported CAD therefore carries an
+unquantified as-built error, and there is no artefact to reconcile it against.
+
+How much that matters depends on what the model is for, and the two answers are
+far apart:
+
+- **For collision checking, it is currently in the noise.** Coarse-model fit
+  error is 63–173 mm (Q1). Whatever the survey tolerance is, it is not that. If
+  Q1 is ever answered and the coarse model gets tight, this becomes the next
+  error term to deal with rather than a rounding difference.
+- **For positioning, nominal is not enough** — and for diffractometers it never
+  was. UB refinement exists precisely to calibrate the real geometry out of a
+  nominal description, and it is the only `scipy.optimize` use in diffcalc.
+
+Which exposes a gap: **there is no recorded equivalent of UB refinement for the
+non-diffractometer geometries.** A jack table built from nominal jack positions
+has no calibration step on record. `from_home_positions` is the contrasting
+approach already in use — it takes *measured* joint positions rather than
+nominal ones — so two philosophies are in play across the geometries this
+library would have to cover.
 
 Whatever the source, the parameters have to end up **serialised inside the
 `Transform`**, because that is what reaches analysis and the collision service.
@@ -150,7 +171,10 @@ listed under Q19 apply here too.
 
 ## What is not established
 
-- Whether the exported CAD carries surveyed or nominal joint frames.
+- The size of the nominal-to-as-built error, for any geometry. It is not
+  recorded, so it cannot currently be looked up.
+- Whether a calibration step is wanted for the non-diffractometer geometries,
+  and what would play the part UB refinement plays.
 - The DCM coordinate-system files, beyond their existence.
 - Whether Pinocchio's model representation is a comfortable host for
   closed-form inverses, or fights them.
