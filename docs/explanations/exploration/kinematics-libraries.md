@@ -152,12 +152,22 @@ far apart:
   was. UB refinement exists precisely to calibrate the real geometry out of a
   nominal description, and it is the only `scipy.optimize` use in diffcalc.
 
-Which exposes a gap: **there is no recorded equivalent of UB refinement for the
-non-diffractometer geometries.** A jack table built from nominal jack positions
-has no calibration step on record. `from_home_positions` is the contrasting
-approach already in use — it takes *measured* joint positions rather than
-nominal ones — so two philosophies are in play across the geometries this
-library would have to cover.
+There is no equivalent of UB refinement for the non-diffractometer geometries,
+and **for jack tables that is fine** — the tolerances on what is mounted on them
+are not tight enough to need it. Nominal jack positions are good enough for the
+job the transform does.
+
+If it is ever needed, the shape of the answer is already known and is the same
+shape UB refinement has: **fit against detector data to produce new parameters
+for the transform, and apply those in bluesky.** That falls out of the design
+rather than needing anything new, because a `Transform` already carries its
+geometry parameters as serialised state (ADR-0004) — refinement writes those
+numbers, it does not change the maths.
+
+Worth noting `from_home_positions` as the contrasting approach already in use:
+it takes *measured* joint positions rather than nominal ones. So two starting
+points are in play across the geometries one library would have to cover, even
+if neither currently needs a refinement step on top.
 
 Whatever the source, the parameters have to end up **serialised inside the
 `Transform`**, because that is what reaches analysis and the collision service.
@@ -172,9 +182,8 @@ listed under Q19 apply here too.
 ## What is not established
 
 - The size of the nominal-to-as-built error, for any geometry. It is not
-  recorded, so it cannot currently be looked up.
-- Whether a calibration step is wanted for the non-diffractometer geometries,
-  and what would play the part UB refinement plays.
+  recorded, so it cannot currently be looked up. Judged not to matter for jack
+  tables; unexamined for the others.
 - The DCM coordinate-system files, beyond their existence.
 - Whether Pinocchio's model representation is a comfortable host for
   closed-form inverses, or fights them.
