@@ -1,4 +1,4 @@
-# 9. Checking is a plan preprocessor, and the certificate is a recipe
+# 8. Checking is a plan preprocessor, and the certificate is a recipe
 
 ## Status
 
@@ -101,7 +101,7 @@ Ergonomics here is a design requirement, not documentation.
 engineering mode, a direct `caput`. A service-side watchdog was considered and
 rejected: there is not enough stopping distance to abort usefully once a
 collision is detected. The design is a gatekeeper with nothing behind it, which
-is defensible only under the classification in ADR-0003.
+is defensible only under the classification in ADR-0002.
 
 **The preprocessor reads the certificate when there is one**, taking the branch
 decision rather than repeating the search. That makes the certificate an
@@ -129,4 +129,4 @@ and can be split out later if that turns out wrong.
 Where a replacement certificate comes from mid-scan is not settled — Q6 in
 [](../open-questions.md).
 
-What the checker *is*, as opposed to how it hooks in, is ADR-0010.
+What the checker *is*, as opposed to how it hooks in, is ADR-0009.

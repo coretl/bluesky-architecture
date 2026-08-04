@@ -3,7 +3,7 @@ html_theme.sidebar_secondary.remove: true
 ---
 
 ```{include} ../README.md
-:start-after: <!-- index start
+:start-after: <!-- index start -->
 :end-before: <!-- README only content
 ```
 
@@ -17,8 +17,8 @@ than take it on trust.
 design as it currently stands, and it is self-contained.
 
 **If you are here about queueing**, read
-[](explanations/decisions/0008-validation-state-is-owned-by-the-queue.md) first.
-It is the finding with the widest blast radius outside this project: validation
+[](explanations/decisions/0007-validation-state-is-owned-by-the-queue.md) first.
+It is the finding that reaches furthest outside this project: validation
 verdicts turn out to be queue state, which makes validation and queueing
 inseparable and promotes reconciliation with the existing queuing service from a
 late task to an early architectural decision. Then the *Queue* section of

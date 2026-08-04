@@ -1,4 +1,4 @@
-# 7. The coarse model must be derived automatically from the mesh
+# 6. The coarse model must be derived automatically from the mesh
 
 ## Status
 

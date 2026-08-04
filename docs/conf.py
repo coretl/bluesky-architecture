@@ -80,6 +80,10 @@ master_doc = "index"
 # These patterns also affect html_static_path and html_extra_path
 exclude_patterns = ["_build", "_api"]
 
+# The architecture page is read top to bottom, and the "Section Navigation"
+# sidebar on it only repeats the navbar. Drop the primary sidebar there.
+html_sidebars = {"explanations/architecture": []}
+
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 

@@ -22,16 +22,20 @@ is reflected in `architecture.md`.
 
 ## ADR numbers are permanent
 
-They were renumbered once, in a single pass before the repo was first pushed,
-which is when two superseded ADRs were folded into the ones that superseded them
-and the reasoning they carried was preserved as notes there. **That was the only
-time.** From now on an ADR keeps its number, and a superseded one is marked
-superseded in place — never deleted, never renumbered, never quietly rewritten.
+They were renumbered twice, in two single passes: once before the repo was first
+pushed, when two superseded ADRs were folded into the ones that superseded them,
+and once just after, when the project-template ADR was dropped. Both times the
+reasoning from a removed ADR was preserved as a note in its successor.
+
+**Renumbering is now closed.** From here an ADR keeps its number, and a
+superseded one is marked superseded in place — never deleted, never renumbered,
+never quietly rewritten. Amendments go at the end of an ADR under their own
+heading, saying what changed and why, rather than editing the original decision.
 The rationale is in `decisions.md`.
 
-Note the numbering collision with blueapi's own ADR-0003 ("No Queues"), which is
-referenced from ADR-0008 and is a different document from this project's
-ADR-0003. Always write "blueapi ADR-0003" when you mean theirs.
+Note that blueapi has its own ADR-0003 ("No Queues"), a different document from
+this project's. It is referenced from ADR-0007. Always write "blueapi ADR-0003"
+when you mean theirs.
 
 ## The one rule
 

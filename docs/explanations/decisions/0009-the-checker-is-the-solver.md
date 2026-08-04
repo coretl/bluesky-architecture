@@ -1,4 +1,4 @@
-# 10. The checker is the solver, and runs in three modes
+# 9. The checker is the solver, and runs in three modes
 
 ## Status
 
@@ -76,7 +76,7 @@ structural — it is the only place the whole machine is visible.
 > with opposite required behaviour, where getting it wrong means an unchecked
 > move.
 >
-> Two things replaced it. Selection moved to the message layer (ADR-0009), so
+> Two things replaced it. Selection moved to the message layer (ADR-0008), so
 > devices no longer own a solver and the loop hazard — the validation process
 > instantiates devices, which reference the solver the process exists to serve —
 > disappeared. And selection turned out not to be a separate thing from
@@ -101,6 +101,22 @@ collidable scope and the set of branched transforms are different sets.
 `DerivedSignalFactory` with branches, so it can project; and the collidable
 scope, so it knows what to check. A single-valued transform outside the scope is
 in neither; a raw collidable motor is only in the second.
+
+> **Amended: the two-set framing was wrong.** It survived because the example
+> supporting it was never tested. Nobody could name a device with branches that
+> cannot collide — anything with branches is an articulated chain, and
+> articulated chains self-collide — so the set of branched devices sits inside
+> the collidable set rather than overlapping it.
+>
+> The deeper error is that the two are not the same kind of fact. **"Has
+> branches" is a property of the device**, readable off its transform, and is
+> never registered. **"Can collide" is external**, and now arrives as the
+> axis-to-axis reachability relation in ADR-0005 rather than as a flat scope
+> list. So there is one input, not two overlapping ones.
+>
+> What survives is the observation that drove it: a raw collidable motor has no
+> transform to project through and still needs checking. That is the degenerate
+> case in ADR-0008, not a second registration list.
 
 The forward path stays pure regardless, so monitor updates, analysis and
 descriptors are unaffected.

@@ -4,6 +4,10 @@ Ranked by how much they would move the design. Answered ones are kept at the
 bottom because knowing a question is closed is worth as much as knowing it is
 open.
 
+Numbers are stable identifiers, not positions — questions are referenced by
+number from the ADRs and elsewhere, so a new one is appended with the next free
+number and filed under the heading that matches its weight.
+
 ## Blocking
 
 **Q1. How tight can an automatically-derived coarse model be?**
@@ -30,6 +34,23 @@ Every padding and sample-rate figure scales linearly with it, and the two
 regimes tested (1.6 vs 8 rad/s) swing the required validator rate by 8×. *An
 afternoon with whoever owns the motion controllers.*
 
+**Q18. How are permanently-touching pairs handled?**
+The reachability relation in ADR-0005 is computed *after* the exemption set, so
+this gates the relation as well as every false-positive figure (Q2). The obvious
+answer — exempt a pair once and for all — is wrong on an articulated arm: **a
+self-touching pair can collide** if the elbow rotates transversely and
+cable management is attached to it. An exemption therefore cannot be a static
+property of a pair; it has to be conditioned on something, and what that
+something is has not been worked out. The answer decides whether the relation
+can be built before Q2 is settled or has to wait for it.
+
+Also unresolved underneath it: the limit-switch positions the relation is
+computed from. All ten movable joints in `i16_config.json` carry
+`limits: [-180, 180]`, identical, which reads as a default rather than a
+measurement. If those are the real numbers the relation is close to complete and
+bounds nothing. Same shape as Q3 — the model is only as good as numbers nobody
+has supplied yet.
+
 ## Architectural
 
 **Q4. Oriented vs axis-aligned coarse volumes.** BVH-depth rejection saturates
@@ -42,8 +63,9 @@ JavaScript stack.
 
 **Q5. The batch API contract.** Input shape and units, per-point verdicts rather
 than a boolean, request-time padding, whether coarse-then-fine happens in one
-call, statefulness, transport and concurrency. Being added by the service
-author; cheapest to influence now.
+call, transport and concurrency. Being added by the service author; cheapest to
+influence now. Statefulness is no longer part of this question — the service is
+stateless and the caller supplies full state, per the amendment to ADR-0005.
 
 **Q6. Where does a replacement certificate come from mid-scan?** If the executor
 mints its own, the validator/executor split blurs and the executor is now
@@ -53,7 +75,7 @@ that is meant to be non-blocking. Currently unstated either way.
 **Q7. Fallback budget cap.** Needs a hard cap on exact-tier work per batch, plus
 defined behaviour on exceeding it. The behaviour is settled in kind — **treat as
 collision**, which at insertion time means ✗ and at runtime means the stop in
-ADR-0006 — so what is open is the number. This may be the *answer* to Q1 rather
+ADR-0005 — so what is open is the number. This may be the *answer* to Q1 rather
 than a detail: a cap converts an unmeasurable false-positive rate into a bounded
 cost, so the design does not need the rate to be small, only to stay correct
 when it is not.
@@ -69,7 +91,7 @@ are not the same question. An entry at **⏳** is merely not validated *yet*, so
 the rule could be "wait" — but validation is asynchronous, and a queue that
 stalls on it has serialised itself behind the validator. An entry at **?** can
 *never* be validated, and must still run, so "wait" is not available at all.
-Neither rule is written down. ADR-0008 raises the ⏳ half and leaves it open.
+Neither rule is written down. ADR-0007 raises the ⏳ half and leaves it open.
 
 ## Component-level
 
@@ -83,7 +105,7 @@ blocker is concrete: `Device` is a union of bluesky protocols and
 `register_device` rejects anything failing `is_bluesky_compatible_device`.
 Whether that is a small extension or a rewrite is an hour's reading.
 
-The checker is *not* in this question, which is a narrowing since ADR-0009: it
+The checker is *not* in this question, which is a narrowing since ADR-0008: it
 is wired at RunEngine construction and reached interactively by import, so it
 never travels as a plan parameter.
 
@@ -160,7 +182,7 @@ effect of refreshing world matrices, which is one line of pure CPU maths.
 **Where does checking hook in, for raw as well as derived axes?** A plan
 preprocessor on `RE.preprocessors`, passing its decision down by wrapping the
 value in `Certified[T]`. Raw motors are the degenerate case rather than a
-special one. See ADR-0009. What remains open is the per-beamline wiring for
+special one. See ADR-0008. What remains open is the per-beamline wiring for
 generic plans, which is Q10.
 
 **Is there a hook for preprocessors on the RunEngine?** Yes —

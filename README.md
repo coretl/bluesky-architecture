@@ -3,7 +3,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-<!-- index start. Everything below here is also the front page of the docs -->
+<!-- index start -->
 
 # Scan validation architecture
 
@@ -17,17 +17,9 @@ the evidence behind them. The Python package is a strawman, built to settle
 questions that argument was not settling, and kept because its measurements are
 the reason several decisions went the way they did.
 
-Two things shape everything here.
-
-**Every number has a script behind it, or a label saying it is an estimate.**
-The one figure this architecture was originally sized against lived only in a
-chat transcript, was never reproducible, and turned out to be wrong in premise.
-`benchmarks/` exists so that cannot happen twice.
-
-**Reversals are recorded next to what they reverse.** Fourteen conclusions here
-were argued confidently and then overturned — every one of them by a fact or a
-measurement, none by further argument. The wrong versions are not edited away,
-because the reasoning that produced them usually survives and is worth reading.
+Every number has a script behind it or a label saying it is an estimate, and
+where a conclusion was later overturned the original is kept next to the
+correction rather than edited away.
 
 <!-- README only content. Anything below this line won't be included in index.md -->
 

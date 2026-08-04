@@ -1,4 +1,4 @@
-# 3. Anti-collision is soft machine protection, not a safety function
+# 2. Anti-collision is soft machine protection, not a safety function
 
 ## Status
 

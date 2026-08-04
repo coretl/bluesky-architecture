@@ -14,14 +14,14 @@ exists *outside* DLS, and the re-architecture that follows from it.
 
 All measurements are on the **real i16 geometry** from `garethnisbet/Robot`
 (`i16_scene.glb`, 18 meshes, 233,034 triangles), in a container, single machine.
-Directional, not final — the caveats at the end are load-bearing.
+Directional, not final — the caveats at the end matter.
 
 ## Conclusions first
 
 1. **Split the tiers by geometry type, not by language or process.** Spheres
    and capsules for every point of a trajectory; triangle meshes only for the
    points that tier flags. This is what every fast implementation does. Now
-   ADR-0006.
+   ADR-0005.
 2. **The coarse tier fits the batch budget in plain numpy** — 1.1–1.6 s for a
    15,000-point batch, single core, with a sound hierarchical broad phase. No
    GPU required to meet the deadline for the tier that runs on every point.
@@ -42,7 +42,7 @@ Directional, not final — the caveats at the end are load-bearing.
    meshes and every CAD revision would need re-authoring, so the coarse model
    must be derived automatically. That rules out hand-built capsules and makes
    the mesh's own BVH nodes attractive: conservative by construction, no second
-   artefact to version, and incapable of drifting out of sync. Now ADR-0007.
+   artefact to version, and incapable of drifting out of sync. Now ADR-0006.
 6. **The binding constraint is coarse-model fit quality, not speed.** Fitted
    spheres leave 63–173 mm of error on i16 meshes against 3.3 mm of motion
    padding at 200 Hz. Until something automatic gets that into single digits,
@@ -255,7 +255,7 @@ gap is `intersectsGeometry` rather than the language, it is fixable in place.
 The design this replaced padded the coarse model for *typical* joint velocity
 over 0.1 s, knowingly accepting that a fast segment could slip between samples
 and be caught later by the fine check — a deliberate trade of soundness for
-usability, defensible only under the ADR-0003 classification.
+usability, defensible only under the ADR-0002 classification.
 
 I expected continuous collision detection to remove the trade, and predicted it
 would let the validator stay at 10 Hz. **Measured, that prediction is wrong in
@@ -270,7 +270,7 @@ the relative motion. Rates and costs are tabulated in
 the order of magnitude assumed. It does not on its own justify rebuilding the
 coarse tier around swept volumes.
 
-The genuinely useful findings are the other two:
+The useful findings are the other two:
 
 **The executor is already sound and the padding there is redundant.** Discrete
 checking needs 50 Hz at diffractometer speeds and 400 Hz at robot speeds. The
@@ -372,7 +372,7 @@ reused and the BVH called directly):
 
 **At any affordable ray density the missable feature is larger than the
 clearances this system exists to enforce.** "The detector must stay 20 mm from
-the sample" is one of the motivating constraints in ADR-0003; 16,384 rays per
+the sample" is one of the motivating constraints in ADR-0002; 16,384 rays per
 pose costs 137 ms and can still miss 31 mm.
 
 This matters because of what the fine tier is *for*. The coarse tier
@@ -413,7 +413,7 @@ Gareth's project grew anti-collision out of a visualiser, and the two roles
 should be separated rather than merged:
 
 **Keep as the viewer and model-authoring tool.** The three.js application is
-genuinely good at what it was built for, and the `*_config.json` + `*_scene.glb`
+good at what it was built for, and the `*_config.json` + `*_scene.glb`
 pair is a portable scene description that a checker and a viewer can both
 consume. That format is the interface between the two halves, and it already
 exists.
