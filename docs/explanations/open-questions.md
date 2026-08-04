@@ -93,6 +93,38 @@ stalls on it has serialised itself behind the validator. An entry at **?** can
 *never* be validated, and must still run, so "wait" is not available at all.
 Neither rule is written down. ADR-0003 raises the ⏳ half and leaves it open.
 
+**Q19. How does the model-building UI run the kinematics?** The anti-collision
+service carries its own transforms so that, while building a model, you can
+drive it in cartesian rather than joint space and watch whether it moves
+correctly. That is `js/kinematics.js` — 335 lines of forward kinematics,
+kappa↔euler conversion and virtual angles. The functionality has to be kept,
+**including the smooth animation**, which is the hard part: smooth means a frame
+budget of roughly 16 ms, so anything with a network hop per frame is out unless
+the hop is local or the work is batched.
+
+It is also exactly the drift hazard ADR-0009 names as the failure this project
+has hit most often — two implementations of the same maths, diverging silently.
+Related to Q14, since it bears on where `Transform` has to be runnable, not just
+where it lives.
+
+Options, listed but not evaluated:
+
+- **Precompute server-side, animate client-side.** The UI asks for a cartesian
+  path, Python returns the joint trajectory, the browser interpolates through
+  it. Decouples smoothness from call latency entirely, and is the same shape as
+  the batch API already being designed.
+- **Pyodide.** Run the real Python in the browser. No second implementation at
+  all, at the cost of a large payload and a startup delay.
+- **Serialise the transform as data, evaluate in JS.** Works if transforms come
+  from a fixed vocabulary of closed forms, and needs the type discriminator
+  ADR-0005 already asks for.
+- **Generate the JavaScript from the Python.** One source, one build step, and
+  the generated artefact is checkable.
+- **Two implementations, pinned by shared test vectors** generated from Python.
+  Cheapest, and explicitly the drift case with a net under it.
+- **Per-frame call to a local Python process.** Only viable if it is truly
+  local; a round trip to a service is not.
+
 ## Component-level
 
 **Q10. How do generic plans get beamline-specific collaborators?** A generic
