@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Pinned references &#8212; bluesky-architecture 0.1.dev29+gc73f3de56 documentation</title>
+    <title>Pinned references &#8212; bluesky-architecture 0.1.dev30+g71074f392 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=a43cce0e"></script>
+    <script src="../_static/documentation_options.js?v=933afed0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -388,6 +388,7 @@
 <li class="toctree-l1"><a class="reference internal" href="exploration/measurements.html">Measurements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="exploration/reversals.html">What we got wrong</a></li>
 <li class="toctree-l1"><a class="reference internal" href="exploration/collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exploration/queueing-traces.html">blueapi and bluesky-queueserver, traced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="anti-collision-service.html">The anti-collision service</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Pinned references</a></li>
 <li class="toctree-l1"><a class="reference internal" href="session-notes.html">Where the work stands</a></li>
@@ -497,6 +498,23 @@ whose validator resolves a device <em>name</em> to the object. <code class="docu
 <code class="docutils literal notranslate"><span class="pre">:208</span></code> gates on <code class="docutils literal notranslate"><span class="pre">is_bluesky_compatible_device</span></code>, and <code class="docutils literal notranslate"><span class="pre">Device</span></code> in
 <code class="docutils literal notranslate"><span class="pre">core/bluesky_types.py:37</span></code> is a union of bluesky protocols — which is why a
 non-device collaborator cannot be registered today.</p>
+<p><strong>blueapi, the task path</strong> — read for <a class="reference internal" href="exploration/queueing-traces.html"><span class="std std-doc">blueapi and bluesky-queueserver, traced</span></a>.
+<code class="docutils literal notranslate"><span class="pre">service/main.py</span></code>: <code class="docutils literal notranslate"><span class="pre">submit_task</span></code> at <code class="docutils literal notranslate"><span class="pre">:308</span></code> (POST /tasks), <code class="docutils literal notranslate"><span class="pre">set_active_task</span></code> at
+<code class="docutils literal notranslate"><span class="pre">:389</span></code> (PUT /worker/task, 409 if a task is active), <code class="docutils literal notranslate"><span class="pre">delete_environment</span></code> at
+<code class="docutils literal notranslate"><span class="pre">:223</span></code>, which schedules <code class="docutils literal notranslate"><span class="pre">runner.reload()</span></code> and so discards pending tasks.
+<code class="docutils literal notranslate"><span class="pre">service/runner.py</span></code>: <code class="docutils literal notranslate"><span class="pre">set_start_method(&quot;spawn&quot;,</span> <span class="pre">force=True)</span></code> at <code class="docutils literal notranslate"><span class="pre">:25</span></code>, and the
+pool is <code class="docutils literal notranslate"><span class="pre">processes=1</span></code> at <code class="docutils literal notranslate"><span class="pre">:57</span></code>. <code class="docutils literal notranslate"><span class="pre">worker/task_worker.py</span></code>: <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> is a
+<code class="docutils literal notranslate"><span class="pre">dict</span></code> at <code class="docutils literal notranslate"><span class="pre">:96</span></code>, <code class="docutils literal notranslate"><span class="pre">_task_channel</span> <span class="pre">=</span> <span class="pre">Queue(maxsize=1)</span></code> at <code class="docutils literal notranslate"><span class="pre">:140</span></code>, <code class="docutils literal notranslate"><span class="pre">prepare_params</span></code>
+raises on invalid params at <code class="docutils literal notranslate"><span class="pre">:274</span></code>, <code class="docutils literal notranslate"><span class="pre">WorkerBusyError</span></code> at <code class="docutils literal notranslate"><span class="pre">:298</span></code>, and <code class="docutils literal notranslate"><span class="pre">_cycle</span></code>
+at <code class="docutils literal notranslate"><span class="pre">:423</span></code> is what pulls from the channel.</p>
+<p><strong>bluesky-queueserver</strong> — read for <a class="reference internal" href="exploration/queueing-traces.html"><span class="std std-doc">blueapi and bluesky-queueserver, traced</span></a>. Three
+processes: <code class="docutils literal notranslate"><span class="pre">WatchdogProcess</span></code> at <code class="docutils literal notranslate"><span class="pre">start_manager.py:28</span></code>, <code class="docutils literal notranslate"><span class="pre">RunEngineManager</span></code> at
+<code class="docutils literal notranslate"><span class="pre">manager.py:179</span></code>, <code class="docutils literal notranslate"><span class="pre">RunEngineWorker</span></code> at <code class="docutils literal notranslate"><span class="pre">worker.py:90</span></code>. The 0MQ server address is
+<code class="docutils literal notranslate"><span class="pre">manager.py:255</span></code>, and <code class="docutils literal notranslate"><span class="pre">validate_plan</span></code> runs on add at <code class="docutils literal notranslate"><span class="pre">manager.py:2263</span></code>. The queue
+itself is <code class="docutils literal notranslate"><span class="pre">PlanQueueOperations</span></code> at <code class="docutils literal notranslate"><span class="pre">plan_queue_ops.py:13</span></code>, backed by Redis, with
+the <code class="docutils literal notranslate"><span class="pre">running_plan</span></code> key at <code class="docutils literal notranslate"><span class="pre">:85</span></code>, <code class="docutils literal notranslate"><span class="pre">plan_history</span></code> at <code class="docutils literal notranslate"><span class="pre">:87</span></code>, <code class="docutils literal notranslate"><span class="pre">add_item_to_queue</span></code>
+(taking <code class="docutils literal notranslate"><span class="pre">pos</span></code>/<code class="docutils literal notranslate"><span class="pre">before_uid</span></code>/<code class="docutils literal notranslate"><span class="pre">after_uid</span></code>) at <code class="docutils literal notranslate"><span class="pre">:968</span></code>, and <code class="docutils literal notranslate"><span class="pre">set_next_item_as_running</span></code>
+at <code class="docutils literal notranslate"><span class="pre">:1711</span></code>.</p>
 <p><strong>bluesky</strong> — <code class="docutils literal notranslate"><span class="pre">src/bluesky/run_engine.py</span></code>. <code class="docutils literal notranslate"><span class="pre">preprocessors</span></code> is a constructor
 argument at <code class="docutils literal notranslate"><span class="pre">:410</span></code>, stored as a mutable list at <code class="docutils literal notranslate"><span class="pre">:476</span></code>, and applied in
 <code class="docutils literal notranslate"><span class="pre">__call__</span></code> at <code class="docutils literal notranslate"><span class="pre">:960</span></code>. <code class="docutils literal notranslate"><span class="pre">msg_hook</span></code> at <code class="docutils literal notranslate"><span class="pre">:1644</span></code> discards its return value, so it can

@@ -26,6 +26,25 @@ whose validator resolves a device *name* to the object. `register_device` at
 `core/bluesky_types.py:37` is a union of bluesky protocols — which is why a
 non-device collaborator cannot be registered today.
 
+**blueapi, the task path** — read for [](exploration/queueing-traces.md).
+`service/main.py`: `submit_task` at `:308` (POST /tasks), `set_active_task` at
+`:389` (PUT /worker/task, 409 if a task is active), `delete_environment` at
+`:223`, which schedules `runner.reload()` and so discards pending tasks.
+`service/runner.py`: `set_start_method("spawn", force=True)` at `:25`, and the
+pool is `processes=1` at `:57`. `worker/task_worker.py`: `_pending_tasks` is a
+`dict` at `:96`, `_task_channel = Queue(maxsize=1)` at `:140`, `prepare_params`
+raises on invalid params at `:274`, `WorkerBusyError` at `:298`, and `_cycle`
+at `:423` is what pulls from the channel.
+
+**bluesky-queueserver** — read for [](exploration/queueing-traces.md). Three
+processes: `WatchdogProcess` at `start_manager.py:28`, `RunEngineManager` at
+`manager.py:179`, `RunEngineWorker` at `worker.py:90`. The 0MQ server address is
+`manager.py:255`, and `validate_plan` runs on add at `manager.py:2263`. The queue
+itself is `PlanQueueOperations` at `plan_queue_ops.py:13`, backed by Redis, with
+the `running_plan` key at `:85`, `plan_history` at `:87`, `add_item_to_queue`
+(taking `pos`/`before_uid`/`after_uid`) at `:968`, and `set_next_item_as_running`
+at `:1711`.
+
 **bluesky** — `src/bluesky/run_engine.py`. `preprocessors` is a constructor
 argument at `:410`, stored as a mutable list at `:476`, and applied in
 `__call__` at `:960`. `msg_hook` at `:1644` discards its return value, so it can

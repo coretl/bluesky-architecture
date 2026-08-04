@@ -2,12 +2,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="./" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; bluesky-architecture 0.1.dev30+g71074f392 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>blueapi and bluesky-queueserver, traced &#8212; bluesky-architecture 0.1.dev30+g71074f392 documentation</title>
   
   
   
@@ -26,25 +27,25 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="_static/documentation_options.js?v=933afed0"></script>
-    <script src="_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="_static/copybutton.js?v=30646c52"></script>
-    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/documentation_options.js?v=933afed0"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
 
@@ -401,7 +402,7 @@ mermaid.initialize(
 
 window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/exploration/queueing-traces';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://coretl.github.io/bluesky-architecture/switcher.json';
@@ -410,17 +411,19 @@ window.runMermaid = runMermaid;</script>
             false;
         </script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
-    <link rel="icon" href="_static/dls-logo.svg"/>
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" />
+    <link rel="icon" href="../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The anti-collision service" href="../anti-collision-service.html" />
+    <link rel="prev" title="Collision libraries: survey and re-architecture" href="collision-libraries.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
   
     
-    <script src="_static/searchtools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <script src="searchindex.js"></script>
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
   
   </head>
   <body data-default-mode="">
@@ -440,7 +443,7 @@ window.runMermaid = runMermaid;</script>
   <dialog id="pst-search-dialog">
     
 <form class="bd-search d-flex align-items-center"
-      action="search.html"
+      action="../../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -476,7 +479,7 @@ window.runMermaid = runMermaid;</script>
     
   
 
-<a class="navbar-brand logo" href="index.html">
+<a class="navbar-brand logo" href="../../index.html">
   
   
   
@@ -487,8 +490,8 @@ window.runMermaid = runMermaid;</script>
       
     
     
-    <img src="_static/dls-logo.svg" class="logo__image only-light" alt=""/>
-    <img src="_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">bluesky-architecture</p>
@@ -506,21 +509,21 @@ window.runMermaid = runMermaid;</script>
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/decisions.html">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/exploration.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
@@ -610,6 +613,10 @@ window.runMermaid = runMermaid;</script>
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -620,10 +627,8 @@ window.runMermaid = runMermaid;</script>
       
       
       
-        
-      
       <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -639,21 +644,21 @@ window.runMermaid = runMermaid;</script>
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/architecture.html">
+  <a class="nav-link nav-internal" href="../architecture.html">
     The working architecture
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/decisions.html">
+  <a class="nav-link nav-internal" href="../decisions.html">
     Decisions
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="explanations/exploration.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../exploration.html">
     Exploration
   </a>
 </li>
@@ -722,6 +727,32 @@ window.runMermaid = runMermaid;</script>
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="measurements.html">Measurements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reversals.html">What we got wrong</a></li>
+<li class="toctree-l1"><a class="reference internal" href="collision-libraries.html">Collision libraries: survey and re-architecture</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">blueapi and bluesky-queueserver, traced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../anti-collision-service.html">The anti-collision service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pinned-references.html">Pinned references</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session-notes.html">Where the work stands</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
       <div class="sidebar-primary-item">
@@ -742,7 +773,34 @@ window.runMermaid = runMermaid;</script>
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article d-print-none"></div>
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../exploration.html" class="nav-link">Exploration</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">blueapi and bluesky-queueserver, traced</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
               
               
               
@@ -750,12 +808,219 @@ window.runMermaid = runMermaid;</script>
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <section id="blueapi-and-bluesky-queueserver-traced">
+<h1>blueapi and bluesky-queueserver, traced<a class="headerlink" href="#blueapi-and-bluesky-queueserver-traced" title="Link to this heading">#</a></h1>
+<p>How a scan gets from a client to a RunEngine in each of the two systems, in
+matching notation, plus what each one does and does not provide.</p>
+<p><strong>Descriptive, not a recommendation.</strong> This page does not argue for either. It
+exists because “blueapi and queueserver both queue scans” is true at a level of
+detail that hides every difference that matters, and because the two are usually
+compared from memory.</p>
+<p>Read at the revisions pinned in <a class="reference internal" href="../pinned-references.html"><span class="std std-doc">Pinned references</span></a>: blueapi
+<code class="docutils literal notranslate"><span class="pre">b7676359</span></code>, bluesky-queueserver <code class="docutils literal notranslate"><span class="pre">0a084cf</span></code> (tagged v0.0.25). Both were re-fetched
+and checked out at those SHAs to write this; queueserver’s <code class="docutils literal notranslate"><span class="pre">main</span></code> is still
+exactly the pinned commit.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Everything here is read from source. That establishes <strong>what calls what, where
+state is held, and what the API surface is</strong>. It does not establish behaviour
+under concurrency, failure or restart, except where that behaviour is written
+down in the code — those cases are called out. Nothing here was run.</p>
 </div>
+<section id="blueapi">
+<h2>blueapi<a class="headerlink" href="#blueapi" title="Link to this heading">#</a></h2>
+<p>Two processes: a FastAPI service, and one subprocess holding the devices and the
+RunEngine. <code class="docutils literal notranslate"><span class="pre">set_start_method(&quot;spawn&quot;,</span> <span class="pre">force=True)</span></code> at <code class="docutils literal notranslate"><span class="pre">service/runner.py:25</span></code>, and
+the pool is <code class="docutils literal notranslate"><span class="pre">Pool(initializer=_init_worker,</span> <span class="pre">processes=1)</span></code> at <code class="docutils literal notranslate"><span class="pre">:57</span></code> — one
+subprocess, not a pool of many.</p>
+<p>The shape to notice is that <strong>submitting and starting are two separate calls.</strong></p>
+<pre  class="mermaid">
+        sequenceDiagram
+    autonumber
+    participant C as client
+    participant A as FastAPI&lt;br/&gt;service process
+    participant D as WorkerDispatcher&lt;br/&gt;Pool(processes=1)
+    participant W as TaskWorker&lt;br/&gt;subprocess
+    participant RE as RunEngine
+
+    C-&gt;&gt;A: POST /tasks {name, params}
+    A-&gt;&gt;D: run(submit_task)
+    D-&gt;&gt;W: submit_task(task)
+    W-&gt;&gt;W: prepare_params — raises if params invalid
+    W-&gt;&gt;W: _pending_tasks[uuid4] = TrackableTask
+    W--&gt;&gt;A: task_id
+    A--&gt;&gt;C: 201, Location: /tasks/{task_id}
+
+    Note over C,RE: nothing is running. A second, explicit call starts it.
+
+    C-&gt;&gt;A: PUT /worker/task {task_id}
+    A-&gt;&gt;D: run(get_active_task)
+    A--&gt;&gt;C: 409 Conflict, if a task is active and incomplete
+    A-&gt;&gt;D: run(begin_task)
+    D-&gt;&gt;W: begin_task(task_id)
+    W-&gt;&gt;W: raise WorkerBusyError unless state is IDLE
+    W-&gt;&gt;W: _task_channel.put(task) — Queue(maxsize=1)
+    W-&gt;&gt;RE: task.do_task(ctx)
+    RE--&gt;&gt;W: result, or exception
+    W-&gt;&gt;W: _pending_tasks.pop → _completed_tasks
+    </pre><p><strong>There is no queue, and that is deliberate</strong> — it is blueapi’s own ADR-0003,
+“No Queues”. <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> at <code class="docutils literal notranslate"><span class="pre">worker/task_worker.py:96</span></code> is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>, not an
+ordered structure, and <code class="docutils literal notranslate"><span class="pre">_task_channel</span></code> at <code class="docutils literal notranslate"><span class="pre">:140</span></code> is <code class="docutils literal notranslate"><span class="pre">Queue(maxsize=1)</span></code>: a handoff
+slot for the task currently being started, not a backlog. A submitted task waits
+until a client explicitly starts it, and if one is already running the start call
+raises <code class="docutils literal notranslate"><span class="pre">WorkerBusyError</span></code> at <code class="docutils literal notranslate"><span class="pre">:298</span></code>.</p>
+<p><strong>Parameters are validated at submit time</strong>, before a task_id is returned —
+<code class="docutils literal notranslate"><span class="pre">task.prepare_params(self._ctx)</span></code> at <code class="docutils literal notranslate"><span class="pre">:274</span></code>, commented “Will raise if parameters
+are invalid”. So an invalid plan fails at <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/tasks</span></code>, not later.</p>
+<p><strong>Tasks live in the subprocess and do not survive its reload.</strong>
+<code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/environment</span></code> (<code class="docutils literal notranslate"><span class="pre">service/main.py:223</span></code>) schedules <code class="docutils literal notranslate"><span class="pre">runner.reload()</span></code>, which
+stops and restarts the subprocess. <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> is ordinary process memory,
+so anything submitted and not yet started is gone. Nothing persists tasks
+anywhere else.</p>
+</section>
+<section id="bluesky-queueserver">
+<h2>bluesky-queueserver<a class="headerlink" href="#bluesky-queueserver" title="Link to this heading">#</a></h2>
+<p>Three processes, plus Redis. <code class="docutils literal notranslate"><span class="pre">WatchdogProcess</span></code> (<code class="docutils literal notranslate"><span class="pre">start_manager.py:28</span></code>) supervises
+<code class="docutils literal notranslate"><span class="pre">RunEngineManager</span></code> (<code class="docutils literal notranslate"><span class="pre">manager.py:179</span></code>), which in turn drives <code class="docutils literal notranslate"><span class="pre">RunEngineWorker</span></code>
+(<code class="docutils literal notranslate"><span class="pre">worker.py:90</span></code>). Clients speak 0MQ to the manager at <code class="docutils literal notranslate"><span class="pre">tcp://*:60615</span></code>
+(<code class="docutils literal notranslate"><span class="pre">manager.py:255</span></code>), optionally encrypted with a private key. The HTTP interface
+is a separate package, <code class="docutils literal notranslate"><span class="pre">bluesky-httpserver</span></code>, and is not in this repo.</p>
+<pre  class="mermaid">
+        sequenceDiagram
+    autonumber
+    participant C as client&lt;br/&gt;qserver / httpserver
+    participant M as RE Manager&lt;br/&gt;0MQ process
+    participant Q as Redis&lt;br/&gt;plan queue
+    participant W as RE Worker&lt;br/&gt;process
+    participant RE as RunEngine
+
+    C-&gt;&gt;M: 0MQ queue_item_add {item}
+    M-&gt;&gt;M: validate_plan vs allowed_plans / allowed_devices
+    M-&gt;&gt;Q: add_item_to_queue(pos / before_uid / after_uid)
+    Q--&gt;&gt;M: item, with uid
+    M--&gt;&gt;C: success, qsize
+
+    Note over C,RE: the item is in Redis. It outlives the manager process.
+
+    C-&gt;&gt;M: 0MQ queue_start
+    M-&gt;&gt;Q: process_next_item → set_next_item_as_running
+    Q--&gt;&gt;M: item, also written to the running_plan key
+    M-&gt;&gt;W: run the plan (JSON-RPC over a pipe)
+    W-&gt;&gt;RE: RE(plan)
+    RE--&gt;&gt;W: result, or exception
+    W--&gt;&gt;M: plan result
+    M-&gt;&gt;Q: append to plan_history, clear running_plan
+    M-&gt;&gt;Q: take the next item, until the queue is empty or stopped
+    </pre><p><strong>The queue is the point, and it is in Redis.</strong> <code class="docutils literal notranslate"><span class="pre">PlanQueueOperations</span></code>
+(<code class="docutils literal notranslate"><span class="pre">plan_queue_ops.py:13</span></code>) holds the queue, the <code class="docutils literal notranslate"><span class="pre">running_plan</span></code> key (<code class="docutils literal notranslate"><span class="pre">:85</span></code>) and
+<code class="docutils literal notranslate"><span class="pre">plan_history</span></code> (<code class="docutils literal notranslate"><span class="pre">:87</span></code>) under a <code class="docutils literal notranslate"><span class="pre">qs_default</span></code> name prefix. That is what makes the
+queue outlive the manager process, and it is the structural difference from
+blueapi rather than a feature difference.</p>
+<p><strong>Position is a first-class argument.</strong> <code class="docutils literal notranslate"><span class="pre">add_item_to_queue</span></code> at <code class="docutils literal notranslate"><span class="pre">:968</span></code> takes
+<code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">before_uid</span></code> and <code class="docutils literal notranslate"><span class="pre">after_uid</span></code>; there are <code class="docutils literal notranslate"><span class="pre">pop_item_from_queue</span></code> (<code class="docutils literal notranslate"><span class="pre">:780</span></code>) and
+a batch form (<code class="docutils literal notranslate"><span class="pre">:847</span></code>). Items have uids, so a client can address, move and remove
+a specific entry.</p>
+<p><strong>Validation happens on add</strong>, against the allowed-plans and allowed-devices
+lists — <code class="docutils literal notranslate"><span class="pre">validate_plan(...)</span></code> at <code class="docutils literal notranslate"><span class="pre">manager.py:2263</span></code>.</p>
+<p><strong>Starting is a queue-level verb, not a per-item one.</strong> <code class="docutils literal notranslate"><span class="pre">queue_start</span></code> begins
+processing and keeps going; its docstring notes items can be added while it runs.
+<code class="docutils literal notranslate"><span class="pre">queue_stop</span></code> lets the running plan finish and does not start the next one. There
+is also an autostart mode, persisted to Redis (<code class="docutils literal notranslate"><span class="pre">manager.py:346</span></code>), where adding an
+item is enough to begin execution.</p>
+</section>
+<section id="side-by-side">
+<h2>Side by side<a class="headerlink" href="#side-by-side" title="Link to this heading">#</a></h2>
+<p>Descriptive. “—” means the mechanism does not exist, not that it could not be
+added.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>blueapi <code class="docutils literal notranslate"><span class="pre">b7676359</span></code></p></th>
+<th class="head"><p>bluesky-queueserver <code class="docutils literal notranslate"><span class="pre">0a084cf</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>processes</p></td>
+<td><p>2: service + 1 subprocess</p></td>
+<td><p>3: watchdog, manager, worker</p></td>
+</tr>
+<tr class="row-odd"><td><p>client transport</p></td>
+<td><p>HTTP/REST, FastAPI</p></td>
+<td><p>0MQ, optionally encrypted</p></td>
+</tr>
+<tr class="row-even"><td><p>HTTP front end</p></td>
+<td><p>built in</p></td>
+<td><p>separate package (<code class="docutils literal notranslate"><span class="pre">bluesky-httpserver</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>where submitted work lives</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code> in subprocess memory</p></td>
+<td><p>Redis</p></td>
+</tr>
+<tr class="row-even"><td><p>survives a process restart</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>ordered queue</p></td>
+<td><p>—</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-even"><td><p>reorder / insert at position</p></td>
+<td><p>—</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">before_uid</span></code>, <code class="docutils literal notranslate"><span class="pre">after_uid</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>address one entry</p></td>
+<td><p>task_id (uuid4)</p></td>
+<td><p>item uid</p></td>
+</tr>
+<tr class="row-even"><td><p>params validated at submit</p></td>
+<td><p>yes, <code class="docutils literal notranslate"><span class="pre">prepare_params</span></code></p></td>
+<td><p>yes, <code class="docutils literal notranslate"><span class="pre">validate_plan</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>what starts execution</p></td>
+<td><p>explicit <code class="docutils literal notranslate"><span class="pre">PUT</span> <span class="pre">/worker/task</span></code> per task</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">queue_start</span></code> for the queue, or autostart</p></td>
+</tr>
+<tr class="row-even"><td><p>concurrent tasks</p></td>
+<td><p>one; <code class="docutils literal notranslate"><span class="pre">WorkerBusyError</span></code> / 409</p></td>
+<td><p>one; queue serialises</p></td>
+</tr>
+<tr class="row-odd"><td><p>completed-work record</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_completed_tasks</span></code> in memory</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">plan_history</span></code> in Redis</p></td>
+</tr>
+<tr class="row-even"><td><p>per-entry state a caller can set</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The last row is the one to look at twice, and it is the same answer for both:
+neither has a place to hang arbitrary per-entry state set by something other than
+the submitter. queueserver has <em>somewhere it could live</em> — entries are addressable
+by uid and stored in Redis — where blueapi’s <code class="docutils literal notranslate"><span class="pre">_pending_tasks</span></code> dict is process
+memory keyed by task_id. What neither has today is an API for a third party to
+attach state to an entry and have it revoked on a condition.</p>
+<p>That matters here because of <a class="reference internal" href="../decisions/0008-validation-state-is-owned-by-the-queue.html"><span class="std std-doc">8. Validation state is owned by the queue</span></a>,
+and working out what it would take in either system is not attempted on this
+page.</p>
+</section>
+<section id="what-this-does-not-cover">
+<h2>What this does not cover<a class="headerlink" href="#what-this-does-not-cover" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">daq-queuing-service</span></code></strong> — DLS’s own queuing service, which ADR-0008 names as
+the obvious place for verdicts to live. Reachable, not read. A three-way
+comparison was scoped out of this page rather than done badly.</p></li>
+<li><p><strong>Failure and restart behaviour</strong> beyond what the code states. Redis
+persistence is a code fact; whether a queue survives a <em>worker</em> crash
+mid-plan in practice is not.</p></li>
+<li><p><strong>Authorisation.</strong> blueapi has OIDC and OPA hooks visible in <code class="docutils literal notranslate"><span class="pre">service/main.py</span></code>;
+queueserver has a lock-key mechanism on queue-mutating calls. Neither was
+traced.</p></li>
+<li><p><strong>Anything run.</strong> No process was started, no plan executed.</p></li>
+</ul>
+</section>
+</section>
 
 
                 </article>
@@ -767,12 +1032,76 @@ window.runMermaid = runMermaid;</script>
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="collision-libraries.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Collision libraries: survey and re-architecture</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../anti-collision-service.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The anti-collision service</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blueapi">blueapi</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bluesky-queueserver">bluesky-queueserver</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#side-by-side">Side by side</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-does-not-cover">What this does not cover</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/coretl/bluesky-architecture/edit/main/docs/explanations/exploration/queueing-traces.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/explanations/exploration/queueing-traces.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
               
             
           </div>
@@ -785,8 +1114,8 @@ window.runMermaid = runMermaid;</script>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
